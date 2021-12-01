@@ -637,11 +637,68 @@ function processRegionFile(req, res, next) {
 
     lineReader.on('close', () => {
       console.timeEnd('processing region file');
-      cleanUpAndSendResult(req, res, next);
+      loadGFFAnnotationFiles(req, res, next);
     });
   } catch (error) {
     return next(error);
   }
+}
+
+function loadGFFAnnotationFiles(req, res, next) {
+  let dataPath = pickDataPath(req.body.dataPath);
+  let annotationConfigPath = path.join(dataPath, "annotation.config");
+  if (!fs.existsSync(annotationConfigPath)) {
+    cleanUpAndSendResult(req, res, next);
+  }
+  let annotationConfig = fs.readFileSync(annotationConfigPath).toString().trim().split('\n');
+  let annotationsString = "";
+  let count = 0;
+
+  annotationConfig.forEach(e => {
+    let tmp = e.split(':');
+    let queryAnnotationCall = spawn('./scripts/query_annotations.sh',
+      [path.join(dataPath, tmp[0]), req.regionArr[1],  req.regionArr[2]]);
+
+    queryAnnotationCall.stdout.on("data", data => {
+      annotationsString += tmp[1] + "\n" + data.toString().trim() + "||";
+    });
+
+    queryAnnotationCall.on("close", () => {
+      count++;
+      console.log(`successfully load annotation file${count}: ${tmp[0]}`);
+      if (count === annotationConfig.length) {
+        req.annotationsString = annotationsString;
+        processGFFAnnotationFiles(req, res, next);
+      }
+    })
+  });
+}
+
+function processGFFAnnotationFiles(req, res, next) {
+  const annotationsArray = req.annotationsString.split("||");
+  annotationsArray.pop();
+  let annotations = {};
+  annotationsArray.forEach(e => {
+    let rows = e.split("\n");
+    let name = rows[0];
+    annotations[name] = [];
+    for(let i = 1; i < rows.length; i++) {
+      let cols = rows[i].split('\t');
+      annotations[name].push({
+        seqid: cols[0],
+        source: cols[1],
+        type: cols[2],
+        start: cols[3],
+        end: cols[4],
+        score: cols[5],
+        strand: cols[6],
+        phase: cols[7],
+        attributes: cols[8]
+      })
+    }
+  })
+  req.annotations = annotations;
+  cleanUpAndSendResult(req, res, next);
 }
 
 // Cleanup functuion shared between success and error code paths.
@@ -668,6 +725,7 @@ function cleanUpAndSendResult(req, res, next) {
     result.graph = req.graph;
     result.gam = req.withGam === true ? req.gamArr : [];
     result.region = req.region;
+    result.annotations = req.annotations;
     res.json(result);
     console.timeEnd('request-duration');
   } catch (error) {
