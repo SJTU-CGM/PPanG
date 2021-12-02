@@ -51,7 +51,8 @@ class App extends Component {
         removeRedundantNodes: true,
         compressedView: false,
         transparentNodes: false,
-        showReads: true,
+        showExons: true,
+        showReads: false,
         showSoftClips: true,
         haplotypeColors: 'ygreys',
         forwardReadColors: 'reds',
@@ -70,6 +71,7 @@ class App extends Component {
     tubeMap.setMergeNodesFlag(visOptions.removeRedundantNodes);
     tubeMap.setTransparentNodesFlag(visOptions.transparentNodes);
     tubeMap.setShowReadsFlag(visOptions.showReads);
+    tubeMap.setShowExonsFlag(visOptions.showExons);
     tubeMap.setSoftClipsFlag(visOptions.showSoftClips);
     tubeMap.setColorSet('haplotypeColors', visOptions.haplotypeColors);
     tubeMap.setColorSet('forwardReadColors', visOptions.forwardReadColors);

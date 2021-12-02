@@ -104,6 +104,16 @@ class VisualizationOptions extends Component {
                       Fully transparent nodes
                     </Label>
                   </FormGroup>
+                  <FormGroup check>
+                    <Label check>
+                      <Input
+                        type="checkbox"
+                        checked={visOptions.showExons}
+                        onChange={() => toggleFlag('showExons')}
+                      />
+                      Show exons on tracks
+                    </Label>
+                  </FormGroup>
                 </FormGroup>
 
                 <FormGroup>

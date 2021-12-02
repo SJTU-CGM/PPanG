@@ -100,10 +100,11 @@ let inputNodes = [];
 let inputTracks = [];
 let inputReads = [];
 let inputRegion = [];
-let inputAnnotation = [];
+let inputAnnotations = [];
 let nodes;
 let tracks;
 let reads;
+let annotations;
 let numberOfNodes;
 let numberOfTracks;
 let nodeMap; // maps node names to node indices
@@ -124,7 +125,7 @@ const config = {
   // 1...scale node width with log2 of number of bases within node
   // 2...scale node width with log10 of number of bases within node
   nodeWidthOption: 0,
-  showReads: true,
+  showReads: false,
   showSoftClips: true,
   haplotypeColors: 'ygreys',
   forwardReadColors: 'reds',
@@ -160,7 +161,7 @@ export function create(params) {
   inputTracks = JSON.parse(JSON.stringify(params.tracks)); // deep copy
   inputReads = params.reads || null;
   inputRegion = params.region;
-  inputAnnotation = params.annotations;
+  inputAnnotations = params.annotations;
   bed = params.bed || null;
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
@@ -290,6 +291,15 @@ export function changeExonVisibility() {
   createTubeMap();
 }
 
+// sets the flag for whether exons are shown in tracks or not
+export function setShowExonsFlag(value) {
+  if (config.showExonsFlag !== value) {
+    config.showExonsFlag = value;
+    svg = d3.select(svgID);
+    createTubeMap();
+  }
+}
+
 // sets the flag for whether redundant nodes should be automatically removed or not
 export function setMergeNodesFlag(value) {
   if (config.mergeNodesFlag !== value) {
@@ -390,6 +400,7 @@ function createTubeMap() {
   nodes = JSON.parse(JSON.stringify(inputNodes)); // deep copy (can add stuff to copy and leave original unchanged)
   tracks = JSON.parse(JSON.stringify(inputTracks));
   reads = JSON.parse(JSON.stringify(inputReads));
+  annotations = JSON.parse(JSON.stringify(inputAnnotations));
 
   assignColorSets();
   reads = filterReads(reads);
@@ -2227,12 +2238,12 @@ function addTrackFeatures() {
     });
   }
 
-  if (inputAnnotation != null) {
-    for (let trackName in inputAnnotation) {
+  if (annotations != null) {
+    for (let trackName in annotations) {
       let i = 0;
       while (i < numberOfTracks && !tracks[i].name.startsWith(trackName)) i += 1;
       if (i < numberOfTracks) {
-        inputAnnotation[trackName].forEach(line => {
+        annotations[trackName].forEach(line => {
           // coordinate starts with 1 in gff while 0 in vg
           line.start -= 1;
           line.end -= 1;
