@@ -2438,7 +2438,7 @@ function generateSVGShapesFromPath() {
   tracks.forEach(track => {
     highlight = 'plain';
     trackColor = generateTrackColor(track, highlight);
-
+    const originalTrackColor = trackColor;
     // start of path
     yStart = track.path[0].y;
     if (track.type !== 'read') {
@@ -2567,7 +2567,7 @@ function generateSVGShapesFromPath() {
             yStart = track.path[i].y;
           }
         }
-
+        trackColor = originalTrackColor;
         if (track.path[i].hasOwnProperty('features')) {
           reversalFlag = track.path[i - 1].order === track.path[i].order;
           dummy = createFeatureRectangle(
