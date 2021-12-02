@@ -630,6 +630,7 @@ function processRegionFile(req, res, next) {
     lineReader.on('line', line => {
       console.log('Region: ' + line);
       const arr = line.replace(/\s+/g, ' ').split(' ');
+      req.regionArr = arr;
       req.graph.path.forEach(p => {
         if (p.name === arr[0]) p.indexOfFirstBase = arr[1];
       });
@@ -645,6 +646,8 @@ function processRegionFile(req, res, next) {
 }
 
 function loadGFFAnnotationFiles(req, res, next) {
+  // extend query range 500bp larger than ref seq
+  const EXTRA_LENGTH = 500;
   let dataPath = pickDataPath(req.body.dataPath);
   let annotationConfigPath = path.join(dataPath, "annotation.config");
   if (!fs.existsSync(annotationConfigPath)) {
@@ -656,21 +659,41 @@ function loadGFFAnnotationFiles(req, res, next) {
 
   annotationConfig.forEach(e => {
     let tmp = e.split(':');
-    let queryAnnotationCall = spawn('./scripts/query_annotations.sh',
-      [path.join(dataPath, tmp[0]), req.regionArr[1],  req.regionArr[2]]);
+    let i = 0;
+    let regionStart = Infinity;
+    while(i < req.graph.path.length) {
+      if(req.graph.path[i].name.startsWith(tmp[1])) {
+         regionStart = Math.min(regionStart, req.graph.path[i].indexOfFirstBase ?? req.graph.path[i].name.substring(
+          req.graph.path[i].name.indexOf('[') + 1, req.graph.path[i].name.indexOf(']')));
+      }
+      i++;
+    }
+    if(regionStart < Infinity) {
+      // coordinate starts with 1 in gff while 0 in vg
+      regionStart = Number(regionStart) + 1;
+      let queryAnnotationCall = spawn('./scripts/query_annotations.sh',
+        [path.join(dataPath, tmp[0]), regionStart,  req.regionArr[2] - req.regionArr[1] + regionStart + EXTRA_LENGTH]);
 
-    queryAnnotationCall.stdout.on("data", data => {
-      annotationsString += tmp[1] + "\n" + data.toString().trim() + "||";
-    });
+      queryAnnotationCall.stdout.on("data", data => {
+        annotationsString += tmp[1] + "\n" + data.toString().trim() + "||";
+      });
 
-    queryAnnotationCall.on("close", () => {
+      queryAnnotationCall.on("close", () => {
+        count++;
+        console.log(`annotations found in file${count}: ${tmp[0]}`);
+        if (count === annotationConfig.length) {
+          req.annotationsString = annotationsString;
+          processGFFAnnotationFiles(req, res, next);
+        }
+      })
+    } else {
       count++;
-      console.log(`successfully load annotation file${count}: ${tmp[0]}`);
+      console.log(`no annotation found in file${count}: ${tmp[0]}`);
       if (count === annotationConfig.length) {
         req.annotationsString = annotationsString;
         processGFFAnnotationFiles(req, res, next);
       }
-    })
+    }
   });
 }
 

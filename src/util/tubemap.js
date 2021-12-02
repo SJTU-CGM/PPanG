@@ -100,6 +100,7 @@ let inputNodes = [];
 let inputTracks = [];
 let inputReads = [];
 let inputRegion = [];
+let inputAnnotation = [];
 let nodes;
 let tracks;
 let reads;
@@ -116,7 +117,7 @@ const config = {
   mergeNodesFlag: true,
   transparentNodesFlag: false,
   clickableNodesFlag: false,
-  showExonsFlag: false,
+  showExonsFlag: true,
   colorScheme: 0,
   // Options for the width of sequence nodes:
   // 0...scale node width linear with number of bases within node
@@ -159,6 +160,7 @@ export function create(params) {
   inputTracks = JSON.parse(JSON.stringify(params.tracks)); // deep copy
   inputReads = params.reads || null;
   inputRegion = params.region;
+  inputAnnotation = params.annotations;
   bed = params.bed || null;
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
@@ -441,7 +443,7 @@ function createTubeMap() {
   calculateTrackWidth(tracks);
   generateLaneAssignment();
 
-  if (config.showExonsFlag === true && bed !== null) addTrackFeatures();
+  if (config.showExonsFlag === true) addTrackFeatures();
   generateNodeXCoords();
 
   if (reads && config.showReads) {
@@ -2184,44 +2186,92 @@ function addTrackFeatures() {
   let nodeEnd;
   let feature = {};
 
-  bed.forEach(line => {
-    let i = 0;
-    while (i < numberOfTracks && tracks[i].name !== line.track) i += 1;
-    if (i < numberOfTracks) {
-      nodeStart = 0;
-      tracks[i].path.forEach(node => {
-        if (node.node !== null) {
-          feature = {};
-          if (nodes[node.node].hasOwnProperty('sequenceLength')) {
-            nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
-          } else {
-            nodeEnd = nodeStart + nodes[node.node].width - 1;
-          }
+  if (bed != null) {
+    bed.forEach(line => {
+      let i = 0;
+      while (i < numberOfTracks && tracks[i].name !== line.track) i += 1;
+      if (i < numberOfTracks) {
+        nodeStart = 0;
+        tracks[i].path.forEach(node => {
+          if (node.node !== null) {
+            feature = {};
+            if (nodes[node.node].hasOwnProperty('sequenceLength')) {
+              nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
+            } else {
+              nodeEnd = nodeStart + nodes[node.node].width - 1;
+            }
 
-          if (nodeStart >= line.start && nodeStart <= line.end) {
-            feature.start = 0;
+            if (nodeStart >= line.start && nodeStart <= line.end) {
+              feature.start = 0;
+            }
+            if (nodeStart < line.start && nodeEnd >= line.start) {
+              feature.start = line.start - nodeStart;
+            }
+            if (nodeEnd <= line.end && nodeEnd >= line.start) {
+              feature.end = nodeEnd - nodeStart;
+              if (nodeEnd < line.end) feature.continue = true;
+            }
+            if (nodeEnd > line.end && nodeStart <= line.end) {
+              feature.end = line.end - nodeStart;
+            }
+            if (feature.hasOwnProperty('start')) {
+              feature.type = line.type;
+              feature.name = line.name;
+              if (!node.hasOwnProperty('features')) node.features = [];
+              node.features.push(feature);
+            }
+            nodeStart = nodeEnd + 1;
           }
-          if (nodeStart < line.start && nodeEnd >= line.start) {
-            feature.start = line.start - nodeStart;
-          }
-          if (nodeEnd <= line.end && nodeEnd >= line.start) {
-            feature.end = nodeEnd - nodeStart;
-            if (nodeEnd < line.end) feature.continue = true;
-          }
-          if (nodeEnd > line.end && nodeStart <= line.end) {
-            feature.end = line.end - nodeStart;
-          }
-          if (feature.hasOwnProperty('start')) {
-            feature.type = line.type;
-            feature.name = line.name;
-            if (!node.hasOwnProperty('features')) node.features = [];
-            node.features.push(feature);
-          }
-          nodeStart = nodeEnd + 1;
-        }
-      });
+        });
+      }
+    });
+  }
+
+  if (inputAnnotation != null) {
+    for (let trackName in inputAnnotation) {
+      let i = 0;
+      while (i < numberOfTracks && !tracks[i].name.startsWith(trackName)) i += 1;
+      if (i < numberOfTracks) {
+        inputAnnotation[trackName].forEach(line => {
+          // coordinate starts with 1 in gff while 0 in vg
+          line.start -= 1;
+          line.end -= 1;
+          nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
+            tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
+          tracks[i].path.forEach(node => {
+            if (node.node !== null) {
+              feature = {};
+              if (nodes[node.node].hasOwnProperty('sequenceLength')) {
+                nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
+              } else {
+                nodeEnd = nodeStart + nodes[node.node].width - 1;
+              }
+              if (nodeStart >= line.start && nodeStart <= line.end) {
+                feature.start = 0;
+              }
+              if (nodeStart < line.start && nodeEnd >= line.start) {
+                feature.start = line.start - nodeStart;
+              }
+              if (nodeEnd <= line.end && nodeEnd >= line.start) {
+                feature.end = nodeEnd - nodeStart;
+                if (nodeEnd < line.end) feature.continue = true;
+              }
+              if (nodeEnd > line.end && nodeStart <= line.end) {
+                feature.end = line.end - nodeStart;
+              }
+              if (feature.hasOwnProperty('start')) {
+                feature.type = line.type;
+                feature.name = line.seqid;
+                if (!node.hasOwnProperty('features')) node.features = [];
+                node.features.push(feature);
+              }
+              nodeStart = nodeEnd + 1;
+            }
+          });
+        })
+      }
     }
-  });
+  }
 }
 
 function calculateTrackWidth() {

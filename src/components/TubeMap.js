@@ -17,7 +17,8 @@ class TubeMap extends Component {
       nodes: this.props.nodes,
       tracks: this.props.tracks,
       reads: this.props.reads,
-      region: this.props.region
+      region: this.props.region,
+      annotations: this.props.annotations
     });
   };
 
@@ -30,7 +31,8 @@ TubeMap.propTypes = {
   nodes: PropTypes.array.isRequired,
   tracks: PropTypes.array.isRequired,
   reads: PropTypes.array.isRequired,
-  region: PropTypes.array.isRequired 
+  region: PropTypes.array.isRequired,
+  annotations: PropTypes.array.isRequired
 };
 
 export default TubeMap;

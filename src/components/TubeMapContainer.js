@@ -77,6 +77,7 @@ class TubeMapContainer extends Component {
             tracks={this.state.tracks}
             reads={this.state.reads}
             region={this.state.region}
+            annotations={this.state.annotations}
           />
         </div>
       </div>
@@ -101,13 +102,15 @@ class TubeMapContainer extends Component {
         const nodes = tubeMap.vgExtractNodes(json.graph);
         const tracks = tubeMap.vgExtractTracks(json.graph);
         const reads = tubeMap.vgExtractReads(nodes, tracks, json.gam);
-        const region = json.region; 
+        const region = json.region;
+        const annotations = json.annotations;
         this.setState({
           isLoading: false,
           nodes,
           tracks,
           reads,
-	  region
+	        region,
+          annotations
         });
       }
     } catch (error) {
@@ -175,7 +178,7 @@ class TubeMapContainer extends Component {
 TubeMapContainer.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   dataOrigin: PropTypes.oneOf(Object.values(dataOriginTypes)).isRequired,
-  fetchParams: PropTypes.object.isRequired 
+  fetchParams: PropTypes.object.isRequired
 };
 
 export default TubeMapContainer;
