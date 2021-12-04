@@ -12,6 +12,7 @@ import {
   FormGroup
 } from 'reactstrap';
 import RadioRow from './RadioRow';
+import SelectionDropdown from "./SelectionDropdown";
 
 class VisualizationOptions extends Component {
   state = {
@@ -34,6 +35,14 @@ class VisualizationOptions extends Component {
   handleMappingQualityCutoffChange = event => {
     this.props.handleMappingQualityCutoffChange(event.target.value);
   };
+
+  handleSelectGene = event => {
+    this.props.handleSelectGene(event.target.value);
+  }
+
+  handleSelectTranscript = event => {
+    this.props.handleSelectTranscript(event.target.value);
+  }
 
   render() {
     const { visOptions, toggleFlag } = this.props;
@@ -114,6 +123,25 @@ class VisualizationOptions extends Component {
                       Show exons on tracks
                     </Label>
                   </FormGroup>
+                  <Form inline>
+                  {visOptions.showExons && (
+                    <React.Fragment>
+                      <label className="tight-label">Gene ID:</label>
+                        <SelectionDropdown
+                          value={visOptions.geneSelected}
+                          onChange={this.handleSelectGene}
+                          options={visOptions.geneSelectOptions}
+                        />
+                      &nbsp;&nbsp;&nbsp;&nbsp;
+                      <label className="tight-label">Transcript ID:</label>
+                      <SelectionDropdown
+                        value={visOptions.transcriptSelected}
+                        onChange={this.handleSelectTranscript}
+                        options={visOptions.transcriptSelectOptions}
+                      />
+                    </React.Fragment>
+                  )}
+                  </Form>
                 </FormGroup>
 
                 <FormGroup>
@@ -207,7 +235,9 @@ class VisualizationOptions extends Component {
 
 VisualizationOptions.propTypes = {
   handleMappingQualityCutoffChange: PropTypes.func.isRequired,
-  setColorSetting: PropTypes.func.isRequired
+  setColorSetting: PropTypes.func.isRequired,
+  handleSelectGene: PropTypes.func.isRequired,
+  handleSelectTranscript: PropTypes.func.isRequired
 };
 
 export default VisualizationOptions;

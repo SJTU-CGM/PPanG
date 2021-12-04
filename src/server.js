@@ -139,7 +139,8 @@ api.post('/getChunkedData', (req, res, next) => {
   console.time('request-duration');
   console.log('http POST getChunkedData received');
   console.log(`region = ${req.body.region}`);
-  
+  req.trackName = req.body.region.split(":")[0]
+
   // Assign each request a UUID. v1 UUIDs can be very similar for similar
   // timestamps on the same node, but are still guaranteed to be unique within
   // a given nodejs process.
@@ -674,8 +675,11 @@ function loadGFFAnnotationFiles(req, res, next) {
     if(regionStart < Infinity) {
       // coordinate starts with 1 in gff while 0 in vg
       regionStart = Number(regionStart) + 1;
+      let regionEnd = req.regionArr[2] - req.regionArr[1] + regionStart;
+      if (!req.graph.path[i].indexOfFirstBase) regionEnd += EXTRA_LENGTH;
+
       let queryAnnotationCall = spawn('./scripts/query_annotations.sh',
-        [path.join(dataPath, tmp[0]), regionStart,  req.regionArr[2] - req.regionArr[1] + regionStart + EXTRA_LENGTH]);
+        [path.join(dataPath, tmp[0]), regionStart, regionEnd]);
 
       queryAnnotationCall.stdout.pipe(concat(data => {
         annotations[tmp[1]] = []
@@ -746,6 +750,7 @@ function cleanUpAndSendResult(req, res, next) {
     result.gam = req.withGam === true ? req.gamArr : [];
     result.region = req.region;
     result.annotations = req.annotations;
+    result.trackName = req.trackName;
     res.json(result);
     console.timeEnd('request-duration');
   } catch (error) {

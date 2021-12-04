@@ -104,13 +104,21 @@ class TubeMapContainer extends Component {
         const reads = tubeMap.vgExtractReads(nodes, tracks, json.gam);
         const region = json.region;
         const annotations = json.annotations;
+        const trackName = json.trackName;
+        const transcripts = tubeMap.parseTranscriptsFromAnnotations(annotations, trackName);
+        let geneOptions = [];
+        for (let geneId in transcripts) {
+          geneOptions.push(transcripts[geneId].start ? `${geneId} (${transcripts[geneId].start}-${transcripts[geneId].end})`
+            : `${geneId} (Not present in ${trackName})`)
+        }
+        this.props.loadGeneSelectOptions(geneOptions, transcripts);
         this.setState({
           isLoading: false,
           nodes,
           tracks,
           reads,
 	        region,
-          annotations
+          annotations,
         });
       }
     } catch (error) {
@@ -178,7 +186,8 @@ class TubeMapContainer extends Component {
 TubeMapContainer.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   dataOrigin: PropTypes.oneOf(Object.values(dataOriginTypes)).isRequired,
-  fetchParams: PropTypes.object.isRequired
+  fetchParams: PropTypes.object.isRequired,
+  loadGeneSelectOptions: PropTypes.func.isRequired
 };
 
 export default TubeMapContainer;

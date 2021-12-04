@@ -105,6 +105,7 @@ let nodes;
 let tracks;
 let reads;
 let annotations;
+let transcripts = {};
 let numberOfNodes;
 let numberOfTracks;
 let nodeMap; // maps node names to node indices
@@ -133,7 +134,10 @@ const config = {
   exonColors: 'lightColors',
   hideLegendFlag: false,
   colorReadsByMappingQuality: false,
-  mappingQualityCutoff: 0
+  mappingQualityCutoff: 0,
+  // Select gene when show exons
+  geneSelected: 'All',
+  transcriptSelected: 'All'
 };
 
 // variables for storing info which can be directly translated into drawing instructions
@@ -259,6 +263,18 @@ function straightenTrack(index) {
         .join('');
     }
   });
+}
+
+export function selectGene(value) {
+  config.geneSelected = value;
+  svg = d3.select(svgID);
+  createTubeMap();
+}
+
+export function selectTranscript(value) {
+  config.transcriptSelected = value;
+  svg = d3.select(svgID);
+  createTubeMap();
 }
 
 export function changeTrackVisibility(trackID) {
@@ -2197,46 +2213,46 @@ function addTrackFeatures() {
   let nodeEnd;
   let feature = {};
 
-  if (bed != null) {
-    bed.forEach(line => {
-      let i = 0;
-      while (i < numberOfTracks && tracks[i].name !== line.track) i += 1;
-      if (i < numberOfTracks) {
-        nodeStart = 0;
-        tracks[i].path.forEach(node => {
-          if (node.node !== null) {
-            feature = {};
-            if (nodes[node.node].hasOwnProperty('sequenceLength')) {
-              nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
-            } else {
-              nodeEnd = nodeStart + nodes[node.node].width - 1;
-            }
-
-            if (nodeStart >= line.start && nodeStart <= line.end) {
-              feature.start = 0;
-            }
-            if (nodeStart < line.start && nodeEnd >= line.start) {
-              feature.start = line.start - nodeStart;
-            }
-            if (nodeEnd <= line.end && nodeEnd >= line.start) {
-              feature.end = nodeEnd - nodeStart;
-              if (nodeEnd < line.end) feature.continue = true;
-            }
-            if (nodeEnd > line.end && nodeStart <= line.end) {
-              feature.end = line.end - nodeStart;
-            }
-            if (feature.hasOwnProperty('start')) {
-              feature.type = line.type;
-              feature.name = line.name;
-              if (!node.hasOwnProperty('features')) node.features = [];
-              node.features.push(feature);
-            }
-            nodeStart = nodeEnd + 1;
-          }
-        });
-      }
-    });
-  }
+  // if (bed != null) {
+  //   bed.forEach(line => {
+  //     let i = 0;
+  //     while (i < numberOfTracks && tracks[i].name !== line.track) i += 1;
+  //     if (i < numberOfTracks) {
+  //       nodeStart = 0;
+  //       tracks[i].path.forEach(node => {
+  //         if (node.node !== null) {
+  //           feature = {};
+  //           if (nodes[node.node].hasOwnProperty('sequenceLength')) {
+  //             nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
+  //           } else {
+  //             nodeEnd = nodeStart + nodes[node.node].width - 1;
+  //           }
+  //
+  //           if (nodeStart >= line.start && nodeStart <= line.end) {
+  //             feature.start = 0;
+  //           }
+  //           if (nodeStart < line.start && nodeEnd >= line.start) {
+  //             feature.start = line.start - nodeStart;
+  //           }
+  //           if (nodeEnd <= line.end && nodeEnd >= line.start) {
+  //             feature.end = nodeEnd - nodeStart;
+  //             if (nodeEnd < line.end) feature.continue = true;
+  //           }
+  //           if (nodeEnd > line.end && nodeStart <= line.end) {
+  //             feature.end = line.end - nodeStart;
+  //           }
+  //           if (feature.hasOwnProperty('start')) {
+  //             feature.type = line.type;
+  //             feature.name = line.name;
+  //             if (!node.hasOwnProperty('features')) node.features = [];
+  //             node.features.push(feature);
+  //           }
+  //           nodeStart = nodeEnd + 1;
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
   if (annotations != null) {
     for (let trackName in annotations) {
@@ -2244,41 +2260,52 @@ function addTrackFeatures() {
       while (i < numberOfTracks && !tracks[i].name.startsWith(trackName)) i += 1;
       if (i < numberOfTracks) {
         annotations[trackName].forEach(line => {
-          // coordinate starts with 1 in gff while 0 in vg
-          line.start -= 1;
-          line.end -= 1;
-          nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
-            tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
-          tracks[i].path.forEach(node => {
-            if (node.node !== null) {
-              feature = {};
-              if (nodes[node.node].hasOwnProperty('sequenceLength')) {
-                nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
-              } else {
-                nodeEnd = nodeStart + nodes[node.node].width - 1;
+          let isSelected = true;
+          if (config.geneSelected !== 'All' && line.attributes.gene_id.indexOf(
+            config.geneSelected.substring(0, config.geneSelected.indexOf('(') - 1)) === -1) {
+            isSelected = false;
+          }
+          if (config.transcriptSelected !== 'All' && line.attributes?.transcript_id.indexOf(
+            config.transcriptSelected) === -1) {
+            isSelected = false;
+          }
+          if (isSelected) {
+            // coordinate starts with 1 in gff while 0 in vg
+            line.start -= 1;
+            line.end -= 1;
+            nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
+              tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
+            tracks[i].path.forEach(node => {
+              if (node.node !== null) {
+                feature = {};
+                if (nodes[node.node].hasOwnProperty('sequenceLength')) {
+                  nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
+                } else {
+                  nodeEnd = nodeStart + nodes[node.node].width - 1;
+                }
+                if (nodeStart >= line.start && nodeStart <= line.end) {
+                  feature.start = 0;
+                }
+                if (nodeStart < line.start && nodeEnd >= line.start) {
+                  feature.start = line.start - nodeStart;
+                }
+                if (nodeEnd <= line.end && nodeEnd >= line.start) {
+                  feature.end = nodeEnd - nodeStart;
+                  if (nodeEnd < line.end) feature.continue = true;
+                }
+                if (nodeEnd > line.end && nodeStart <= line.end) {
+                  feature.end = line.end - nodeStart;
+                }
+                if (feature.hasOwnProperty('start')) {
+                  feature.type = line.type;
+                  feature.name = line.seqid;
+                  if (!node.hasOwnProperty('features')) node.features = [];
+                  node.features.push(feature);
+                }
+                nodeStart = nodeEnd + 1;
               }
-              if (nodeStart >= line.start && nodeStart <= line.end) {
-                feature.start = 0;
-              }
-              if (nodeStart < line.start && nodeEnd >= line.start) {
-                feature.start = line.start - nodeStart;
-              }
-              if (nodeEnd <= line.end && nodeEnd >= line.start) {
-                feature.end = nodeEnd - nodeStart;
-                if (nodeEnd < line.end) feature.continue = true;
-              }
-              if (nodeEnd > line.end && nodeStart <= line.end) {
-                feature.end = line.end - nodeStart;
-              }
-              if (feature.hasOwnProperty('start')) {
-                feature.type = line.type;
-                feature.name = line.seqid;
-                if (!node.hasOwnProperty('features')) node.features = [];
-                node.features.push(feature);
-              }
-              nodeStart = nodeEnd + 1;
-            }
-          });
+            });
+          }
         })
       }
     }
@@ -3580,6 +3607,36 @@ export function vgExtractNodes(vg) {
     });
   });
   return result;
+}
+
+export function parseTranscriptsFromAnnotations(annotations, trackName) {
+  let transcripts = {};
+  for (let name in annotations) {
+    annotations[name].forEach(line => {
+        if (line.attributes.transcript_id) {
+          let transcript_id = line.attributes.transcript_id.startsWith("aug")
+            ? line.attributes.transcript_id.substring(
+              line.attributes.transcript_id.indexOf("-") + 1,
+              line.attributes.transcript_id.lastIndexOf("-"))
+            : line.attributes.transcript_id;
+          if (!transcripts.hasOwnProperty(line.attributes.gene_id)) {
+            transcripts[line.attributes.gene_id] = {
+              transcripts: [transcript_id]
+            };
+          } else if (transcripts[line.attributes.gene_id].transcripts.indexOf(transcript_id) === -1) {
+            transcripts[line.attributes.gene_id].transcripts.push(transcript_id);
+          }
+          if (name === trackName) {
+            transcripts[line.attributes.gene_id].start = transcripts[line.attributes.gene_id].start
+              ? Math.min(transcripts[line.attributes.gene_id].start, line.start) : line.start;
+            transcripts[line.attributes.gene_id].end = transcripts[line.attributes.gene_id].end
+              ? Math.max(transcripts[line.attributes.gene_id].end, line.end) : line.end;
+          }
+        }
+      }
+    )
+  }
+  return transcripts;
 }
 
 // calculate node widths depending on sequence lengths and chosen calculation method
