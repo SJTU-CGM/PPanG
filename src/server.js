@@ -17,6 +17,7 @@ const rl = require('readline');
 const compression = require('compression');
 const WebSocketServer = require('websocket').server;
 const config = require('./config.json');
+const concat = require('concat-stream');
 
 const VG_PATH = config.vgPath;
 const MOUNTED_DATA_PATH = config.dataPath;
@@ -654,13 +655,15 @@ function loadGFFAnnotationFiles(req, res, next) {
     cleanUpAndSendResult(req, res, next);
   }
   let annotationConfig = fs.readFileSync(annotationConfigPath).toString().trim().split('\n');
-  let annotationsString = "";
+  let annotations = {};
   let count = 0;
 
   annotationConfig.forEach(e => {
     let tmp = e.split(':');
     let i = 0;
     let regionStart = Infinity;
+    // separator in gtf is " " while in gff is "="
+    let separator = tmp[0].endsWith('gtf') ? " " : "=";
     while(i < req.graph.path.length) {
       if(req.graph.path[i].name.startsWith(tmp[1])) {
          regionStart = Math.min(regionStart, req.graph.path[i].indexOfFirstBase ?? req.graph.path[i].name.substring(
@@ -674,54 +677,48 @@ function loadGFFAnnotationFiles(req, res, next) {
       let queryAnnotationCall = spawn('./scripts/query_annotations.sh',
         [path.join(dataPath, tmp[0]), regionStart,  req.regionArr[2] - req.regionArr[1] + regionStart + EXTRA_LENGTH]);
 
-      queryAnnotationCall.stdout.on("data", data => {
-        annotationsString += tmp[1] + "\n" + data.toString().trim() + "||";
-      });
+      queryAnnotationCall.stdout.pipe(concat(data => {
+        annotations[tmp[1]] = []
+        data.toString().trim().split('\n').forEach(row => {
+          let cols = row.split('\t');
+          let attributes = {}
+          cols[8].split(';').forEach(attribute => {
+            let attributeArray = attribute.trim().split(separator)
+            if (attributeArray.length === 2) {
+              attributes[attributeArray[0]] = attributeArray[1].replaceAll('"', '');
+            }
+          })
+          annotations[tmp[1]].push({
+            seqid: cols[0],
+            source: cols[1],
+            type: cols[2],
+            start: cols[3],
+            end: cols[4],
+            score: cols[5],
+            strand: cols[6],
+            phase: cols[7],
+            attributes: attributes
+          })
+        })
+      }));
 
       queryAnnotationCall.on("close", () => {
         count++;
         console.log(`annotations found in file${count}: ${tmp[0]}`);
         if (count === annotationConfig.length) {
-          req.annotationsString = annotationsString;
-          processGFFAnnotationFiles(req, res, next);
+          req.annotations = annotations;
+          cleanUpAndSendResult(req, res, next);
         }
       })
     } else {
       count++;
       console.log(`no annotation found in file${count}: ${tmp[0]}`);
       if (count === annotationConfig.length) {
-        req.annotationsString = annotationsString;
-        processGFFAnnotationFiles(req, res, next);
+        req.annotations = annotations;
+        cleanUpAndSendResult(req, res, next);
       }
     }
   });
-}
-
-function processGFFAnnotationFiles(req, res, next) {
-  const annotationsArray = req.annotationsString.split("||");
-  annotationsArray.pop();
-  let annotations = {};
-  annotationsArray.forEach(e => {
-    let rows = e.split("\n");
-    let name = rows[0];
-    annotations[name] = [];
-    for(let i = 1; i < rows.length; i++) {
-      let cols = rows[i].split('\t');
-      annotations[name].push({
-        seqid: cols[0],
-        source: cols[1],
-        type: cols[2],
-        start: cols[3],
-        end: cols[4],
-        score: cols[5],
-        strand: cols[6],
-        phase: cols[7],
-        attributes: cols[8]
-      })
-    }
-  })
-  req.annotations = annotations;
-  cleanUpAndSendResult(req, res, next);
 }
 
 // Cleanup functuion shared between success and error code paths.
