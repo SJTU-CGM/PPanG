@@ -23,8 +23,10 @@ const dataTypes = {
 
 class HeaderForm extends Component {
   state = {
-    xgSelectOptions: ['none'],
-    xgSelect: 'none',
+    // xgSelectOptions: ['none'],
+    // xgSelect: 'none',
+    xgSelectOptions: [],
+    xgSelect: '',
 
     gbwtSelectOptions: ['none'],
     gbwtSelect: 'none',
@@ -105,7 +107,7 @@ class HeaderForm extends Component {
         const error = json.error || 'Listing file names';
         this.setState({ error: error });
       } else {
-        json.xgFiles.unshift('none');
+        //json.xgFiles.unshift('none');
         json.gbwtFiles.unshift('none');
         json.gamIndices.unshift('none');
         json.bedFiles.unshift('none');
@@ -149,7 +151,7 @@ class HeaderForm extends Component {
               gamSelectOptions: json.gamIndices,
               bedSelectOptions: json.bedFiles
             };
-          });          
+          });
         }
       }
     } catch (error) {
@@ -414,14 +416,15 @@ class HeaderForm extends Component {
       );
     });
     dataSourceDropdownOptions.push(
-      <option value="syntheticExamples" key="syntheticExamples">
-        synthetic data examples
-      </option>,
-      <option value="customFileUpload" key="customFileUpload">
-        custom (file upload)
-      </option>,
+      // <option value="syntheticExamples" key="syntheticExamples">
+      //   synthetic data examples
+      // </option>,
+      // <option value="customFileUpload" key="customFileUpload">
+      //   custom (file upload)
+      // </option>,
       <option value="customMounted" key="customMounted">
-        custom (mounted files)
+        {/*custom (mounted files)*/}
+        select chromosome
       </option>
     );
 
@@ -429,8 +432,8 @@ class HeaderForm extends Component {
     const uploadFilesFlag = this.state.dataType === dataTypes.FILE_UPLOAD;
     const examplesFlag = this.state.dataType === dataTypes.EXAMPLES;
     const bedRegionsFlag = this.state.bedSelect !== 'none';
-    const pathNamesFlag = this.state.xgSelect !== 'none';
-    
+    const pathNamesFlag = this.state.dataType === dataTypes.MOUNTED_FILES && this.state.xgSelect !== 'none';
+
     return (
       <div>
         {errorDiv}

@@ -7,6 +7,7 @@ import CustomizationAccordion from './components/CustomizationAccordion';
 import { dataOriginTypes } from './enums';
 import * as tubeMap from './util/tubemap';
 import config from './config.json';
+import {parseTranscripts} from "./util/util";
 
 class App extends Component {
   constructor(props) {
@@ -50,11 +51,11 @@ class App extends Component {
       visOptions: {
         removeRedundantNodes: true,
         compressedView: false,
-        transparentNodes: false,
+        transparentNodes: true,
         showExons: true,
         showReads: false,
         showSoftClips: true,
-        haplotypeColors: 'ygreys',
+        haplotypeColors: 'greys',
         forwardReadColors: 'reds',
         reverseReadColors: 'blues',
         colorReadsByMappingQuality: false,
@@ -134,7 +135,7 @@ class App extends Component {
   handleSelectGene = (value) => {
     let transcriptSelectOptions = ['All'];
     if (value !== 'All') {
-      let geneId = value.substring(0, value.indexOf('(') - 1);
+      let geneId = parseTranscripts(value).id;
       transcriptSelectOptions = transcriptSelectOptions.concat(this.state.visOptions.transcripts[geneId].transcripts);
     }
     this.setState(state => ({

@@ -132,98 +132,102 @@ class VisualizationOptions extends Component {
                           onChange={this.handleSelectGene}
                           options={visOptions.geneSelectOptions}
                         />
-                      &nbsp;&nbsp;&nbsp;&nbsp;
-                      <label className="tight-label">Transcript ID:</label>
-                      <SelectionDropdown
-                        value={visOptions.transcriptSelected}
-                        onChange={this.handleSelectTranscript}
-                        options={visOptions.transcriptSelectOptions}
-                      />
                     </React.Fragment>
                   )}
                   </Form>
-                </FormGroup>
-
-                <FormGroup>
-                  <h5>Sequence Reads</h5>
-                  <FormGroup check>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        checked={visOptions.showReads}
-                        onChange={() => toggleFlag('showReads')}
-                      />
-                      Show sequence reads
-                    </Label>
-                  </FormGroup>
-                  {visOptions.showReads && (
-                    <React.Fragment>
-                      <FormGroup check>
-                        <Label check>
-                          <Input
-                            type="checkbox"
-                            checked={visOptions.showSoftClips}
-                            onChange={() => toggleFlag('showSoftClips')}
-                          />
-                          Show soft clips
-                        </Label>
-                      </FormGroup>
-                      <FormGroup check>
-                        <Label check>
-                          <Input
-                            type="checkbox"
-                            checked={visOptions.colorReadsByMappingQuality}
-                            onChange={() =>
-                              toggleFlag('colorReadsByMappingQuality')
-                            }
-                          />
-                          Color reads by mapping quality
-                        </Label>
-                      </FormGroup>
-                      <Form inline>
-                        <Label className="mr-sm-2 " for="dataSourceSelect">
-                          Mapping Quality Cutoff:
-                        </Label>
-                        <Input
-                          type="select"
-                          id="dataSourceSelect"
-                          className="custom-select"
-                          value={visOptions.mappingQualityCutoff}
-                          onChange={this.handleMappingQualityCutoffChange}
-                        >
-                          {mappingQualityOptions}
-                        </Input>
-                      </Form>
-                    </React.Fragment>
-                  )}
-                </FormGroup>
-
-                <h5>Colors</h5>
-                <Form>
-                  <RadioRow
-                    rowHeading="Haplotypes"
-                    color={visOptions.haplotypeColors}
-                    trackType="haplotypeColors"
-                    setColorSetting={this.props.setColorSetting}
-                  />
-                  {visOptions.showReads &&
-                    !visOptions.colorReadsByMappingQuality && (
+                  <Form inline>
+                    {visOptions.showExons && (
                       <React.Fragment>
-                        <RadioRow
-                          rowHeading="Reads (forward strand)"
-                          color={visOptions.forwardReadColors}
-                          trackType="forwardReadColors"
-                          setColorSetting={this.props.setColorSetting}
-                        />
-                        <RadioRow
-                          rowHeading="Reads (reverse strand)"
-                          color={visOptions.reverseReadColors}
-                          trackType="reverseReadColors"
-                          setColorSetting={this.props.setColorSetting}
+                        <label className="tight-label">Transcript ID:</label>
+                        <SelectionDropdown
+                          value={visOptions.transcriptSelected}
+                          onChange={this.handleSelectTranscript}
+                          options={visOptions.transcriptSelectOptions}
                         />
                       </React.Fragment>
                     )}
-                </Form>
+                  </Form>
+                </FormGroup>
+                {/*<FormGroup>*/}
+                {/*  <h5>Sequence Reads</h5>*/}
+                {/*  <FormGroup check>*/}
+                {/*    <Label check>*/}
+                {/*      <Input*/}
+                {/*        type="checkbox"*/}
+                {/*        checked={visOptions.showReads}*/}
+                {/*        onChange={() => toggleFlag('showReads')}*/}
+                {/*      />*/}
+                {/*      Show sequence reads*/}
+                {/*    </Label>*/}
+                {/*  </FormGroup>*/}
+                {/*  {visOptions.showReads && (*/}
+                {/*    <React.Fragment>*/}
+                {/*      <FormGroup check>*/}
+                {/*        <Label check>*/}
+                {/*          <Input*/}
+                {/*            type="checkbox"*/}
+                {/*            checked={visOptions.showSoftClips}*/}
+                {/*            onChange={() => toggleFlag('showSoftClips')}*/}
+                {/*          />*/}
+                {/*          Show soft clips*/}
+                {/*        </Label>*/}
+                {/*      </FormGroup>*/}
+                {/*      <FormGroup check>*/}
+                {/*        <Label check>*/}
+                {/*          <Input*/}
+                {/*            type="checkbox"*/}
+                {/*            checked={visOptions.colorReadsByMappingQuality}*/}
+                {/*            onChange={() =>*/}
+                {/*              toggleFlag('colorReadsByMappingQuality')*/}
+                {/*            }*/}
+                {/*          />*/}
+                {/*          Color reads by mapping quality*/}
+                {/*        </Label>*/}
+                {/*      </FormGroup>*/}
+                {/*      <Form inline>*/}
+                {/*        <Label className="mr-sm-2 " for="dataSourceSelect">*/}
+                {/*          Mapping Quality Cutoff:*/}
+                {/*        </Label>*/}
+                {/*        <Input*/}
+                {/*          type="select"*/}
+                {/*          id="dataSourceSelect"*/}
+                {/*          className="custom-select"*/}
+                {/*          value={visOptions.mappingQualityCutoff}*/}
+                {/*          onChange={this.handleMappingQualityCutoffChange}*/}
+                {/*        >*/}
+                {/*          {mappingQualityOptions}*/}
+                {/*        </Input>*/}
+                {/*      </Form>*/}
+                {/*    </React.Fragment>*/}
+                {/*  )}*/}
+                {/*</FormGroup>*/}
+
+                {/*<h5>Colors</h5>*/}
+                {/*<Form>*/}
+                {/*  <RadioRow*/}
+                {/*    rowHeading="Haplotypes"*/}
+                {/*    color={visOptions.haplotypeColors}*/}
+                {/*    trackType="haplotypeColors"*/}
+                {/*    setColorSetting={this.props.setColorSetting}*/}
+                {/*  />*/}
+                {/*  {visOptions.showReads &&*/}
+                {/*    !visOptions.colorReadsByMappingQuality && (*/}
+                {/*      <React.Fragment>*/}
+                {/*        <RadioRow*/}
+                {/*          rowHeading="Reads (forward strand)"*/}
+                {/*          color={visOptions.forwardReadColors}*/}
+                {/*          trackType="forwardReadColors"*/}
+                {/*          setColorSetting={this.props.setColorSetting}*/}
+                {/*        />*/}
+                {/*        <RadioRow*/}
+                {/*          rowHeading="Reads (reverse strand)"*/}
+                {/*          color={visOptions.reverseReadColors}*/}
+                {/*          trackType="reverseReadColors"*/}
+                {/*          setColorSetting={this.props.setColorSetting}*/}
+                {/*        />*/}
+                {/*      </React.Fragment>*/}
+                {/*    )}*/}
+                {/*</Form>*/}
               </CardBody>
             </Collapse>
           </Card>

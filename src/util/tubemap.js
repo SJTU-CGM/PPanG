@@ -10,6 +10,7 @@
 /* eslint no-return-assign: "off" */
 import * as d3 from 'd3';
 import 'd3-selection-multi';
+import {parseTranscripts} from "./util";
 
 const DEBUG = false;
 
@@ -63,7 +64,8 @@ const plainColors = [
   '#9467bd',
   '#8c564b',
   '#e377c2',
-  '#7f7f7f',
+  // '#7f7f7f',
+  '#FFFF93',
   '#bcbd22',
   '#17becf'
 ];
@@ -77,7 +79,7 @@ const lightColors = [
   '#D7C6E6',
   '#C6ABA5',
   '#F4CCE8',
-  '#CFCFCF',
+  // '#CFCFCF','#F2F2A0',
   '#E6E6AC',
   '#A8E7ED'
 ];
@@ -470,7 +472,9 @@ function createTubeMap() {
   calculateTrackWidth(tracks);
   generateLaneAssignment();
 
-  if (config.showExonsFlag === true) addTrackFeatures();
+  if (config.showExonsFlag === true) {
+    addTrackFeatures();
+  }
   generateNodeXCoords();
 
   if (reads && config.showReads) {
@@ -1132,7 +1136,7 @@ function alignSVG() {
     .zoom()
     // We need to set an extent here because auto-determination of the region
     // to zoom breaks on the React testing jsdom
-    .extent([[0, 0], [svg.attr('width'), svg.attr('height')]]) 
+    .extent([[0, 0], [svg.attr('width'), svg.attr('height')]])
     .scaleExtent([minZoom, 8])
     .translateExtent([
       [-1, minYCoordinate - 25],
@@ -1163,7 +1167,7 @@ export function zoomBy(zoomFactor) {
   let svgElement = document.getElementById(svgID.substring(1));
   // And find its parent holding element.
   let parentElement = svgElement.parentNode;
-  
+
   const minZoom = Math.min(
     1,
     parentElement.offsetWidth / (maxXCoordinate + 10)
@@ -2256,57 +2260,62 @@ function addTrackFeatures() {
 
   if (annotations != null) {
     for (let trackName in annotations) {
-      let i = 0;
-      while (i < numberOfTracks && !tracks[i].name.startsWith(trackName)) i += 1;
-      if (i < numberOfTracks) {
-        annotations[trackName].forEach(line => {
-          let isSelected = true;
-          if (config.geneSelected !== 'All' && line.attributes.gene_id.indexOf(
-            config.geneSelected.substring(0, config.geneSelected.indexOf('(') - 1)) === -1) {
-            isSelected = false;
-          }
-          if (config.transcriptSelected !== 'All' && line.attributes?.transcript_id.indexOf(
-            config.transcriptSelected) === -1) {
-            isSelected = false;
-          }
-          if (isSelected) {
-            // coordinate starts with 1 in gff while 0 in vg
-            line.start -= 1;
-            line.end -= 1;
-            nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
-              tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
-            tracks[i].path.forEach(node => {
-              if (node.node !== null) {
-                feature = {};
-                if (nodes[node.node].hasOwnProperty('sequenceLength')) {
-                  nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
-                } else {
-                  nodeEnd = nodeStart + nodes[node.node].width - 1;
-                }
-                if (nodeStart >= line.start && nodeStart <= line.end) {
-                  feature.start = 0;
-                }
-                if (nodeStart < line.start && nodeEnd >= line.start) {
-                  feature.start = line.start - nodeStart;
-                }
-                if (nodeEnd <= line.end && nodeEnd >= line.start) {
-                  feature.end = nodeEnd - nodeStart;
-                  if (nodeEnd < line.end) feature.continue = true;
-                }
-                if (nodeEnd > line.end && nodeStart <= line.end) {
-                  feature.end = line.end - nodeStart;
-                }
-                if (feature.hasOwnProperty('start')) {
-                  feature.type = line.type;
-                  feature.name = line.seqid;
-                  if (!node.hasOwnProperty('features')) node.features = [];
-                  node.features.push(feature);
-                }
-                nodeStart = nodeEnd + 1;
+      for (let i = 0; i < numberOfTracks; i++) {
+        if (tracks[i].name.startsWith(trackName)) {
+          annotations[trackName].forEach(line => {
+            let isSelected = true;
+            let gene_id = line.attributes.gene_id ?? line.attributes.ID;
+            let transcript_id = line.attributes.transcript_id ?? line.attributes.ID;
+            if (config.geneSelected !== 'All' && gene_id.indexOf(
+              parseTranscripts(config.geneSelected).id) === -1) {
+              isSelected = false;
+            }
+            if (config.transcriptSelected !== 'All') {
+              let transcript = parseTranscripts(config.transcriptSelected);
+              if(transcript_id.indexOf(transcript.id) === -1) {
+                isSelected = false;
               }
-            });
-          }
-        })
+            }
+            if (isSelected) {
+              let start = line.start, end = line.end;
+              // coordinate starts with 1 in gff while 0 in vg
+              start -= 1;
+              end -= 1;
+              nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
+                tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
+              tracks[i].path.forEach(node => {
+                if (node.node !== null) {
+                  feature = {};
+                  if (nodes[node.node].hasOwnProperty('sequenceLength')) {
+                    nodeEnd = nodeStart + nodes[node.node].sequenceLength - 1;
+                  } else {
+                    nodeEnd = nodeStart + nodes[node.node].width - 1;
+                  }
+                  if (nodeStart >= start && nodeStart <= end) {
+                    feature.start = 0;
+                  }
+                  if (nodeStart < start && nodeEnd >= start) {
+                    feature.start = start - nodeStart;
+                  }
+                  if (nodeEnd <= end && nodeEnd >= start) {
+                    feature.end = nodeEnd - nodeStart;
+                    if (nodeEnd < end) feature.continue = true;
+                  }
+                  if (nodeEnd > end && nodeStart <= end) {
+                    feature.end = end - nodeStart;
+                  }
+                  if (feature.hasOwnProperty('start')) {
+                    feature.type = line.type;
+                    feature.name = line.seqid;
+                    if (!node.hasOwnProperty('features')) node.features = [];
+                    node.features.push(feature);
+                  }
+                  nodeStart = nodeEnd + 1;
+                }
+              });
+            }
+          })
+        }
       }
     }
   }
@@ -3072,20 +3081,20 @@ function drawRuler() {
   if (config.nodeWidthOption === 0) markingInterval = 20;
   // How close may markings be in image space?
   const markingClearance = 80;
-  
+
   // We need to call drawRulerMarking(base pair number, layout X coordinate)
   // for each tick mark we want in our legend. But we can't just walk the path
   // and X at the same time, placing ticks periodically because the ruler path
   // isn't nexessarily used for the layout backbone, and can go all over the
-  // place, including backward through nodes. 
+  // place, including backward through nodes.
 
   // So we walk along the path, place ticks, and then drop the ones that are
   // too close together.
-  
+
   // This will hold pairs of base position, x coordinate.
   let ticks = [];
   let ticks_region = [];
-  
+
   // We keep a cursor to the start of the current node traversal along the path
   let indexOfFirstBaseInNode = rulerTrack.indexOfFirstBase;
   // And the next index along the path that doesn't have a mark but could.
@@ -3094,25 +3103,25 @@ function drawRuler() {
   function getCorrectXCoordinateOfBaseWithinNode(position, currentNode, currentNodeIsReverse, is_region=false){
     // What base along our traversal of this node should we be marking?
     let indexIntoVisitToMark = position - indexOfFirstBaseInNode;
-    
+
     // What offset into the node should we mark at, relative to its forward-strand start?
     let offsetIntoNodeForward = currentNodeIsReverse ?
         // If going in reverse, take off bases of the node we use from the right side
         currentNode.sequenceLength - 1 - indexIntoVisitToMark :
         // Otherwise, add them to the left side
         indexIntoVisitToMark;
-    
+
     if (config.nodeWidthOption !== 0 && !is_region) {
       // Actually always mark at an edge of the node, if we are scaling the node nonlinearly
       // and if we are not highlighting the input region
       offsetIntoNodeForward = currentNodeIsReverse ? currentNode.sequenceLength - 1 : 0;
     }
-    
+
     // Where should we mark in the visualization?
     let xCoordOfMarking = getXCoordinateOfBaseWithinNode(currentNode, offsetIntoNodeForward);
     return(xCoordOfMarking)
   }
-  
+
   let start_region = Number(inputRegion[0]);
   let end_region = Number(inputRegion[1]);
   for (let i = 0; i < rulerTrack.indexSequence.length; i++) {
@@ -3123,7 +3132,7 @@ function drawRuler() {
     // backward. In fact, the whole track may be laid out backward.
     // So xor the reverse flags, which we assume to be bools
     const currentNodeIsReverse = isReverse(rulerTrack.sequence[i]) !== rulerTrack.isCompletelyReverse;
-    
+
     // For some displayus we want to mark each node only once.
     let alreadyMarkedNode = false;
 
@@ -3137,30 +3146,30 @@ function drawRuler() {
       let xCoordOfMarking = getCorrectXCoordinateOfBaseWithinNode(end_region, currentNode, currentNodeIsReverse, true)
       ticks_region.push([end_region, xCoordOfMarking]);
     }
-    
+
     while (nextUnmarkedIndex < indexOfFirstBaseInNode + currentNode.sequenceLength) {
       // We are thinking of marking a position on this node.
-     
+
       // Where should we mark in the visualization?
       let xCoordOfMarking = getCorrectXCoordinateOfBaseWithinNode(nextUnmarkedIndex, currentNode, currentNodeIsReverse)
-      
+
       if (config.nodeWidthOption === 0 || !alreadyMarkedNode) {
         // This is a mark we are not filtering due to node compression.
         // Make the mark
         ticks.push([nextUnmarkedIndex, xCoordOfMarking]);
         alreadyMarkedNode = true;
       }
-      
+
       // Think about the next place along the path we care about.
       nextUnmarkedIndex += markingInterval;
     }
     // Advance to the next node
     indexOfFirstBaseInNode += currentNode.sequenceLength;
   }
-  
+
   // Sort ticks on X coordinate
   ticks.sort(([bp1, x1], [bp2, x2]) => x1 > x2)
-  
+
   // Filter ticks for a minimum X separartion
   let separatedTicks = []
   ticks.forEach(tick => {
@@ -3183,7 +3192,7 @@ function drawRuler() {
     .attr('y2', minYCoordinate - 10)
     .attr('stroke-width', 1)
     .attr('stroke', 'black');
-  
+
   // Plot all the ticks
   ticks.forEach(tick => drawRulerMarking(tick[0], tick[1]));
 
@@ -3613,28 +3622,40 @@ export function parseTranscriptsFromAnnotations(annotations, trackName) {
   let transcripts = {};
   for (let name in annotations) {
     annotations[name].forEach(line => {
-        if (line.attributes.transcript_id) {
-          let transcript_id = line.attributes.transcript_id.startsWith("aug")
-            ? line.attributes.transcript_id.substring(
-              line.attributes.transcript_id.indexOf("-") + 1,
-              line.attributes.transcript_id.lastIndexOf("-"))
-            : line.attributes.transcript_id;
-          if (!transcripts.hasOwnProperty(line.attributes.gene_id)) {
-            transcripts[line.attributes.gene_id] = {
-              transcripts: [transcript_id]
-            };
-          } else if (transcripts[line.attributes.gene_id].transcripts.indexOf(transcript_id) === -1) {
-            transcripts[line.attributes.gene_id].transcripts.push(transcript_id);
-          }
-          if (name === trackName) {
-            transcripts[line.attributes.gene_id].start = transcripts[line.attributes.gene_id].start
-              ? Math.min(transcripts[line.attributes.gene_id].start, line.start) : line.start;
-            transcripts[line.attributes.gene_id].end = transcripts[line.attributes.gene_id].end
-              ? Math.max(transcripts[line.attributes.gene_id].end, line.end) : line.end;
-          }
+      let transcript_id = undefined, gene_id;
+      if (line.attributes.transcript_id) {
+        transcript_id = line.attributes.transcript_id.startsWith("aug")
+          ? line.attributes.transcript_id.substring(
+            line.attributes.transcript_id.indexOf("-") + 1,
+            line.attributes.transcript_id.lastIndexOf("-"))
+          : line.attributes.transcript_id;
+        gene_id = line.attributes.gene_id;
+      } else {
+        transcript_id = line.attributes.Parent;
+        if (transcript_id.includes("-mRNA")) {
+          gene_id = transcript_id.split("-mRNA")[0];
+        } else {
+          gene_id = transcript_id.split(".")[0];
         }
       }
-    )
+      transcript_id += ` (${line.strand})`
+      if (!transcripts.hasOwnProperty(gene_id)) {
+        transcripts[gene_id] = {
+          transcripts: [transcript_id],
+          exons_length: line.length,
+          track_name: name
+        };
+      } else if (transcripts[gene_id].transcripts.indexOf(transcript_id) === -1) {
+        transcripts[gene_id].transcripts.push(transcript_id);
+      }
+      transcripts[gene_id].exons_length += line.length;
+      if (name === trackName) {
+        transcripts[gene_id].start = transcripts[gene_id].start
+          ? Math.min(transcripts[gene_id].start, line.start) : line.start;
+        transcripts[gene_id].end = transcripts[gene_id].end
+          ? Math.max(transcripts[gene_id].end, line.end) : line.end;
+      }
+    })
   }
   return transcripts;
 }

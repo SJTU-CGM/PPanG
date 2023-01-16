@@ -42,7 +42,7 @@ class DataPositionFormRow extends Component {
     downloadLink.click();
     document.body.removeChild(downloadLink);
   };
-  
+
   onKeyUp(event) {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -81,7 +81,9 @@ class DataPositionFormRow extends Component {
         <div className="popup" onClick={this.helpPopupFunction}>
           <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
           <span className="popuptext" id="helpPopup">
-            Seach for a coordinate range (e.g. "chr1:1-100"), a node ID ranges (e.g. "node:100-110"), a start position and a distance (e.g. "chr1:1+100"), or a node ID anchor and a distance (e.g. "node:100+10").
+            Coordinate: Search for a coordinate range (e.g. "chr1:1-100"), a node ID ranges (e.g. "node:100-110"), a start position and a distance (e.g. "chr1:1+100"), or a node ID anchor and a distance (e.g. "node:100+10").
+            <br/>
+            Gene/Transcript Id: Search the gene/transcript id in msu7.gff in selected chromosome and find the gene region.
           </span>
         </div>
         <Button

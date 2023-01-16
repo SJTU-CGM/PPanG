@@ -22,7 +22,7 @@ class TubeMapContainer extends Component {
     // a loading state and immediately do another update, which then means we
     // have to mess around with deep comparison to see we don't need yet a
     // third update. Is there a way to let React keep track of the fact that we
-    // aren't up to date with the requested state yet? 
+    // aren't up to date with the requested state yet?
     if (this.props.dataOrigin !== prevProps.dataOrigin) {
       this.props.dataOrigin === dataOriginTypes.API
         ? this.getRemoteTubeMapData()
@@ -34,7 +34,7 @@ class TubeMapContainer extends Component {
         // don't want to compare object identity. TODO: stringify isn't
         // guaranteed to be stable so we can still make extra requests.
         this.getRemoteTubeMapData();
-      } 
+      }
     }
   }
 
@@ -108,8 +108,10 @@ class TubeMapContainer extends Component {
         const transcripts = tubeMap.parseTranscriptsFromAnnotations(annotations, trackName);
         let geneOptions = [];
         for (let geneId in transcripts) {
-          geneOptions.push(transcripts[geneId].start ? `${geneId} (${transcripts[geneId].start}-${transcripts[geneId].end})`
-            : `${geneId} (Not present in ${trackName})`)
+          // geneOptions.push(transcripts[geneId].start ? `${geneId} (${transcripts[geneId].start}-${transcripts[geneId].end})`
+          //   : `${geneId} (Not present in ${trackName})`)
+          const trackName = transcripts[geneId].track_name
+          geneOptions.push(`${geneId} (${trackName.substring(0, trackName.length/2)})`)
         }
         this.props.loadGeneSelectOptions(geneOptions, transcripts);
         this.setState({

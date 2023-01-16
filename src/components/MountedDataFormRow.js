@@ -18,47 +18,47 @@ class MountedDataFormRow extends Component {
           options={this.props.xgSelectOptions}
         />
 
-        <Label
-          for="gbwtFileSelect"
-          className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
-        >
-          gbwt file:
-        </Label>
-        <SelectionDropdown
-          className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
-          id="gbwtSelect"
-          value={this.props.gbwtSelect}
-          onChange={this.props.handleInputChange}
-          options={this.props.gbwtSelectOptions}
-        />
+        {/*<Label*/}
+        {/*  for="gbwtFileSelect"*/}
+        {/*  className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"*/}
+        {/*>*/}
+        {/*  gbwt file:*/}
+        {/*</Label>*/}
+        {/*<SelectionDropdown*/}
+        {/*  className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"*/}
+        {/*  id="gbwtSelect"*/}
+        {/*  value={this.props.gbwtSelect}*/}
+        {/*  onChange={this.props.handleInputChange}*/}
+        {/*  options={this.props.gbwtSelectOptions}*/}
+        {/*/>*/}
 
-        <Label
-          for="gamFileSelect"
-          className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
-        >
-          gam index:
-        </Label>
-        <SelectionDropdown
-          className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
-          id="gamSelect"
-          value={this.props.gamSelect}
-          onChange={this.props.handleInputChange}
-          options={this.props.gamSelectOptions}
-        />
+        {/*<Label*/}
+        {/*  for="gamFileSelect"*/}
+        {/*  className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"*/}
+        {/*>*/}
+        {/*  gam index:*/}
+        {/*</Label>*/}
+        {/*<SelectionDropdown*/}
+        {/*  className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"*/}
+        {/*  id="gamSelect"*/}
+        {/*  value={this.props.gamSelect}*/}
+        {/*  onChange={this.props.handleInputChange}*/}
+        {/*  options={this.props.gamSelectOptions}*/}
+        {/*/>*/}
 
-        <Label
-          for="bedFileSelect"
-          className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
-        >
-          BED file:
-        </Label>
-        <SelectionDropdown
-          className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
-          id="bedSelect"
-          value={this.props.bedSelect}
-          onChange={this.props.handleInputChange}
-          options={this.props.bedSelectOptions}
-        />
+        {/*<Label*/}
+        {/*  for="bedFileSelect"*/}
+        {/*  className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"*/}
+        {/*>*/}
+        {/*  BED file:*/}
+        {/*</Label>*/}
+        {/*<SelectionDropdown*/}
+        {/*  className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"*/}
+        {/*  id="bedSelect"*/}
+        {/*  value={this.props.bedSelect}*/}
+        {/*  onChange={this.props.handleInputChange}*/}
+        {/*  options={this.props.bedSelectOptions}*/}
+        {/*/>*/}
 
       </React.Fragment>
     );
