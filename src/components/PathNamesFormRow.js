@@ -11,7 +11,7 @@ class PathNamesFormRow extends Component {
                 for="pathName"
                 className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
               >
-          Path name:
+          Custom Path:
         </Label>
         <SelectionDropdown
           className="customData dropdown mb-2 mr-sm-4 mb-sm-0"

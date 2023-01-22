@@ -11,7 +11,7 @@ class BedRegionsFormRow extends Component {
           for="regionSelect"
           className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
         >
-          Region:
+          Built-in Gene:
         </Label>
         <SelectionDropdown
           className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"

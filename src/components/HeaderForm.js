@@ -415,24 +415,24 @@ class HeaderForm extends Component {
         </option>
       );
     });
-    dataSourceDropdownOptions.push(
-      // <option value="syntheticExamples" key="syntheticExamples">
-      //   synthetic data examples
-      // </option>,
-      // <option value="customFileUpload" key="customFileUpload">
-      //   custom (file upload)
-      // </option>,
-      <option value="customMounted" key="customMounted">
-        {/*custom (mounted files)*/}
-        select chromosome
-      </option>
-    );
+    // dataSourceDropdownOptions.push(
+    //   <option value="syntheticExamples" key="syntheticExamples">
+    //     synthetic data examples
+    //   </option>,
+    //   <option value="customFileUpload" key="customFileUpload">
+    //     custom (file upload)
+    //   </option>,
+    //   <option value="customMounted" key="customMounted">
+    //     {/*custom (mounted files)*/}
+    //     select chromosome
+    //   </option>
+    // );
 
     const mountedFilesFlag = this.state.dataType === dataTypes.MOUNTED_FILES;
     const uploadFilesFlag = this.state.dataType === dataTypes.FILE_UPLOAD;
     const examplesFlag = this.state.dataType === dataTypes.EXAMPLES;
     const bedRegionsFlag = this.state.bedSelect !== 'none';
-    const pathNamesFlag = this.state.dataType === dataTypes.MOUNTED_FILES && this.state.xgSelect !== 'none';
+    const pathNamesFlag = true;
 
     return (
       <div>
@@ -475,17 +475,17 @@ class HeaderForm extends Component {
                     handleInputChange={this.handleInputChange}
                   />
                 )}
-                {pathNamesFlag && (
-                  <PathNamesFormRow
-                    pathSelect={this.state.pathSelect}
-                    pathSelectOptions={this.state.pathSelectOptions}
-                    handleInputChange={this.handleInputChange}
-                  />
-                )}
                 {bedRegionsFlag && (
                   <BedRegionsFormRow
                     regionSelect={this.state.regionSelect}
                     regionSelectOptions={this.state.regionSelectOptions}
+                    handleInputChange={this.handleInputChange}
+                  />
+                )}
+                {pathNamesFlag && (
+                  <PathNamesFormRow
+                    pathSelect={this.state.pathSelect}
+                    pathSelectOptions={this.state.pathSelectOptions}
                     handleInputChange={this.handleInputChange}
                   />
                 )}
