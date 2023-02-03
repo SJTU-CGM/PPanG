@@ -111,7 +111,7 @@ class TubeMapContainer extends Component {
           // geneOptions.push(transcripts[geneId].start ? `${geneId} (${transcripts[geneId].start}-${transcripts[geneId].end})`
           //   : `${geneId} (Not present in ${trackName})`)
           const trackName = transcripts[geneId].track_name
-          geneOptions.push(`${geneId} (${trackName.substring(0, trackName.length/2)})`)
+          geneOptions.push(`${geneId} (${trackName})`)
         }
         this.props.loadGeneSelectOptions(geneOptions, transcripts);
         this.setState({

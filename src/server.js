@@ -168,7 +168,7 @@ api.post('/getChunkedData', (req, res, next) => {
         return next(new VgExecutionError('parse region failed: region invalid or geneId not found'));
       }
       let cols = target.split('\t');
-      req.body.region = `IRGSP-1.0.IRGSP-1.0.${cols[0]}:${cols[3] - 1}-${cols[4] - 1}`
+      req.body.region = `IRGSP-1.0.${cols[0]}:${cols[3] - 1}-${cols[4] - 1}`
       getChunkedData(req, res, next);
     });
   }
