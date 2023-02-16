@@ -99,12 +99,23 @@ class App extends Component {
   };
 
   toggleVisOptionFlag = flagName => {
-    this.setState(state => ({
-      visOptions: {
-        ...state.visOptions,
-        [flagName]: !state.visOptions[flagName]
-      }
-    }));
+    if (flagName === "showExons") {
+      const haplotypeColors = this.state.visOptions[flagName] ? "lightColors" : "greys";
+      this.setState(state => ({
+        visOptions: {
+          ...state.visOptions,
+          [flagName]: !state.visOptions[flagName],
+          haplotypeColors: haplotypeColors
+        }
+      }));
+    } else {
+      this.setState(state => ({
+        visOptions: {
+          ...state.visOptions,
+          [flagName]: !state.visOptions[flagName]
+        }
+      }));
+    }
   };
 
   handleMappingQualityCutoffChange = value => {
