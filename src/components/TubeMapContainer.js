@@ -106,14 +106,20 @@ class TubeMapContainer extends Component {
         const annotations = json.annotations;
         const trackName = json.trackName;
         const transcripts = tubeMap.parseTranscriptsFromAnnotations(annotations, trackName);
-        let geneOptions = [];
+        let transcriptSelectOptions = [];
         for (let geneId in transcripts) {
-          // geneOptions.push(transcripts[geneId].start ? `${geneId} (${transcripts[geneId].start}-${transcripts[geneId].end})`
-          //   : `${geneId} (Not present in ${trackName})`)
           const trackName = transcripts[geneId].track_name
-          geneOptions.push(`${geneId} (${trackName})`)
+          transcripts[geneId].transcripts.forEach(transcriptId => {
+            transcriptSelectOptions.push(`[${trackName}] ${transcriptId}`)
+          });
         }
-        this.props.loadGeneSelectOptions(geneOptions, transcripts);
+        transcriptSelectOptions.sort((a, b) => {
+          if (a.includes("[IRGSP") && b.includes("IRGSP")) return a.localeCompare(b);
+          if (a.includes("[IRGSP")) return -1;
+          if (b.includes("[IRGSP")) return 1;
+          return a.localeCompare(b);
+        });
+        this.props.loadTranscriptSelectOptions(transcriptSelectOptions, transcripts);
         this.setState({
           isLoading: false,
           nodes,
@@ -189,7 +195,7 @@ TubeMapContainer.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   dataOrigin: PropTypes.oneOf(Object.values(dataOriginTypes)).isRequired,
   fetchParams: PropTypes.object.isRequired,
-  loadGeneSelectOptions: PropTypes.func.isRequired
+  loadTranscriptSelectOptions: PropTypes.func.isRequired
 };
 
 export default TubeMapContainer;

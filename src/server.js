@@ -1042,7 +1042,7 @@ function getBedRegions(bedFile, dataPath) {
   let bed_info = {chr:[], start:[], end:[], desc:[], chunk:[]};
 
   // Load and parse the BED file
-  let bed_data = fs.readFileSync(bed_path).toString();
+  let bed_data = fs.readFileSync(bed_path).toString().trim();
   let lines = bed_data.split('\n');
   lines.map(function(line){
     let records = line.split("\t");

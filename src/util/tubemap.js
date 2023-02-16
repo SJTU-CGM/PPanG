@@ -138,8 +138,7 @@ const config = {
   colorReadsByMappingQuality: false,
   mappingQualityCutoff: 0,
   // Select gene when show exons
-  geneSelected: 'All',
-  transcriptSelected: 'All'
+  transcriptSelected: []
 };
 
 // variables for storing info which can be directly translated into drawing instructions
@@ -265,12 +264,6 @@ function straightenTrack(index) {
         .join('');
     }
   });
-}
-
-export function selectGene(value) {
-  config.geneSelected = value;
-  svg = d3.select(svgID);
-  createTubeMap();
 }
 
 export function selectTranscript(value) {
@@ -2264,16 +2257,11 @@ function addTrackFeatures() {
         if (tracks[i].name.startsWith(trackName)) {
           annotations[trackName].forEach(line => {
             let isSelected = true;
-            let gene_id = line.attributes.gene_id ?? line.attributes.ID;
             let transcript_id = line.attributes.transcript_id ?? line.attributes.ID;
-            if (config.geneSelected !== 'All' && gene_id.indexOf(
-              parseTranscripts(config.geneSelected).id) === -1) {
-              isSelected = false;
-            }
-            if (config.transcriptSelected !== 'All') {
-              let transcript = parseTranscripts(config.transcriptSelected);
-              if(transcript_id.indexOf(transcript.id) === -1) {
+            for (let i = 0; i < config.transcriptSelected.length; i++) {
+              if (transcript_id.includes(parseTranscripts(config.transcriptSelected[i]).id)) {
                 isSelected = false;
+                break;
               }
             }
             if (isSelected) {

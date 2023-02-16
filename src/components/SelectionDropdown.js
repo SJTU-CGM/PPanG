@@ -47,6 +47,31 @@ class SelectionDropdown extends Component {
       });
     }
 
+    const onMultiChange = options => {
+      let selected = [];
+      options.forEach(option => selected.push(option.value))
+      this.props.onChange({
+        target: {
+          id: this.props.id,
+          value: selected,
+        }
+      });
+    }
+
+    if (this.props.isMulti) {
+      return (
+        <Select
+          id={this.props.id}
+          className={this.props.className}
+          styles={styles}
+          isSearchable={true}
+          onChange={onMultiChange}
+          options={dropdownOptions}
+          openMenuOnClick={dropdownOptions.length < 2000}
+          isMulti
+        />
+      )
+    }
     return (
       <Select
         id={this.props.id}
@@ -66,6 +91,7 @@ SelectionDropdown.propTypes = {
   id: PropTypes.string,
   className: PropTypes.string,
   value: PropTypes.string,
+  isMulti: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   options: PropTypes.array.isRequired,
 };
@@ -74,6 +100,7 @@ SelectionDropdown.defaultProps = {
   id: undefined,
   className: undefined,
   value: undefined,
+  isMulti: false
 };
 
 export default SelectionDropdown;
