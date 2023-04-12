@@ -29,7 +29,8 @@ class SelectionDropdown extends Component {
       menu: base => ({
         ...base,
         width: "max-content",
-        minWidth: "100%"
+        minWidth: "100%",
+        zIndex: 999
       }),
     }
 

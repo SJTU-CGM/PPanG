@@ -760,7 +760,7 @@ function loadGFFAnnotationFiles(req, res, next) {
               cols[8].split(';').forEach(attribute => {
                 let attributeArray = attribute.trim().split(separator)
                 if (attributeArray.length === 2) {
-                  attributes[attributeArray[0]] = attributeArray[1].replace('"', '');
+                  attributes[attributeArray[0]] = attributeArray[1].replace(/"/g, '');
                 }
               })
               if (cols[2] === 'exon') {

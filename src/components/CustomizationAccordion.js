@@ -53,7 +53,7 @@ class VisualizationOptions extends Component {
       <Container>
         <div id="accordion">
           <Card>
-            <CardHeader id="legendCard">
+            <CardHeader id="legendCard" onClick={this.toggleLegend}>
               <h5 className="mb-0">
                 <a href="#collapse" onClick={this.toggleLegend}>
                   Legend
@@ -68,7 +68,7 @@ class VisualizationOptions extends Component {
           </Card>
 
           <Card>
-            <CardHeader id="visOptionsCard">
+            <CardHeader id="visOptionsCard" onClick={this.toggleVisOptions}>
               <h5 className="mb-0">
                 <a href="#collapse" onClick={this.toggleVisOptions}>
                   Visualization Options

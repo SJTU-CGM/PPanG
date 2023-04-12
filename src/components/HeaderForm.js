@@ -415,18 +415,18 @@ class HeaderForm extends Component {
         </option>
       );
     });
-    //dataSourceDropdownOptions.push(
-      // <option value="syntheticExamples" key="syntheticExamples">
-      //   synthetic data examples
-      // </option>,
-      // <option value="customFileUpload" key="customFileUpload">
-      //   custom (file upload)
-      // </option>,
-      //<option value="customMounted" key="customMounted">
-        {/*custom (mounted files)*/}
-        //select chromosome
-      //</option>
-    //);
+    // dataSourceDropdownOptions.push(
+    //   <option value="syntheticExamples" key="syntheticExamples">
+    //     synthetic data examples
+    //   </option>,
+    //   <option value="customFileUpload" key="customFileUpload">
+    //     custom (file upload)
+    //   </option>,
+    //   <option value="customMounted" key="customMounted">
+    //     {/*custom (mounted files)*/}
+    //     select chromosome
+    //   </option>
+    // );
 
     const mountedFilesFlag = this.state.dataType === dataTypes.MOUNTED_FILES;
     const uploadFilesFlag = this.state.dataType === dataTypes.FILE_UPLOAD;
@@ -440,7 +440,7 @@ class HeaderForm extends Component {
         <Container fluid={true}>
           <Row>
             <Col md="auto">
-              <img src="./logo.png" alt="Logo" />
+              {/*<img src="./logo.png" alt="Logo" />*/}
             </Col>
             <Col>
               <Form inline>
@@ -482,7 +482,7 @@ class HeaderForm extends Component {
                     handleInputChange={this.handleInputChange}
                   />
                 )}
-	    	{pathNamesFlag && (
+                {pathNamesFlag && (
                   <PathNamesFormRow
                     pathSelect={this.state.pathSelect}
                     pathSelectOptions={this.state.pathSelectOptions}

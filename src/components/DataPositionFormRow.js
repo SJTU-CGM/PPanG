@@ -81,7 +81,7 @@ class DataPositionFormRow extends Component {
         <div className="popup" onClick={this.helpPopupFunction}>
           <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
           <span className="popuptext" id="helpPopup">
-            Coordinate: Search for a coordinate range (e.g. "IRGSP-1.0.chr1:1-100"), or a start position and a distance (e.g. "IRGSP-1.0.chr1:1-100"). Note that the coordinate starts from 0.
+            Coordinate: Search for a coordinate range (e.g. "IRGSP-1.0.chr01:1-100"), or a start position and a distance (e.g. "IRGSP-1.0.chr01:1+100"). Note that the coordinate starts from 0.
             <br/>
             Gene/Transcript Id: Search the gene/transcript id (e.g. "LOC_Os01g66100") in msu7 in selected chromosome and find the gene region.
           </span>
