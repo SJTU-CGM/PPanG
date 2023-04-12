@@ -36,10 +36,6 @@ class VisualizationOptions extends Component {
     this.props.handleMappingQualityCutoffChange(event.target.value);
   };
 
-  handleSelectGene = event => {
-    this.props.handleSelectGene(event.target.value);
-  }
-
   handleSelectTranscript = event => {
     this.props.handleSelectTranscript(event.target.value);
   }
@@ -126,26 +122,15 @@ class VisualizationOptions extends Component {
                   <Form inline>
                   {visOptions.showExons && (
                     <React.Fragment>
-                      <label className="tight-label">Gene ID:</label>
-                        <SelectionDropdown
-                          value={visOptions.geneSelected}
-                          onChange={this.handleSelectGene}
-                          options={visOptions.geneSelectOptions}
-                        />
-                    </React.Fragment>
-                  )}
-                  </Form>
-                  <Form inline>
-                    {visOptions.showExons && (
-                      <React.Fragment>
-                        <label className="tight-label">Transcript ID:</label>
+                      <label className="tight-label">Select genes of no interest to hide:</label>
                         <SelectionDropdown
                           value={visOptions.transcriptSelected}
                           onChange={this.handleSelectTranscript}
                           options={visOptions.transcriptSelectOptions}
+                          isMulti
                         />
-                      </React.Fragment>
-                    )}
+                    </React.Fragment>
+                  )}
                   </Form>
                 </FormGroup>
                 {/*<FormGroup>*/}
@@ -240,7 +225,6 @@ class VisualizationOptions extends Component {
 VisualizationOptions.propTypes = {
   handleMappingQualityCutoffChange: PropTypes.func.isRequired,
   setColorSetting: PropTypes.func.isRequired,
-  handleSelectGene: PropTypes.func.isRequired,
   handleSelectTranscript: PropTypes.func.isRequired
 };
 

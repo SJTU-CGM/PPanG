@@ -1,14 +1,92 @@
 {
-  "BACKEND_URL": false,
+  "BACKEND_URL": "https://cgm.sjtu.edu.cn/public/rice-maker/9ref",
   "DATA_SOURCES": [
     {
-      "name": "sd-1 gene",
+      "name": "chr01",
       "xgFile": "chr01.xg",
       "defaultPosition": "LOC_Os01g66100",
-      "useMountedPath": true
+      "useMountedPath": true,
+      "bedFile": "chr01.bed"
+    },
+    {
+      "name": "chr02",
+      "xgFile": "chr02.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os02g52550",
+      "bedFile": "chr02.bed"
+    },
+    {
+      "name": "chr03",
+      "xgFile": "chr03.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os03g62500",
+      "bedFile": "chr03.bed"
+    },
+    {
+      "name": "chr04",
+      "xgFile": "chr04.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os04g32850",
+      "bedFile": "chr04.bed"
+    },
+    {
+      "name": "chr05",
+      "xgFile": "chr05.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os05g06660",
+      "bedFile": "chr05.bed"
+    },
+    {
+      "name": "chr06",
+      "xgFile": "chr06.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os06g17900",
+      "bedFile": "chr06.bed"
+    },
+    {
+      "name": "chr07",
+      "xgFile": "chr07.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os07g05900",
+      "bedFile": "chr07.bed"
+    },
+    {
+      "name": "chr08",
+      "xgFile": "chr08.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os08g05440",
+      "bedFile": "chr08.bed"
+    },
+    {
+      "name": "chr09",
+      "xgFile": "chr09.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os09g15840",
+      "bedFile": "chr09.bed"
+    },
+    {
+      "name": "chr10",
+      "xgFile": "chr10.xg",
+      "useMountedPath": true,
+      "defaultPosition": ""
+    },
+    {
+      "name": "chr11",
+      "xgFile": "chr11.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os11g11790",
+      "bedFile": "chr11.bed"
+    },
+    {
+      "name": "chr12",
+      "xgFile": "chr12.xg",
+      "useMountedPath": true,
+      "defaultPosition": "LOC_Os12g18360",
+      "bedFile": "chr12.bed"
     }
   ],
   "vgPath": "",
   "dataPath": "./riceData",
   "internalDataPath": "./exampleData/internal/",
+  "serverPort": 3001
 }

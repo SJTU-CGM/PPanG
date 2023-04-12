@@ -70,7 +70,6 @@ app.use(compression());
 
 // Serve the frontend
 app.use(express.static('./build'));
-
 // Make another Express object to keep all the API calls on a sensible path
 // that can be proxied around if needed.
 const api = express();
@@ -168,7 +167,7 @@ api.post('/getChunkedData', (req, res, next) => {
         return next(new VgExecutionError('parse region failed: region invalid or geneId not found'));
       }
       let cols = target.split('\t');
-      req.body.region = `IRGSP-1.0.IRGSP-1.0.${cols[0]}:${cols[3] - 1}-${cols[4] - 1}`
+      req.body.region = `IRGSP-1.0.${cols[0]}:${cols[3] - 1}-${cols[4] - 1}`
       getChunkedData(req, res, next);
     });
   }
@@ -761,7 +760,7 @@ function loadGFFAnnotationFiles(req, res, next) {
               cols[8].split(';').forEach(attribute => {
                 let attributeArray = attribute.trim().split(separator)
                 if (attributeArray.length === 2) {
-                  attributes[attributeArray[0]] = attributeArray[1].replaceAll('"', '');
+                  attributes[attributeArray[0]] = attributeArray[1].replace('"', '');
                 }
               })
               if (cols[2] === 'exon') {
@@ -1042,7 +1041,7 @@ function getBedRegions(bedFile, dataPath) {
   let bed_info = {chr:[], start:[], end:[], desc:[], chunk:[]};
 
   // Load and parse the BED file
-  let bed_data = fs.readFileSync(bed_path).toString();
+  let bed_data = fs.readFileSync(bed_path).toString().trim();
   let lines = bed_data.split('\n');
   lines.map(function(line){
     let records = line.split("\t");

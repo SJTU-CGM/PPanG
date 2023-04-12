@@ -60,10 +60,8 @@ class App extends Component {
         reverseReadColors: 'blues',
         colorReadsByMappingQuality: false,
         mappingQualityCutoff: 0,
-        geneSelected: 'All',
-        geneSelectOptions: ['All'],
-        transcriptSelected: 'All',
-        transcriptSelectOptions: ['All'],
+        transcriptSelected: [],
+        transcriptSelectOptions: [],
         transcripts: {}
       }
     };
@@ -87,7 +85,6 @@ class App extends Component {
     );
     tubeMap.setMappingQualityCutoff(visOptions.mappingQualityCutoff);
     try {
-      tubeMap.selectGene(visOptions.geneSelected);
       tubeMap.selectTranscript(visOptions.transcriptSelected);
     } catch (e) {
       console.error(e);
@@ -102,12 +99,23 @@ class App extends Component {
   };
 
   toggleVisOptionFlag = flagName => {
-    this.setState(state => ({
-      visOptions: {
-        ...state.visOptions,
-        [flagName]: !state.visOptions[flagName]
-      }
-    }));
+    if (flagName === "showExons") {
+      const haplotypeColors = this.state.visOptions[flagName] ? "lightColors" : "greys";
+      this.setState(state => ({
+        visOptions: {
+          ...state.visOptions,
+          [flagName]: !state.visOptions[flagName],
+          haplotypeColors: haplotypeColors
+        }
+      }));
+    } else {
+      this.setState(state => ({
+        visOptions: {
+          ...state.visOptions,
+          [flagName]: !state.visOptions[flagName]
+        }
+      }));
+    }
   };
 
   handleMappingQualityCutoffChange = value => {
@@ -132,28 +140,11 @@ class App extends Component {
     this.setState({ dataOrigin });
   };
 
-  handleSelectGene = (value) => {
-    let transcriptSelectOptions = ['All'];
-    if (value !== 'All') {
-      let geneId = parseTranscripts(value).id;
-      transcriptSelectOptions = transcriptSelectOptions.concat(this.state.visOptions.transcripts[geneId].transcripts);
-    }
+  loadTranscriptSelectOptions = (transcriptSelectOptions, transcripts) => {
     this.setState(state => ({
       visOptions: {
         ...state.visOptions,
-        geneSelected: value,
         transcriptSelectOptions: transcriptSelectOptions,
-        transcriptSelected: 'All'
-      }
-    }));
-  }
-
-  loadGeneSelectOptions = (geneOptions, transcripts) => {
-    const geneSelectOptions = ['All'].concat(geneOptions);
-    this.setState(state => ({
-      visOptions: {
-        ...state.visOptions,
-        geneSelectOptions: geneSelectOptions,
         transcripts: transcripts
       }
     }));
@@ -182,7 +173,7 @@ class App extends Component {
           fetchParams={this.state.fetchParams}
           dataOrigin={this.state.dataOrigin}
           apiUrl={this.props.apiUrl}
-          loadGeneSelectOptions={this.loadGeneSelectOptions}
+          loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
         />
         <CustomizationAccordion
           visOptions={this.state.visOptions}
@@ -190,7 +181,6 @@ class App extends Component {
           handleMappingQualityCutoffChange={
             this.handleMappingQualityCutoffChange
           }
-          handleSelectGene={this.handleSelectGene}
           handleSelectTranscript={this.handleSelectTranscript}
           setColorSetting={this.setColorSetting}
         />
