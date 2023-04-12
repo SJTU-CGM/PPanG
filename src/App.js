@@ -7,7 +7,27 @@ import CustomizationAccordion from './components/CustomizationAccordion';
 import { dataOriginTypes } from './enums';
 import * as tubeMap from './util/tubemap';
 import config from './config.json';
-import {parseTranscripts} from "./util/util";
+import assembly, {getAssembly} from './jbrowse/assembly'
+import tracks, {getTracks} from './jbrowse/tracks'
+import defaultSession, {getDefaultSession} from './jbrowse/defaultSession'
+
+import {
+  createViewState,
+  JBrowseLinearGenomeView,
+} from '@jbrowse/react-linear-genome-view'
+import {Button, Collapse} from "reactstrap";
+import SelectionDropdown from "./components/SelectionDropdown";
+
+const accessions = [
+  "ARC10497",
+  "CHAOMEO",
+  "KETANNANGKA",
+  "LARHAMUGAD",
+  "LIMA",
+  "NATELBORO",
+  "PR106",
+  "TG22"
+]
 
 class App extends Component {
   constructor(props) {
@@ -63,7 +83,16 @@ class App extends Component {
         transcriptSelected: [],
         transcriptSelectOptions: [],
         transcripts: {}
-      }
+      },
+      jbrowseViewStates: {
+        "IRGSP-1.0": createViewState({
+          assembly,
+          tracks,
+          defaultSession,
+          location: 'chr01:38382382-38385504',
+        })
+      },
+      accessionSelected: "ARC10497"
     };
   }
 
@@ -88,6 +117,14 @@ class App extends Component {
       tubeMap.selectTranscript(visOptions.transcriptSelected);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  jbrowseNav() {
+    for (let accession in this.props.regions) {
+      if (accession in this.state.jbrowseViewStates) {
+        this.state.jbrowseViewStates[accession].session.view.navToLocString(this.props.regions[accession])
+      }
     }
   }
 
@@ -159,7 +196,13 @@ class App extends Component {
     }));
   }
 
+  handleChangeRegion = (region) => {
+    this.props.regions = region
+    this.jbrowseNav()
+  }
+
   render() {
+    const { jbrowseViews } = this.state;
     return (
       <div>
         <HeaderForm
@@ -174,7 +217,47 @@ class App extends Component {
           dataOrigin={this.state.dataOrigin}
           apiUrl={this.props.apiUrl}
           loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
+          handleChangeRegion={this.handleChangeRegion}
         />
+        <div style={{margin: "20px"}}>
+          <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
+          {/*<Collapse>*/}
+            <SelectionDropdown
+              value={this.state.accessionSelected}
+              options={accessions}
+              onChange={(event) => this.setState({accessionSelected: event.target.value})}/>
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const assembly = getAssembly(this.state.accessionSelected)
+                const tracks = getTracks(this.state.accessionSelected)
+                const defaultSession = getDefaultSession(this.state.accessionSelected)
+                let location;
+                if (this.state.accessionSelected in this.props.regions) {
+                  location = this.props.regions[this.state.accessionSelected]
+                } else {
+                  location = "chr01:1-1000"
+                }
+                this.setState((state) => ({
+                  jbrowseViewStates: {
+                    ...state.jbrowseViewStates,
+                    [this.state.accessionSelected]: createViewState({
+                      assembly,
+                      tracks,
+                      defaultSession,
+                      location: location
+                    })
+                  }
+                }))
+              }}
+            >+</Button>
+            {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP")).map(e => {
+              return <JBrowseLinearGenomeView viewState={e[1]}/>
+            })}
+          {/*</Collapse>*/}
+        </div>
         <CustomizationAccordion
           visOptions={this.state.visOptions}
           toggleFlag={this.toggleVisOptionFlag}
@@ -190,7 +273,8 @@ class App extends Component {
 }
 
 App.propTypes = {
-  apiUrl: PropTypes.string
+  apiUrl: PropTypes.string,
+  regions: PropTypes.object,
 }
 
 App.defaultProps = {
@@ -198,7 +282,18 @@ App.defaultProps = {
   // the config or the browser, but needs to be swapped out in the fake
   // browser testing environment to point to a real testing backend.
   // Note that host includes the port.
-  apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0'
+  apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0',
+  regions: {
+    "IRGSP-1.0": "chr01:38382382-38385504",
+    "ARC10497": "chr01:38938856-38941978",
+    "CHAOMEO": "chr01:39649118-39652240",
+    "KETANNANGKA": "chr01:39379545-39382667",
+    "LARHAMUGAD": "chr01:40029054-40032176",
+    "LIMA": "chr01:39932788-39935910",
+    "NATELBORO": "chr01:38813443-38816565",
+    "PR106": "chr01:39631014-39634136",
+    "TG22": "chr01:38728489-38731611"
+  }
 };
 
 export default App;

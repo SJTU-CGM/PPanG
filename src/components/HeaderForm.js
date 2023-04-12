@@ -440,7 +440,7 @@ class HeaderForm extends Component {
         <Container fluid={true}>
           <Row>
             <Col md="auto">
-              <img src="./logo.png" alt="Logo" />
+              {/*<img src="./logo.png" alt="Logo" />*/}
             </Col>
             <Col>
               <Form inline>
