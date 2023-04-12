@@ -40,7 +40,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "serve": "node ./src/server.js"
+    "serve": "node ./src/server.js --port 3001"
   },
   "eslintConfig": {
     "extends": "react-app"
