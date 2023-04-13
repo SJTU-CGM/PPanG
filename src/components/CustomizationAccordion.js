@@ -1,17 +1,15 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
-  Container,
-  Collapse,
-  CardBody,
   Card,
+  CardBody,
   CardHeader,
-  Form,
-  Label,
+  Collapse,
+  Container,
+  FormGroup,
   Input,
-  FormGroup
+  Label
 } from 'reactstrap';
-import RadioRow from './RadioRow';
 import SelectionDropdown from "./SelectionDropdown";
 
 class VisualizationOptions extends Component {
@@ -119,20 +117,20 @@ class VisualizationOptions extends Component {
                       Show exons on tracks
                     </Label>
                   </FormGroup>
-                  <Form inline>
-                  {visOptions.showExons && (
-                    <React.Fragment>
+                </FormGroup>
+                {visOptions.showExons && (
+                  <React.Fragment>
                       <label className="tight-label">Select genes of no interest to hide:</label>
+                    <div style={{maxWidth: "60%"}}>
                         <SelectionDropdown
                           value={visOptions.transcriptSelected}
                           onChange={this.handleSelectTranscript}
                           options={visOptions.transcriptSelectOptions}
                           isMulti
                         />
-                    </React.Fragment>
-                  )}
-                  </Form>
-                </FormGroup>
+                    </div>
+                  </React.Fragment>
+                )}
                 {/*<FormGroup>*/}
                 {/*  <h5>Sequence Reads</h5>*/}
                 {/*  <FormGroup check>*/}

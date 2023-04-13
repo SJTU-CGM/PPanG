@@ -15,8 +15,9 @@ import {
   createViewState,
   JBrowseLinearGenomeView,
 } from '@jbrowse/react-linear-genome-view'
-import {Button, Collapse} from "reactstrap";
+import {Button, Form} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
+import {Cross} from "./components/Cross";
 
 const accessions = [
   "ARC10497",
@@ -202,7 +203,6 @@ class App extends Component {
   }
 
   render() {
-    const { jbrowseViews } = this.state;
     return (
       <div>
         <HeaderForm
@@ -221,42 +221,65 @@ class App extends Component {
         />
         <div style={{margin: "20px"}}>
           <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
-          {/*<Collapse>*/}
+          <Form style={{marginTop: "20px"}} inline>
+            <h5 style={{marginRight: "20px"}}>More Genomes:</h5>
+            <div style={{minWidth: "200px", marginRight: "20px"}}>
             <SelectionDropdown
               value={this.state.accessionSelected}
               options={accessions}
               onChange={(event) => this.setState({accessionSelected: event.target.value})}/>
+            </div>
             <Button
               size="small"
               variant="outlined"
               color="primary"
               onClick={() => {
-                const assembly = getAssembly(this.state.accessionSelected)
-                const tracks = getTracks(this.state.accessionSelected)
-                const defaultSession = getDefaultSession(this.state.accessionSelected)
+                const selected = this.state.accessionSelected
+                if (selected === "None") return
+                let index = accessions.indexOf(selected)
+                const assembly = getAssembly(selected)
+                const tracks = getTracks(selected)
+                const defaultSession = getDefaultSession(selected)
                 let location;
-                if (this.state.accessionSelected in this.props.regions) {
-                  location = this.props.regions[this.state.accessionSelected]
+                if (selected in this.props.regions) {
+                  location = this.props.regions[selected]
                 } else {
                   location = "chr01:1-1000"
                 }
+                accessions.splice(index, 1)
+                if (accessions.length <= index) index--
                 this.setState((state) => ({
                   jbrowseViewStates: {
                     ...state.jbrowseViewStates,
-                    [this.state.accessionSelected]: createViewState({
+                    [selected]: createViewState({
                       assembly,
                       tracks,
                       defaultSession,
                       location: location
                     })
-                  }
+                  },
+                  accessionSelected: accessions[index] ?? "None"
                 }))
               }}
             >+</Button>
-            {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP")).map(e => {
-              return <JBrowseLinearGenomeView viewState={e[1]}/>
+          </Form>
+            {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
+              return <div>
+                <div style={{textAlign: "right"}}>
+                  <Cross onClick={() => {
+                    accessions.push(e[0])
+                    accessions.sort()
+                    this.setState((state) => ({
+                      jbrowseViewStates: {
+                        ...state.jbrowseViewStates,
+                        [e[0]]: undefined
+                      }
+                    }))
+                  }}></Cross>
+                </div>
+                <JBrowseLinearGenomeView viewState={e[1]}/>
+              </div>
             })}
-          {/*</Collapse>*/}
         </div>
         <CustomizationAccordion
           visOptions={this.state.visOptions}
