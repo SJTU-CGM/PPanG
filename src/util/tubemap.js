@@ -10,7 +10,7 @@
 /* eslint no-return-assign: "off" */
 import * as d3 from 'd3';
 import 'd3-selection-multi';
-import {parseTranscripts} from "./util";
+import {getTrackStart, parseTranscripts} from "./util";
 
 const DEBUG = false;
 
@@ -2255,6 +2255,7 @@ function addTrackFeatures() {
     for (let trackName in annotations) {
       for (let i = 0; i < numberOfTracks; i++) {
         if (tracks[i].name.startsWith(trackName)) {
+          let regionStart = getTrackStart(tracks[i])
           annotations[trackName].forEach(line => {
             let isSelected = true;
             let transcript_id = line.attributes.transcript_id ?? line.attributes.ID;
@@ -2269,9 +2270,8 @@ function addTrackFeatures() {
               // coordinate starts with 1 in gff while 0 in vg
               start -= 1;
               end -= 1;
-              nodeStart = tracks[i].indexOfFirstBase ?? Number(tracks[i].name.substring(
-                tracks[i].name.indexOf('[') + 1, tracks[i].name.indexOf(']')));
-              tracks[i].path.forEach(node => {
+              nodeStart = regionStart
+              tracks[i].path.forEach((node, index) => {
                 if (node.node !== null) {
                   feature = {};
                   if (nodes[node.node].hasOwnProperty('sequenceLength')) {
@@ -2287,7 +2287,7 @@ function addTrackFeatures() {
                   }
                   if (nodeEnd <= end && nodeEnd >= start) {
                     feature.end = nodeEnd - nodeStart;
-                    if (nodeEnd < end) feature.continue = true;
+                    if (nodeEnd < end && index < tracks[i].path.length - 1) feature.continue = true;
                   }
                   if (nodeEnd > end && nodeStart <= end) {
                     feature.end = end - nodeStart;
