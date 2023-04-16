@@ -1142,6 +1142,8 @@ function start() {
       // See if the other server components are up yet and, if so, resolve our promise.
       resolveIfReady();
     });
+
+    server.timeout = 240000;
     // Create the WebSocketServer, for watching for updated files, using the HTTP server instance
     // Note that all websocket connections on any path end up here!
     const wss = new WebSocketServer({ httpServer: server });
