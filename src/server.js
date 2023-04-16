@@ -341,16 +341,14 @@ function getChunkedData(req, res, next) {
       '-b',
       `${req.chunkDir}/chunk`,
       '-E',
-      `${req.chunkDir}/regions.tsv`,
-      '--threads',
-      8
+      `${req.chunkDir}/regions.tsv`
     );
 
     console.log(`vg ${vgChunkParams.join(' ')}`);
 
     console.time('vg chunk');
     const vgChunkCall = spawn(`${VG_PATH}vg`, vgChunkParams);
-    const vgViewCall = spawn(`${VG_PATH}vg`, ['view', '-j', '-', '--threads', 8]);
+    const vgViewCall = spawn(`${VG_PATH}vg`, ['view', '-j', '-']);
     let graphAsString = '';
     req.error = new Buffer(0);
 
@@ -1142,8 +1140,6 @@ function start() {
       // See if the other server components are up yet and, if so, resolve our promise.
       resolveIfReady();
     });
-
-    server.timeout = 240000;
     // Create the WebSocketServer, for watching for updated files, using the HTTP server instance
     // Note that all websocket connections on any path end up here!
     const wss = new WebSocketServer({ httpServer: server });
