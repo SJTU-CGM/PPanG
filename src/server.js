@@ -341,16 +341,14 @@ function getChunkedData(req, res, next) {
       '-b',
       `${req.chunkDir}/chunk`,
       '-E',
-      `${req.chunkDir}/regions.tsv`,
-      '--threads',
-      8
+      `${req.chunkDir}/regions.tsv`
     );
 
     console.log(`vg ${vgChunkParams.join(' ')}`);
 
     console.time('vg chunk');
     const vgChunkCall = spawn(`${VG_PATH}vg`, vgChunkParams);
-    const vgViewCall = spawn(`${VG_PATH}vg`, ['view', '-j', '-', '--threads', 8]);
+    const vgViewCall = spawn(`${VG_PATH}vg`, ['view', '-j', '-']);
     let graphAsString = '';
     req.error = new Buffer(0);
 
