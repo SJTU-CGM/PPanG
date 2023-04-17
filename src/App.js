@@ -10,6 +10,7 @@ import config from './config.json';
 import assembly, {getAssembly} from './jbrowse/assembly'
 import tracks, {getTracks} from './jbrowse/tracks'
 import defaultSession, {getDefaultSession} from './jbrowse/defaultSession'
+import accessions, {setDefaultAccessions} from "./accessions";
 
 import {
   createViewState,
@@ -18,17 +19,6 @@ import {
 import {Button, Form} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
-
-const accessions = [
-  "ARC10497",
-  "CHAOMEO",
-  "KETANNANGKA",
-  "LARHAMUGAD",
-  "LIMA",
-  "NATELBORO",
-  "PR106",
-  "TG22"
-]
 
 class App extends Component {
   constructor(props) {
@@ -93,7 +83,7 @@ class App extends Component {
           location: 'chr01:38382382-38385504',
         })
       },
-      accessionSelected: "ARC10497"
+      accessionSelected: accessions[0]
     };
   }
 
@@ -202,6 +192,45 @@ class App extends Component {
     this.jbrowseNav()
   }
 
+  handleClearButton = () => {
+    setDefaultAccessions()
+    this.setState((state) => ({
+      jbrowseViewStates: {
+        'IRGSP-1.0': state.jbrowseViewStates['IRGSP-1.0']
+      },
+      accessionSelected: accessions[0]
+    }))
+  }
+
+  handleAddTrackButton = () => {
+    const selected = this.state.accessionSelected
+    if (selected === "None") return
+    let index = accessions.indexOf(selected)
+    const assembly = getAssembly(selected)
+    const tracks = getTracks(selected)
+    const defaultSession = getDefaultSession(selected)
+    let location;
+    if (selected in this.props.regions) {
+      location = this.props.regions[selected]
+    } else {
+      location = "chr01:1-1000"
+    }
+    accessions.splice(index, 1)
+    if (accessions.length <= index) index--
+    this.setState((state) => ({
+      jbrowseViewStates: {
+        ...state.jbrowseViewStates,
+        [selected]: createViewState({
+          assembly,
+          tracks,
+          defaultSession,
+          location: location
+        })
+      },
+      accessionSelected: accessions[index] ?? "None"
+    }))
+  }
+
   render() {
     return (
       <div>
@@ -233,35 +262,14 @@ class App extends Component {
               size="small"
               variant="outlined"
               color="primary"
-              onClick={() => {
-                const selected = this.state.accessionSelected
-                if (selected === "None") return
-                let index = accessions.indexOf(selected)
-                const assembly = getAssembly(selected)
-                const tracks = getTracks(selected)
-                const defaultSession = getDefaultSession(selected)
-                let location;
-                if (selected in this.props.regions) {
-                  location = this.props.regions[selected]
-                } else {
-                  location = "chr01:1-1000"
-                }
-                accessions.splice(index, 1)
-                if (accessions.length <= index) index--
-                this.setState((state) => ({
-                  jbrowseViewStates: {
-                    ...state.jbrowseViewStates,
-                    [selected]: createViewState({
-                      assembly,
-                      tracks,
-                      defaultSession,
-                      location: location
-                    })
-                  },
-                  accessionSelected: accessions[index] ?? "None"
-                }))
-              }}
+              onClick={this.handleAddTrackButton}
             >+</Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              onClick={this.handleClearButton}
+            >Clear</Button>
           </Form>
             {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
               return <div>
