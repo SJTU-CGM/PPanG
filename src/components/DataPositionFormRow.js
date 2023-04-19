@@ -98,6 +98,7 @@ class DataPositionFormRow extends Component {
           color="primary"
           id="goLeftButton"
           onClick={this.props.handleGoLeft}
+          disabled={this.props.isGoNextDisabled}
         >
           <FontAwesomeIcon icon={faStepBackward} size="lg" />
         </Button>
@@ -111,11 +112,12 @@ class DataPositionFormRow extends Component {
           color="primary"
           id="goRightButton"
           onClick={this.props.handleGoRight}
+          disabled={this.props.isGoNextDisabled}
         >
           <FontAwesomeIcon icon={faStepForward} size="lg" />
         </Button>
         <Button
-          color="secondary"
+          color="primary"
           id="downloadButton"
           onClick={this.handleDownloadButton}
         >
@@ -133,6 +135,7 @@ DataPositionFormRow.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
   region: PropTypes.string.isRequired,
   uploadInProgress: PropTypes.bool.isRequired,
+  isGoNextDisabled: PropTypes.bool.isRequired
 };
 
 export default DataPositionFormRow;
