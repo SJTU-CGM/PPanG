@@ -19,6 +19,7 @@ import {
 import {Button, Form} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
+import {update} from "./util/tubemap";
 
 class App extends Component {
   constructor(props) {
@@ -109,6 +110,7 @@ class App extends Component {
     } catch (e) {
       console.error(e);
     }
+    tubeMap.update();
   }
 
   jbrowseNav() {

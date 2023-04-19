@@ -528,6 +528,7 @@ class HeaderForm extends Component {
                   handleGoRight={this.handleGoRight}
                   handleGoButton={this.handleGoButton}
                   uploadInProgress={this.state.uploadInProgress}
+                  isGoNextDisabled={!this.state.region || !this.state.region.includes(":")}
                 />
               )}
             </Col>

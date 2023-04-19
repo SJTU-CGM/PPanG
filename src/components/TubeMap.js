@@ -7,9 +7,9 @@ class TubeMap extends Component {
     this.createTubeMap();
   }
 
-  componentDidUpdate() {
-    this.createTubeMap();
-  }
+  // componentDidUpdate() {
+  //   this.createTubeMap();
+  // }
 
   createTubeMap = () => {
     tubeMap.create({
