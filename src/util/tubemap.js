@@ -117,6 +117,10 @@ let extraLeft = []; // info whether nodes have to be moved further apart because
 let extraRight = []; // info whether nodes have to be moved further apart because of multiple 180° directional changes at the same horizontal order
 let maxOrder; // horizontal order of the rightmost node
 
+let lastInputNodes;
+let lastInputTracks;
+let lastConfig;
+
 const config = {
   mergeNodesFlag: true,
   transparentNodesFlag: false,
@@ -170,8 +174,7 @@ export function create(params) {
   bed = params.bed || null;
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
-  const tr = createTubeMap();
-  if (!config.hideLegendFlag) drawLegend(tr);
+  update();
 }
 
 // Return true if the given name names a reverse strand node, and false otherwise.
@@ -267,9 +270,11 @@ function straightenTrack(index) {
 }
 
 export function selectTranscript(value) {
-  config.transcriptSelected = value;
-  svg = d3.select(svgID);
-  createTubeMap();
+  if (config.transcriptSelected !== value) {
+    config.transcriptSelected = value;
+    // svg = d3.select(svgID);
+    //createTubeMap();
+  }
 }
 
 export function changeTrackVisibility(trackID) {
@@ -282,7 +287,7 @@ export function changeTrackVisibility(trackID) {
       inputTracks[i].hidden = true;
     }
   }
-  createTubeMap();
+  //createTubeMap();
 }
 
 // to select/deselect all
@@ -294,20 +299,20 @@ export function changeAllTracksVisibility(value) {
     checkbox.checked = value;
     i += 1;
   }
-  createTubeMap();
+  //createTubeMap();
 }
 
 export function changeExonVisibility() {
   config.showExonsFlag = !config.showExonsFlag;
-  createTubeMap();
+  //createTubeMap();
 }
 
 // sets the flag for whether exons are shown in tracks or not
 export function setShowExonsFlag(value) {
   if (config.showExonsFlag !== value) {
     config.showExonsFlag = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
@@ -315,8 +320,8 @@ export function setShowExonsFlag(value) {
 export function setMergeNodesFlag(value) {
   if (config.mergeNodesFlag !== value) {
     config.mergeNodesFlag = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
@@ -324,8 +329,8 @@ export function setMergeNodesFlag(value) {
 export function setTransparentNodesFlag(value) {
   if (config.transparentNodesFlag !== value) {
     config.transparentNodesFlag = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
@@ -333,8 +338,8 @@ export function setTransparentNodesFlag(value) {
 export function setSoftClipsFlag(value) {
   if (config.showSoftClips !== value) {
     config.showSoftClips = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
@@ -342,16 +347,16 @@ export function setSoftClipsFlag(value) {
 export function setShowReadsFlag(value) {
   if (config.showReads !== value) {
     config.showReads = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
 export function setColorSet(trackType, colorSet) {
   if (config[trackType] !== colorSet) {
     config[trackType] = colorSet;
-    const tr = createTubeMap();
-    if (!config.hideLegendFlag && tracks) drawLegend(tr);
+    // const tr = createTubeMap();
+    // if (!config.hideLegendFlag && tracks) drawLegend(tr);
   }
 }
 
@@ -360,10 +365,10 @@ export function setNodeWidthOption(value) {
   if (value === 0 || value === 1 || value === 2) {
     if (config.nodeWidthOption !== value) {
       config.nodeWidthOption = value;
-      if (svg !== undefined) {
-        svg = d3.select(svgID);
-        createTubeMap();
-      }
+      // if (svg !== undefined) {
+      //   svg = d3.select(svgID);
+      //   createTubeMap();
+      // }
     }
   }
 }
@@ -371,23 +376,37 @@ export function setNodeWidthOption(value) {
 export function setColorReadsByMappingQualityFlag(value) {
   if (config.colorReadsByMappingQuality !== value) {
     config.colorReadsByMappingQuality = value;
-    svg = d3.select(svgID);
-    createTubeMap();
+    // svg = d3.select(svgID);
+    //createTubeMap();
   }
 }
 
 export function setMappingQualityCutoff(value) {
   if (config.mappingQualityCutoff !== value) {
     config.mappingQualityCutoff = value;
-    if (svg !== undefined) {
-      svg = d3.select(svgID);
-      createTubeMap();
-    }
+    // if (svg !== undefined) {
+    //   svg = d3.select(svgID);
+    //   createTubeMap();
+    // }
   }
+}
+
+export function update() {
+  const tr = createTubeMap();
+  if (!config.hideLegendFlag && tr) drawLegend(tr);
 }
 
 // main
 function createTubeMap() {
+  // if nodes, tracks, config are not changed, the svg won't update
+  const nodesStr = JSON.stringify(inputNodes)
+  const tracksStr = JSON.stringify(inputTracks)
+  const configStr = JSON.stringify(config)
+  if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig === configStr) return;
+  lastInputNodes = nodesStr
+  lastInputTracks = tracksStr
+  lastConfig = configStr
+
   trackRectangles = [];
   trackCurves = [];
   trackCorners = [];
@@ -400,6 +419,7 @@ function createTubeMap() {
   minYCoordinate = 0;
   maxXCoordinate = 0;
   trackForRuler = undefined;
+
   svg = d3.select(svgID);
   svg.selectAll('*').remove(); // clear svg for (re-)drawing
 
@@ -408,8 +428,8 @@ function createTubeMap() {
   if (inputNodes.length === 0 || inputTracks.length === 0) return;
 
   straightenTrack(0);
-  nodes = JSON.parse(JSON.stringify(inputNodes)); // deep copy (can add stuff to copy and leave original unchanged)
-  tracks = JSON.parse(JSON.stringify(inputTracks));
+  nodes = JSON.parse(nodesStr); // deep copy (can add stuff to copy and leave original unchanged)
+  tracks = JSON.parse(tracksStr);
   reads = JSON.parse(JSON.stringify(inputReads));
   annotations = JSON.parse(JSON.stringify(inputAnnotations));
 
@@ -2340,9 +2360,9 @@ function calculateTrackWidth() {
 
 export function useColorScheme(x) {
   config.colorScheme = x;
-  svg = d3.select(svgID);
-  const tr = createTubeMap();
-  if (!config.hideLegendFlag && tracks) drawLegend(tr);
+  // svg = d3.select(svgID);
+  // const tr = createTubeMap();
+  // if (!config.hideLegendFlag && tracks) drawLegend(tr);
 }
 
 function assignColorSets() {
