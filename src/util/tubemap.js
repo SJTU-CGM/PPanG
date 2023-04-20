@@ -11,6 +11,7 @@
 import * as d3 from 'd3';
 import 'd3-selection-multi';
 import {getTrackStart, parseTranscripts} from "./util";
+import {accessions9Ref} from "../accessions";
 
 const DEBUG = false;
 
@@ -168,6 +169,8 @@ export function create(params) {
   svg = d3.select(params.svgID);
   inputNodes = JSON.parse(JSON.stringify(params.nodes)); // deep copy
   inputTracks = JSON.parse(JSON.stringify(params.tracks)); // deep copy
+  inputTracks.forEach(track => track.hidden = true)
+  set9RefTrackVisible(false)
   inputReads = params.reads || null;
   inputRegion = params.region;
   inputAnnotations = params.annotations;
@@ -287,7 +290,20 @@ export function changeTrackVisibility(trackID) {
       inputTracks[i].hidden = true;
     }
   }
-  //createTubeMap();
+  createTubeMap();
+}
+
+export function set9RefTrackVisible(isUpdate) {
+  for (let index in accessions9Ref) {
+    let i = 0;
+    while (i < inputTracks.length && !inputTracks[i].name.startsWith(accessions9Ref[index])) i += 1;
+    if (i < inputTracks.length) {
+      inputTracks[i].hidden = false
+      let checkbox = document.getElementById(`showTrack${i}`);
+      if (checkbox) checkbox.checked = !inputTracks[i].hidden
+    }
+  }
+  if (isUpdate) createTubeMap();
 }
 
 // to select/deselect all
@@ -299,7 +315,7 @@ export function changeAllTracksVisibility(value) {
     checkbox.checked = value;
     i += 1;
   }
-  //createTubeMap();
+  createTubeMap();
 }
 
 export function changeExonVisibility() {
@@ -2391,6 +2407,13 @@ function getColorSet(colorSetName) {
   }
 }
 
+function getTrackColor(track, isFeature) {
+  let index = 0
+  const colors = isFeature ? greys : lightColors
+  if (track.id !== 0) index = ((track.id - 1) % (colors.length - 1)) + 1
+  return colors[index]
+}
+
 function generateTrackColor(track, highlight) {
   if (typeof highlight === 'undefined') highlight = 'plain';
   let trackColor;
@@ -3511,23 +3534,36 @@ function drawTrackCorners(corners, type) {
 }
 
 function drawLegend() {
-  let content = '<button id="selectall">Select all</button>';
-  content += '<button id="deselectall">Deselect all</button>';
+  let content = '<button style="margin-left: 5px;" id="deselectall">Deselect all</button>';
+  content += '<button style="margin-left: 10px;" id="select9ref">Select 9 references</button>';
+  content += '<button style="margin-left: 10px;" id="selectall">Select all (Maybe slow)</button>';
   content +=
-    '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Color</th><th>Trackname</th><th>Show Track</th></tr></thead>';
+    '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Trackname</th><th>Genome Color</th>';
+  if (config.showExonsFlag) {
+    content += "<th>Annotation Color</th>"
+  }
+  content += "<th>Show Track</th></tr></thead>";
   const listeners = [];
   for (let i = 0; i < tracks.length; i += 1) {
     if (tracks[i].type === 'haplo') {
-      content += `<tr><td style="text-align:right"><div class="color-box" style="background-color: ${generateTrackColor(
-        tracks[i],
-        'exon'
-      )};"></div></td>`;
+      content += "<tr>"
       if (tracks[i].hasOwnProperty('name')) {
         content += `<td>${tracks[i].name}</td>`;
       } else {
         content += `<td>${tracks[i].id}</td>`;
       }
-      content += `<td><input type="checkbox" checked=true id="showTrack${i}"></td>`;
+      content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], false)};"></div></td>`;
+      if (config.showExonsFlag) {
+        content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], true)};"></div></td>`;
+      }
+      content += "</div></td>"
+      let checked = false;
+      let j = 0;
+      while (j < inputTracks.length && inputTracks[j].id !== i) j += 1;
+      if (j < inputTracks.length && inputTracks[j].hasOwnProperty('hidden')) {
+        checked = !inputTracks[j].hidden;
+      }
+      content += `<td><input type="checkbox" checked=${checked} id="showTrack${i}"></td>`;
       listeners.push(i);
     }
   }
@@ -3545,6 +3581,9 @@ function drawLegend() {
   document
     .getElementById('deselectall')
     .addEventListener('click', () =>  changeAllTracksVisibility(false), false);
+  document
+    .getElementById('select9ref')
+    .addEventListener('click', () =>  set9RefTrackVisible(true), false);
 }
 
 // Highlight track on mouseover
@@ -3630,7 +3669,7 @@ export function parseTranscriptsFromAnnotations(annotations, trackName) {
   let transcripts = {};
   for (let name in annotations) {
     annotations[name].forEach(line => {
-      let transcript_id = undefined, gene_id;
+      let transcript_id, gene_id;
       if (line.attributes.transcript_id) {
         transcript_id = line.attributes.transcript_id.startsWith("aug")
           ? line.attributes.transcript_id.substring(

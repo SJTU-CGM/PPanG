@@ -114,6 +114,18 @@ const allAccessions = [
   "wild65"
 ]
 
+export const accessions9Ref = [
+  "ARC10497",
+  "CHAOMEO",
+  "IRGSP-1.0",
+  "KETANNANGKA",
+  "LARHAMUGAD",
+  "LIMA",
+  "NATELBORO",
+  "PR106",
+  "TG22"
+]
+
 let accessions = [...allAccessions]
 export const setDefaultAccessions = () => {
   accessions.length = 0
