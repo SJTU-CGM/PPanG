@@ -3545,7 +3545,7 @@ function drawLegend() {
   content += "<th>Show Track</th></tr></thead>";
   const listeners = [];
   for (let i = 0; i < inputTracks.length; i += 1) {
-    if (inputTracks[i].type === 'haplo') {
+    // if (inputTracks[i].type === 'haplo') {
       content += "<tr>"
       if (inputTracks[i].hasOwnProperty('name')) {
         content += `<td>${inputTracks[i].name}</td>`;
@@ -3557,10 +3557,13 @@ function drawLegend() {
         content += `<td><div class="color-box" style="background-color: ${getTrackColor(inputTracks[i], true)};"></div></td>`;
       }
       content += "</div></td>"
-      let checked = !inputTracks[i].hidden ?? false;
+      let checked = false;
+      if (inputTracks[i].hasOwnProperty('hidden')) {
+        checked = !inputTracks[i].hidden
+      }
       content += `<td><input type="checkbox" checked=${checked} id="showTrack${i}"></td>`;
       listeners.push(i);
-    }
+    // }
   }
   content += '</table';
   // $('#legendDiv').html(content);
