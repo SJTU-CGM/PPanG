@@ -169,7 +169,6 @@ export function create(params) {
   svg = d3.select(params.svgID);
   inputNodes = JSON.parse(JSON.stringify(params.nodes)); // deep copy
   inputTracks = JSON.parse(JSON.stringify(params.tracks)); // deep copy
-  inputTracks.forEach(track => track.hidden = true)
   set9RefTrackVisible(false)
   inputReads = params.reads || null;
   inputRegion = params.region;
@@ -294,6 +293,7 @@ export function changeTrackVisibility(trackID) {
 }
 
 export function set9RefTrackVisible(isUpdate) {
+  inputTracks.forEach(track => track.hidden = true)
   for (let index in accessions9Ref) {
     let i = 0;
     while (i < inputTracks.length && !inputTracks[i].name.startsWith(accessions9Ref[index])) i += 1;
@@ -3534,8 +3534,8 @@ function drawTrackCorners(corners, type) {
 }
 
 function drawLegend() {
-  let content = '<button style="margin-left: 5px;" id="deselectall">Deselect all</button>';
-  content += '<button style="margin-left: 10px;" id="select9ref">Select 9 references</button>';
+  // let content = '<button style="margin-left: 5px;" id="deselectall">Deselect all</button>';
+  let content = '<button style="margin-left: 5px;" id="select9ref">Select 9 references (Default)</button>';
   content += '<button style="margin-left: 10px;" id="selectall">Select all (Maybe slow)</button>';
   content +=
     '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Trackname</th><th>Genome Color</th>';
@@ -3576,9 +3576,9 @@ function drawLegend() {
   document
     .getElementById('selectall')
     .addEventListener('click', () =>  changeAllTracksVisibility(true), false);
-  document
-    .getElementById('deselectall')
-    .addEventListener('click', () =>  changeAllTracksVisibility(false), false);
+  // document
+  //   .getElementById('deselectall')
+  //   .addEventListener('click', () =>  changeAllTracksVisibility(false), false);
   document
     .getElementById('select9ref')
     .addEventListener('click', () =>  set9RefTrackVisible(true), false);
