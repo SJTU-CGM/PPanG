@@ -293,7 +293,11 @@ export function changeTrackVisibility(trackID) {
 }
 
 export function set9RefTrackVisible(isUpdate) {
-  inputTracks.forEach(track => track.hidden = true)
+  inputTracks.forEach((track, i) => {
+    track.hidden = true
+    const checkbox = document.getElementById(`showTrack${i}`);
+    if (checkbox) checkbox.checked = false
+  })
   for (let index in accessions9Ref) {
     let i = 0;
     while (i < inputTracks.length && !inputTracks[i].name.startsWith(accessions9Ref[index])) i += 1;
