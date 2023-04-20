@@ -3561,7 +3561,7 @@ function drawLegend() {
       if (inputTracks[i].hasOwnProperty('hidden')) {
         checked = !inputTracks[i].hidden
       }
-      content += `<td><input type="checkbox" checked=${checked} id="showTrack${i}"></td>`;
+      content += `<td><input type="checkbox" ${checked ? "checked" : ""} id="showTrack${i}"></td>`;
       listeners.push(i);
     // }
   }
