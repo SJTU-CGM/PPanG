@@ -2407,6 +2407,13 @@ function getColorSet(colorSetName) {
   }
 }
 
+function getTrackColor(track, isFeature) {
+  let index = 0
+  const colors = isFeature ? greys : lightColors
+  if (track.id !== 0) index = ((track.id - 1) % (colors.length - 1)) + 1
+  return colors[index]
+}
+
 function generateTrackColor(track, highlight) {
   if (typeof highlight === 'undefined') highlight = 'plain';
   let trackColor;
@@ -3527,23 +3534,29 @@ function drawTrackCorners(corners, type) {
 }
 
 function drawLegend() {
-  let content = '<button id="selectall">Select all(Maybe slow)</button>';
-  content += '<button style="margin-left: 10px;" id="deselectall">Deselect all</button>';
+  let content = '<button style="margin-left: 5px;" id="deselectall">Deselect all</button>';
   content += '<button style="margin-left: 10px;" id="select9ref">Select 9 references</button>';
+  content += '<button style="margin-left: 10px;" id="selectall">Select all (Maybe slow)</button>';
   content +=
-    '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Color</th><th>Trackname</th><th>Show Track</th></tr></thead>';
+    '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Trackname</th><th>Genome Color</th>';
+  if (config.showExonsFlag) {
+    content += "<th>Annotation Color</th>"
+  }
+  content += "<th>Show Track</th></tr></thead>";
   const listeners = [];
   for (let i = 0; i < tracks.length; i += 1) {
     if (tracks[i].type === 'haplo') {
-      content += `<tr><td style="text-align:right"><div class="color-box" style="background-color: ${generateTrackColor(
-        tracks[i],
-        'exon'
-      )};"></div></td>`;
+      content += "<tr>"
       if (tracks[i].hasOwnProperty('name')) {
         content += `<td>${tracks[i].name}</td>`;
       } else {
         content += `<td>${tracks[i].id}</td>`;
       }
+      content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], false)};"></div></td>`;
+      if (config.showExonsFlag) {
+        content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], true)};"></div></td>`;
+      }
+      content += "</div></td>"
       let checked = false;
       let j = 0;
       while (j < inputTracks.length && inputTracks[j].id !== i) j += 1;

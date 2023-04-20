@@ -14,7 +14,7 @@ import SelectionDropdown from "./SelectionDropdown";
 
 class VisualizationOptions extends Component {
   state = {
-    isOpenLegend: false,
+    isOpenLegend: true,
     isOpenVisualizationOptions: true
   };
 
