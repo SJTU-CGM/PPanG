@@ -281,8 +281,8 @@ export function selectTranscript(value) {
 }
 
 export function changeTrackVisibility(trackID) {
-  let i = 0;
-  while (i < inputTracks.length && inputTracks[i].id !== trackID) i += 1;
+  let i = trackID;
+  // while (i < inputTracks.length && inputTracks[i].id !== trackID) i += 1;
   if (i < inputTracks.length) {
     if (inputTracks[i].hasOwnProperty('hidden')) {
       inputTracks[i].hidden = !inputTracks[i].hidden;
@@ -3544,25 +3544,20 @@ function drawLegend() {
   }
   content += "<th>Show Track</th></tr></thead>";
   const listeners = [];
-  for (let i = 0; i < tracks.length; i += 1) {
-    if (tracks[i].type === 'haplo') {
+  for (let i = 0; i < inputTracks.length; i += 1) {
+    if (inputTracks[i].type === 'haplo') {
       content += "<tr>"
-      if (tracks[i].hasOwnProperty('name')) {
-        content += `<td>${tracks[i].name}</td>`;
+      if (inputTracks[i].hasOwnProperty('name')) {
+        content += `<td>${inputTracks[i].name}</td>`;
       } else {
-        content += `<td>${tracks[i].id}</td>`;
+        content += `<td>${inputTracks[i].id}</td>`;
       }
-      content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], false)};"></div></td>`;
+      content += `<td><div class="color-box" style="background-color: ${getTrackColor(inputTracks[i], false)};"></div></td>`;
       if (config.showExonsFlag) {
-        content += `<td><div class="color-box" style="background-color: ${getTrackColor(tracks[i], true)};"></div></td>`;
+        content += `<td><div class="color-box" style="background-color: ${getTrackColor(inputTracks[i], true)};"></div></td>`;
       }
       content += "</div></td>"
-      let checked = false;
-      let j = 0;
-      while (j < inputTracks.length && inputTracks[j].id !== i) j += 1;
-      if (j < inputTracks.length && inputTracks[j].hasOwnProperty('hidden')) {
-        checked = !inputTracks[j].hidden;
-      }
+      let checked = !inputTracks[i].hidden ?? false;
       content += `<td><input type="checkbox" checked=${checked} id="showTrack${i}"></td>`;
       listeners.push(i);
     }
