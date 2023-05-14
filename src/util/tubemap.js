@@ -299,12 +299,12 @@ export function set9RefTrackVisible(isUpdate) {
     if (checkbox) checkbox.checked = false
   })
   for (let index in accessions9Ref) {
-    let i = 0;
-    while (i < inputTracks.length && !inputTracks[i].name.startsWith(accessions9Ref[index])) i += 1;
-    if (i < inputTracks.length) {
-      inputTracks[i].hidden = false
-      let checkbox = document.getElementById(`showTrack${i}`);
-      if (checkbox) checkbox.checked = !inputTracks[i].hidden
+    for (let i = 0; i < inputTracks.length; i++) {
+      if (inputTracks[i].name.startsWith(accessions9Ref[index])) {
+        inputTracks[i].hidden = false
+        let checkbox = document.getElementById(`showTrack${i}`);
+        if (checkbox) checkbox.checked = !inputTracks[i].hidden
+      }
     }
   }
   if (isUpdate) createTubeMap();
