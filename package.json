@@ -19,6 +19,7 @@
     "concurrently": "^6.0.2",
     "d3": "^5.9.2",
     "d3-selection-multi": "^1.0.1",
+    "d3-xyzoom": "^1.5.0",
     "express": "^4.17.1",
     "fs-extra": "^8.0.1",
     "gh-pages": "^2.0.1",
@@ -37,7 +38,7 @@
   },
   "scripts": {
     "start": "concurrently -n frontend,backend -c red,green 'HOST=${HOST:=127.0.0.1} PORT=${PORT:=3001} react-scripts start' 'npm:serve'",
-    "build": "react-scripts build",
+    "build": "react-scripts build && ln jbrowse/* build/",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

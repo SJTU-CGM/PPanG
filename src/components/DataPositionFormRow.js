@@ -27,6 +27,14 @@ class DataPositionFormRow extends Component {
     tubeMap.zoomBy(1.0 / ZOOM_FACTOR);
   };
 
+  handleCompress = () => {
+    tubeMap.zoomBy(1e-100);
+  }
+
+  handleReset = () => {
+    tubeMap.zoomReset();
+  }
+
   handleDownloadButton = () => {
     const svgN = document.getElementById('svg');
     const svgData = new XMLSerializer().serializeToString(svgN);
@@ -115,6 +123,20 @@ class DataPositionFormRow extends Component {
           disabled={this.props.isGoNextDisabled}
         >
           <FontAwesomeIcon icon={faStepForward} size="lg" />
+        </Button>
+        <Button
+          color="primary"
+          id="compressButton"
+          onClick={this.handleCompress}
+        >
+          Compress
+        </Button>
+        <Button
+          color="primary"
+          id="resetButton"
+          onClick={this.handleReset}
+        >
+          Reset
         </Button>
         <Button
           color="primary"

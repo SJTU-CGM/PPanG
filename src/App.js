@@ -20,6 +20,7 @@ import {Button, Form} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
 import {update} from "./util/tubemap";
+import {defaultConfiguration} from "./jbrowse/configuration";
 
 class App extends Component {
   constructor(props) {
@@ -81,6 +82,8 @@ class App extends Component {
           assembly,
           tracks,
           defaultSession,
+          configuration: defaultConfiguration,
+          disableAddTracks: true,
           location: 'chr01:38382382-38385504',
         })
       },
