@@ -28,7 +28,7 @@ class DataPositionFormRow extends Component {
   };
 
   handleCompress = () => {
-    tubeMap.zoomBy(1e-100);
+    tubeMap.zoomBy(1e-100, false);
   }
 
   handleReset = () => {

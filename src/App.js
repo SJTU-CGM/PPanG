@@ -84,7 +84,7 @@ class App extends Component {
           defaultSession,
           configuration: defaultConfiguration,
           disableAddTracks: true,
-          location: 'chr01:38382382-38385504',
+          location: 'chr01:38382381-38385559',
         })
       },
       accessionSelected: accessions[0]
@@ -319,17 +319,6 @@ App.defaultProps = {
   // browser testing environment to point to a real testing backend.
   // Note that host includes the port.
   apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0',
-  regions: {
-    "IRGSP-1.0": "chr01:38382382-38385504",
-    "ARC10497": "chr01:38938856-38941978",
-    "CHAOMEO": "chr01:39649118-39652240",
-    "KETANNANGKA": "chr01:39379545-39382667",
-    "LARHAMUGAD": "chr01:40029054-40032176",
-    "LIMA": "chr01:39932788-39935910",
-    "NATELBORO": "chr01:38813443-38816565",
-    "PR106": "chr01:39631014-39634136",
-    "TG22": "chr01:38728489-38731611"
-  }
 };
 
 export default App;

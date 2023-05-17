@@ -108,18 +108,15 @@ class TubeMapContainer extends Component {
         const transcripts = tubeMap.parseTranscriptsFromAnnotations(annotations, trackName);
         let transcriptSelectOptions = [];
         const regions = {}
-        let index = trackName.lastIndexOf('.')
-        regions[trackName.substring(0, index)] = `${trackName.substring(index+1)}:${region[0]+1}-${region[1]+1}`
-        const length = region[1] - region[0]
-        for (let i = 0; i < json.graph.path.length; i++) {
-          const trackName = json.graph.path[i].name
-          if (trackName !== json.trackName) {
-            const pathName = trackName.substring(0, trackName.indexOf('['))
-            const start = Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
-            let index = pathName.lastIndexOf('.')
-            regions[pathName.substring(0, index)] = `${pathName.substring(index+1)}:${start+1}-${start + length + 1}`
-          }
-        }
+        json.graph.path.forEach(path => {
+          const trackName = path.name
+          const pathName = trackName.substring(0, trackName.indexOf('[')) || trackName
+          const start = Number(path.indexOfFirstBase) - 1 || Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
+          let length = 0
+          path.mapping.forEach(item => length += item["edit"][0]["from_length"])
+          let index = pathName.lastIndexOf('.')
+          regions[pathName.substring(0, index)] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
+        })
         this.props.handleChangeRegion(regions);
         for (let geneId in transcripts) {
           const trackName = transcripts[geneId].track_name

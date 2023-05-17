@@ -1130,6 +1130,7 @@ function getImageDimensions() {
   });
 }
 
+const maxZoom = 2;
 // align visualization to the top and left within svg and resize svg to correct size
 // enable zooming and panning
 function alignSVG() {
@@ -1170,7 +1171,7 @@ function alignSVG() {
     // We need to set an extent here because auto-determination of the region
     // to zoom breaks on the React testing jsdom
     .extent([[0, 0], [svg.attr('width'), svg.attr('height')]])
-    .scaleExtent([minZoom, 8])
+    .scaleExtent([minZoom, maxZoom])
     .translateExtent([
       [-1, minYCoordinate - 25],
       [maxXCoordinate + 2, maxYCoordinate + 25]
@@ -1204,7 +1205,7 @@ export function zoomReset() {
   );
 }
 
-export function zoomBy(zoomFactor) {
+export function zoomBy(zoomFactor, zoomY=true) {
   // Find the SVG element.
   // Trim off the leading "#" from the SVG ID.
   let svgElement = document.getElementById(svgID.substring(1));
@@ -1215,7 +1216,6 @@ export function zoomBy(zoomFactor) {
     1,
     parentElement.offsetWidth / (maxXCoordinate + 10)
   );
-  const maxZoom = 8;
   const width = parentElement.clientWidth;
 
   const transform = d3.xyzoomTransform(d3.select(svgID).node());
@@ -1228,7 +1228,7 @@ export function zoomBy(zoomFactor) {
   translateX = Math.min(translateX, 1 * scaleX);
   translateX = Math.max(translateX, width - (maxXCoordinate + 2) * scaleX);
   const translateY = (25 - minYCoordinate) * scaleX;
-  const scaleY = Math.max(scaleX, 1);
+  const scaleY = zoomY ? scaleX : transform.ky;
   d3.select(svgID)
     .transition()
     .duration(750)
