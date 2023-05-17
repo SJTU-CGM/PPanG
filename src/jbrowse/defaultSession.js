@@ -5,17 +5,7 @@ const session = {
     id: 'linearGenomeView',
     minimized: false,
     type: 'LinearGenomeView',
-    offsetPx: 191980240,
-    bpPerPx: 0.1554251851851852,
-    displayedRegions: [
-      {
-        refName: 'chr01',
-        start: 0,
-        end: 133797422,
-        reversed: false,
-        assemblyName: 'IRGSP-1.0',
-      },
-    ],
+    displayName: "IRGSP-1.0",
     tracks: [
       // {
       //   id: '4aZAiE-A3',
@@ -40,7 +30,8 @@ const session = {
         displays: [
           {
             id: 'AD3gqvG0_6',
-            type: 'LinearBasicDisplay'
+            type: 'LinearBasicDisplay',
+            heightPreConfig: 70
           },
         ],
       },
@@ -49,9 +40,9 @@ const session = {
     hideHeaderOverview: true,
     hideNoTracksActive: false,
     trackSelectorType: 'hierarchical',
-    trackLabels: 'overlapping',
+    trackLabels: 'hidden',
     showCenterLine: false,
-    showCytobandsSetting: true,
+    showCytobandsSetting: false,
     showGridlines: true,
   },
 }
@@ -64,17 +55,7 @@ export const getDefaultSession = (accession) => {
       id: 'linearGenomeView',
       minimized: false,
       type: 'LinearGenomeView',
-      offsetPx: 191980240,
-      bpPerPx: 0.1554251851851852,
-      displayedRegions: [
-        {
-          refName: 'chr01',
-          start: 0,
-          end: 133797422,
-          reversed: false,
-          assemblyName: accession,
-        },
-      ],
+      displayName: accession,
       tracks: [
         // {
         //   id: '4aZAiE-A3',
@@ -99,7 +80,8 @@ export const getDefaultSession = (accession) => {
           displays: [
             {
               id: 'AD3gqvG0_6',
-              type: 'LinearBasicDisplay'
+              type: 'LinearBasicDisplay',
+              heightPreConfig: 70
             },
           ],
         },
@@ -108,9 +90,9 @@ export const getDefaultSession = (accession) => {
       hideHeaderOverview: true,
       hideNoTracksActive: false,
       trackSelectorType: 'hierarchical',
-      trackLabels: 'overlapping',
+      trackLabels: 'hidden',
       showCenterLine: false,
-      showCytobandsSetting: true,
+      showCytobandsSetting: false,
       showGridlines: true,
     },
   }

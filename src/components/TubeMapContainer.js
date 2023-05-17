@@ -78,6 +78,7 @@ class TubeMapContainer extends Component {
             reads={this.state.reads}
             region={this.state.region}
             annotations={this.state.annotations}
+            handleTrackDoubleClick={this.props.handleTrackDoubleClick}
           />
         </div>
       </div>
@@ -207,7 +208,8 @@ TubeMapContainer.propTypes = {
   dataOrigin: PropTypes.oneOf(Object.values(dataOriginTypes)).isRequired,
   fetchParams: PropTypes.object.isRequired,
   loadTranscriptSelectOptions: PropTypes.func.isRequired,
-  handleChangeRegion: PropTypes.func.isRequired
+  handleChangeRegion: PropTypes.func.isRequired,
+  handleTrackDoubleClick: PropTypes.func.isRequired
 };
 
 export default TubeMapContainer;

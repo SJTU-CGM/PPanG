@@ -18,7 +18,8 @@ class TubeMap extends Component {
       tracks: this.props.tracks,
       reads: this.props.reads,
       region: this.props.region,
-      annotations: this.props.annotations
+      annotations: this.props.annotations,
+      handleTrackDoubleClick: this.props.handleTrackDoubleClick
     });
   };
 
@@ -32,7 +33,8 @@ TubeMap.propTypes = {
   tracks: PropTypes.array.isRequired,
   reads: PropTypes.array.isRequired,
   region: PropTypes.array.isRequired,
-  annotations: PropTypes.array.isRequired
+  annotations: PropTypes.array.isRequired,
+  handleTrackDoubleClick: PropTypes.func.isRequired
 };
 
 export default TubeMap;

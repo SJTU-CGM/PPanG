@@ -127,6 +127,7 @@ const config = {
   transparentNodesFlag: false,
   clickableNodesFlag: false,
   showExonsFlag: true,
+  drawTextFlag: true,
   colorScheme: 0,
   // Options for the width of sequence nodes:
   // 0...scale node width linear with number of bases within node
@@ -160,6 +161,7 @@ let trackForRuler;
 
 let bed;
 
+let handleTrackDoubleClick;
 // main function to call from outside
 // which starts the process of creating a tube map visualization
 export function create(params) {
@@ -176,6 +178,7 @@ export function create(params) {
   bed = params.bed || null;
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
+  handleTrackDoubleClick = params.handleTrackDoubleClick;
   update();
 }
 
@@ -393,6 +396,12 @@ export function setNodeWidthOption(value) {
   }
 }
 
+export function setDrawTextFlag(value) {
+  if (config.drawTextFlag !== value) {
+    config.drawTextFlag = value;
+  }
+}
+
 export function setColorReadsByMappingQualityFlag(value) {
   if (config.colorReadsByMappingQuality !== value) {
     config.colorReadsByMappingQuality = value;
@@ -413,7 +422,9 @@ export function setMappingQualityCutoff(value) {
 
 export function update() {
   const tr = createTubeMap();
+  if (tr === false) return false;
   if (!config.hideLegendFlag && tr) drawLegend(tr);
+  return true;
 }
 
 // main
@@ -422,7 +433,7 @@ function createTubeMap() {
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
-  if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig === configStr) return;
+  if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig === configStr) return false;
   lastInputNodes = nodesStr
   lastInputTracks = tracksStr
   lastConfig = configStr
@@ -445,7 +456,7 @@ function createTubeMap() {
 
   // early exit is necessary when visualization options such as colors are
   // changed before any graph has been rendered
-  if (inputNodes.length === 0 || inputTracks.length === 0) return;
+  if (inputNodes.length === 0 || inputTracks.length === 0) return false;
 
   straightenTrack(0);
   nodes = JSON.parse(nodesStr); // deep copy (can add stuff to copy and leave original unchanged)
@@ -3110,7 +3121,7 @@ function getPopUpText(node) {
 
 // draw seqence labels for nodes
 function drawLabels(dNodes) {
-  if (config.nodeWidthOption === 0) {
+  if (config.drawTextFlag) {
     svg
       .selectAll('text')
       .data(dNodes)
@@ -3254,11 +3265,12 @@ function drawRuler() {
 }
 
 function drawRulerMarking(sequencePosition, xCoordinate) {
+  const tickText = config.drawTextFlag ? `|${sequencePosition}` : '|';
   svg
     .append('text')
     .attr('x', xCoordinate)
     .attr('y', minYCoordinate - 13)
-    .text(`|${sequencePosition}`)
+    .text(tickText)
     .attr('font-family', fonts)
     .attr('font-size', '12px')
     .attr('fill', 'black')
@@ -3649,9 +3661,12 @@ function trackDoubleClick() {
     index += 1;
   }
   if (index >= inputTracks.length) return;
-  if (DEBUG) console.log(`moving index: ${index}`);
-  moveTrackToFirstPosition(index);
-  createTubeMap();
+  const name = inputTracks[index].name
+  const accession = name.substring(0, name.indexOf('.chr'))
+  handleTrackDoubleClick(accession);
+  // if (DEBUG) console.log(`moving index: ${index}`);
+  // moveTrackToFirstPosition(index);
+  // createTubeMap();
 }
 
 // show track name when hovering mouse

@@ -127,8 +127,4 @@ export const accessions9Ref = [
 ]
 
 let accessions = [...allAccessions]
-export const setDefaultAccessions = () => {
-  accessions.length = 0
-  accessions.push(...allAccessions)
-}
 export default accessions

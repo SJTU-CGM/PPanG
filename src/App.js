@@ -10,7 +10,6 @@ import config from './config.json';
 import assembly, {getAssembly} from './jbrowse/assembly'
 import tracks, {getTracks} from './jbrowse/tracks'
 import defaultSession, {getDefaultSession} from './jbrowse/defaultSession'
-import accessions, {setDefaultAccessions} from "./accessions";
 
 import {
   createViewState,
@@ -19,7 +18,7 @@ import {
 import {Button, Form} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
-import {update} from "./util/tubemap";
+import {setDrawTextFlag, update} from "./util/tubemap";
 import {defaultConfiguration} from "./jbrowse/configuration";
 
 class App extends Component {
@@ -87,15 +86,12 @@ class App extends Component {
           location: 'chr01:38382381-38385559',
         })
       },
-      accessionSelected: accessions[0]
     };
   }
 
   componentDidUpdate() {
     const { visOptions } = this.state;
-    visOptions.compressedView
-      ? tubeMap.setNodeWidthOption(1)
-      : tubeMap.setNodeWidthOption(0);
+    tubeMap.setDrawTextFlag(!visOptions.compressedView);
     tubeMap.setMergeNodesFlag(visOptions.removeRedundantNodes);
     tubeMap.setTransparentNodesFlag(visOptions.transparentNodes);
     tubeMap.setShowReadsFlag(visOptions.showReads);
@@ -113,7 +109,7 @@ class App extends Component {
     } catch (e) {
       console.error(e);
     }
-    tubeMap.update();
+    if (tubeMap.update()) this.clearJBrowseViews();
   }
 
   jbrowseNav() {
@@ -197,42 +193,35 @@ class App extends Component {
     this.jbrowseNav()
   }
 
-  handleClearButton = () => {
-    setDefaultAccessions()
+  clearJBrowseViews = () => {
     this.setState((state) => ({
       jbrowseViewStates: {
         'IRGSP-1.0': state.jbrowseViewStates['IRGSP-1.0']
       },
-      accessionSelected: accessions[0]
     }))
   }
 
-  handleAddTrackButton = () => {
-    const selected = this.state.accessionSelected
-    if (selected === "None") return
-    let index = accessions.indexOf(selected)
-    const assembly = getAssembly(selected)
-    const tracks = getTracks(selected)
-    const defaultSession = getDefaultSession(selected)
+  addJBrowseView = (accession) => {
+    if (accession in this.state.jbrowseViewStates) return
+    const assembly = getAssembly(accession)
+    const tracks = getTracks(accession)
+    const defaultSession = getDefaultSession(accession)
     let location;
-    if (selected in this.props.regions) {
-      location = this.props.regions[selected]
-    } else {
-      location = "chr01:1-1000"
+    if (accession in this.props.regions) {
+      location = this.props.regions[accession]
     }
-    accessions.splice(index, 1)
-    if (accessions.length <= index) index--
     this.setState((state) => ({
       jbrowseViewStates: {
         ...state.jbrowseViewStates,
-        [selected]: createViewState({
+        [accession]: createViewState({
           assembly,
           tracks,
           defaultSession,
+          configuration: defaultConfiguration,
+          disableAddTracks: true,
           location: location
         })
       },
-      accessionSelected: accessions[index] ?? "None"
     }))
   }
 
@@ -252,36 +241,14 @@ class App extends Component {
           apiUrl={this.props.apiUrl}
           loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
           handleChangeRegion={this.handleChangeRegion}
+          handleTrackDoubleClick={this.addJBrowseView}
         />
         <div style={{margin: "20px"}}>
           <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
-          <Form style={{marginTop: "20px"}} inline>
-            <h5 style={{marginRight: "20px"}}>More Genomes:</h5>
-            <div style={{minWidth: "200px", marginRight: "20px"}}>
-            <SelectionDropdown
-              value={this.state.accessionSelected}
-              options={accessions}
-              onChange={(event) => this.setState({accessionSelected: event.target.value})}/>
-            </div>
-            <Button
-              size="small"
-              variant="outlined"
-              color="primary"
-              onClick={this.handleAddTrackButton}
-            >+</Button>
-            <Button
-              size="small"
-              variant="outlined"
-              color="primary"
-              onClick={this.handleClearButton}
-            >Clear</Button>
-          </Form>
             {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
               return <div>
                 <div style={{textAlign: "right"}}>
                   <Cross onClick={() => {
-                    accessions.push(e[0])
-                    accessions.sort()
                     this.setState((state) => ({
                       jbrowseViewStates: {
                         ...state.jbrowseViewStates,

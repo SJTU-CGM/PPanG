@@ -94,7 +94,7 @@ class VisualizationOptions extends Component {
                         checked={visOptions.compressedView}
                         onChange={() => toggleFlag('compressedView')}
                       />
-                      Hide node sequences
+                      Hide all text
                     </Label>
                   </FormGroup>
                   <FormGroup check>
