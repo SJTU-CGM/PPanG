@@ -1149,16 +1149,16 @@ function alignSVG() {
     const transform = d3.event.transform;
     // vertical adjustment so that top of graph is at top of svg
     // otherwise would violate translateExtent, which leads to graph "jumping" on next pan
-    transform.y = (25 - minYCoordinate) * transform.k;
+    transform.y = (25 - minYCoordinate) * transform.ky;
     svg.attr('transform', transform);
     const svg2 = d3.select(svgID);
     // adjust height, so that vertical scroll bar is shown when necessary
     svg2.attr(
       'height',
-      (maxYCoordinate - minYCoordinate + 50) * d3.event.transform.k
+      (maxYCoordinate - minYCoordinate + 50) * d3.event.transform.ky
     );
-    // adjust width to compensate for verical scroll bar appearing
-    svg2.attr('width', document.getElementById('tubeMapSVG').clientWidth);
+    // // adjust width to compensate for verical scroll bar appearing
+    // svg2.attr('width', document.getElementById('tubeMapSVG').clientWidth);
   }
 
   const minZoom = Math.min(
@@ -1166,7 +1166,7 @@ function alignSVG() {
     parentElement.offsetWidth / (maxXCoordinate + 10)
   );
   zoom = d3
-    .zoom()
+    .xyzoom()
     // We need to set an extent here because auto-determination of the region
     // to zoom breaks on the React testing jsdom
     .extent([[0, 0], [svg.attr('width'), svg.attr('height')]])
@@ -1190,7 +1190,17 @@ function alignSVG() {
       : 0;
   d3.select(document).select(svgID).call(
     zoom.transform,
-    d3.zoomIdentity.translate(xOffset, 25 - minYCoordinate)
+    d3.xyzoomIdentity.translate(xOffset, 25 - minYCoordinate)
+  );
+}
+
+export function zoomReset() {
+  d3.select(svgID)
+  .transition()
+  .duration(750)
+  .call(
+    zoom.transform,
+    d3.xyzoomIdentity
   );
 }
 
@@ -1208,22 +1218,23 @@ export function zoomBy(zoomFactor) {
   const maxZoom = 8;
   const width = parentElement.clientWidth;
 
-  const transform = d3.zoomTransform(d3.select(svgID).node());
-  const translateK = Math.min(
+  const transform = d3.xyzoomTransform(d3.select(svgID).node());
+  const scaleX = Math.min(
     maxZoom,
-    Math.max(transform.k * zoomFactor, minZoom)
+    Math.max(transform.kx * zoomFactor, minZoom)
   );
   let translateX =
-    width / 2.0 - ((width / 2.0 - transform.x) * translateK) / transform.k;
-  translateX = Math.min(translateX, 1 * translateK);
-  translateX = Math.max(translateX, width - (maxXCoordinate + 2) * translateK);
-  const translateY = (25 - minYCoordinate) * translateK;
+    width / 2.0 - ((width / 2.0 - transform.x) * scaleX) / transform.kx;
+  translateX = Math.min(translateX, 1 * scaleX);
+  translateX = Math.max(translateX, width - (maxXCoordinate + 2) * scaleX);
+  const translateY = (25 - minYCoordinate) * scaleX;
+  const scaleY = Math.max(scaleX, 1);
   d3.select(svgID)
     .transition()
     .duration(750)
     .call(
       zoom.transform,
-      d3.zoomIdentity.translate(translateX, translateY).scale(translateK)
+      d3.xyzoomIdentity.translate(translateX, translateY).scale(scaleX, scaleY)
     );
 }
 

@@ -14,7 +14,7 @@ import SelectionDropdown from "./SelectionDropdown";
 
 class VisualizationOptions extends Component {
   state = {
-    isOpenLegend: true,
+    isOpenLegend: false,
     isOpenVisualizationOptions: true
   };
 
@@ -94,7 +94,7 @@ class VisualizationOptions extends Component {
                         checked={visOptions.compressedView}
                         onChange={() => toggleFlag('compressedView')}
                       />
-                      Compressed view
+                      Hide bases
                     </Label>
                   </FormGroup>
                   <FormGroup check>
