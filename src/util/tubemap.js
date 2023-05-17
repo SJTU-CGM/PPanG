@@ -1158,8 +1158,8 @@ function alignSVG() {
       'height',
       (maxYCoordinate - minYCoordinate + 50) * d3.event.transform.ky
     );
-    // // adjust width to compensate for verical scroll bar appearing
-    // svg2.attr('width', document.getElementById('tubeMapSVG').clientWidth);
+    // adjust width to compensate for verical scroll bar appearing
+    svg2.attr('width', document.getElementById('tubeMapSVG').clientWidth);
   }
 
   const minZoom = Math.min(
@@ -1205,7 +1205,7 @@ export function zoomReset() {
   );
 }
 
-export function zoomBy(zoomFactor, zoomY=true) {
+export function zoomBy(zoomFactor, method=undefined) {
   // Find the SVG element.
   // Trim off the leading "#" from the SVG ID.
   let svgElement = document.getElementById(svgID.substring(1));
@@ -1219,7 +1219,7 @@ export function zoomBy(zoomFactor, zoomY=true) {
   const width = parentElement.clientWidth;
 
   const transform = d3.xyzoomTransform(d3.select(svgID).node());
-  const scaleX = Math.min(
+  let scaleX = Math.min(
     maxZoom,
     Math.max(transform.kx * zoomFactor, minZoom)
   );
@@ -1228,7 +1228,14 @@ export function zoomBy(zoomFactor, zoomY=true) {
   translateX = Math.min(translateX, 1 * scaleX);
   translateX = Math.max(translateX, width - (maxXCoordinate + 2) * scaleX);
   const translateY = (25 - minYCoordinate) * scaleX;
-  const scaleY = zoomY ? scaleX : transform.ky;
+
+  let scaleY = scaleX;
+  if (method === "Compress") {
+    scaleY = transform.ky;
+  } else if (method === "Expand") {
+    scaleY = transform.ky;
+    scaleX = scaleY;
+  }
   d3.select(svgID)
     .transition()
     .duration(750)

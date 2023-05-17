@@ -17,6 +17,9 @@ class DataPositionFormRow extends Component {
   constructor() {
     super();
     this.onKeyUp = this.onKeyUp.bind(this);
+    this.state = {
+      isCompress: false
+    }
   }
 
   handleZoomIn = () => {
@@ -28,11 +31,13 @@ class DataPositionFormRow extends Component {
   };
 
   handleCompress = () => {
-    tubeMap.zoomBy(1e-100, false);
+    tubeMap.zoomBy(1e-100, this.state.isCompress ? "Expand" : "Compress");
+    this.setState({isCompress: !this.state.isCompress})
   }
 
   handleReset = () => {
     tubeMap.zoomReset();
+    this.setState({isCompress: false})
   }
 
   handleDownloadButton = () => {
@@ -110,10 +115,10 @@ class DataPositionFormRow extends Component {
         >
           <FontAwesomeIcon icon={faStepBackward} size="lg" />
         </Button>
-        <Button color="primary" id="zoomInButton" onClick={this.handleZoomIn}>
+        <Button color="primary" id="zoomInButton" onClick={this.handleZoomIn} disabled={this.state.isCompress}>
           <FontAwesomeIcon icon={faSearchPlus} size="lg" />
         </Button>
-        <Button color="primary" id="zoomOutButton" onClick={this.handleZoomOut}>
+        <Button color="primary" id="zoomOutButton" onClick={this.handleZoomOut} disabled={this.state.isCompress}>
           <FontAwesomeIcon icon={faSearchMinus} size="lg" />
         </Button>
         <Button
@@ -129,7 +134,7 @@ class DataPositionFormRow extends Component {
           id="compressButton"
           onClick={this.handleCompress}
         >
-          Compress
+          {this.state.isCompress ? "Expand" : "Compress"}
         </Button>
         <Button
           color="primary"
