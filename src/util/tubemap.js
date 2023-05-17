@@ -1223,11 +1223,6 @@ export function zoomBy(zoomFactor, method=undefined) {
     maxZoom,
     Math.max(transform.kx * zoomFactor, minZoom)
   );
-  let translateX =
-    width / 2.0 - ((width / 2.0 - transform.x) * scaleX) / transform.kx;
-  translateX = Math.min(translateX, 1 * scaleX);
-  translateX = Math.max(translateX, width - (maxXCoordinate + 2) * scaleX);
-  const translateY = (25 - minYCoordinate) * scaleX;
 
   let scaleY = scaleX;
   if (method === "Compress") {
@@ -1236,6 +1231,13 @@ export function zoomBy(zoomFactor, method=undefined) {
     scaleY = transform.ky;
     scaleX = scaleY;
   }
+
+  let translateX =
+    width / 2.0 - ((width / 2.0 - transform.x) * scaleX) / transform.kx;
+  translateX = Math.min(translateX, 1 * scaleX);
+  translateX = Math.max(translateX, width - (maxXCoordinate + 2) * scaleX);
+  const translateY = (25 - minYCoordinate) * scaleX;
+
   d3.select(svgID)
     .transition()
     .duration(750)
