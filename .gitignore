@@ -7,3 +7,5 @@ node_modules
 build/
 *.swp
 *~
+tmp
+yarn.lock
