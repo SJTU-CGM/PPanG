@@ -456,7 +456,7 @@ function createTubeMap() {
 
   // early exit is necessary when visualization options such as colors are
   // changed before any graph has been rendered
-  if (inputNodes.length === 0 || inputTracks.length === 0) return false;
+  if (inputNodes.length === 0 || inputTracks.length === 0) return;
 
   straightenTrack(0);
   nodes = JSON.parse(nodesStr); // deep copy (can add stuff to copy and leave original unchanged)

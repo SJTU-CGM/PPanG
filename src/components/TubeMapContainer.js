@@ -115,8 +115,9 @@ class TubeMapContainer extends Component {
           const start = Number(path.indexOfFirstBase) - 1 || Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
           let length = 0
           path.mapping.forEach(item => length += item["edit"][0]["from_length"])
-          let index = pathName.lastIndexOf('.')
-          regions[trackName] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
+          let index = pathName.indexOf('.chr')
+          const label = trackName.startsWith("IRGSP") ? "IRGSP-1.0" : trackName
+          regions[label] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
         })
         this.props.handleChangeRegion(regions);
         for (let geneId in transcripts) {

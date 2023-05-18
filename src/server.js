@@ -321,7 +321,7 @@ function getChunkedData(req, res, next) {
       if(distance > -1){
         vgChunkParams.push('-r', r_start, '-c', distance);
       } else {
-        vgChunkParams.push('-r', ''.concat(r_start, ":", r_end), '-c', 1);
+        vgChunkParams.push('-r', ''.concat(r_start, ":", r_end), '-c', 5);
       }
     } else {
       // reformat pos+dist into start-end range
@@ -331,7 +331,7 @@ function getChunkedData(req, res, next) {
       }
       vgChunkParams.push(
         '-c',
-        '1',
+        '5',
         '-p',
         `${region}`
       );

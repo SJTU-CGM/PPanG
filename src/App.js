@@ -83,7 +83,7 @@ class App extends Component {
           defaultSession,
           configuration: defaultConfiguration,
           disableAddTracks: true,
-          location: 'chr01:38382381-38385559',
+          location: 'chr01:38382380-38385640',
         })
       },
     };

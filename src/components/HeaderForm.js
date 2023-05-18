@@ -11,6 +11,7 @@ import BedRegionsFormRow from './BedRegionsFormRow';
 import PathNamesFormRow from './PathNamesFormRow';
 import FileUploadFormRow from './FileUploadFormRow';
 import ExampleSelectButtons from './ExampleSelectButtons';
+import accessions from "../accessions";
 
 const DATA_SOURCES = config.DATA_SOURCES;
 const MAX_UPLOAD_SIZE_DESCRIPTION = '5 MB';
@@ -199,34 +200,46 @@ class HeaderForm extends Component {
     });
   };
 
-  getPathNames = async (xgFile, dataPath) => {
-    this.setState({ error: null });
-    try {
-      const json = await fetchAndParse(`${this.props.apiUrl}/getPathNames`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ xgFile, dataPath })
-      });
-      // We need to do all our parsing here, if we expect the catch to catch errors.
-      let pathNames = json.pathNames;
-      if (!(pathNames instanceof Array)) {
-        throw new Error("Server did not send back an array of path names");
-      }
-      this.setState(state => {
-        const pathSelect = pathNames.includes(state.pathSelect)
-          ? state.pathSelect
-          : pathNames[0];
-        return {
-          pathSelectOptions: pathNames,
-          pathSelect
-        };
-      });
-    } catch (error) {
-      console.log(`POST to ${this.props.apiUrl}/getPathNames failed:`, error);
-      this.setState({ error: error });
-    }
+  getPathNames = (xgFile, dataPath) => {
+    const chrId = xgFile.substring(0, xgFile.indexOf(".chr"))
+    const pathNames = []
+    accessions.forEach(accession => pathNames.push(`${accession}.${chrId}`))
+    this.setState(state => {
+      const pathSelect = pathNames.includes(state.pathSelect)
+        ? state.pathSelect
+        : pathNames[0];
+      return {
+        pathSelectOptions: pathNames,
+        pathSelect
+      };
+    });
+    // this.setState({ error: null });
+    // try {
+    //   const json = await fetchAndParse(`${this.props.apiUrl}/getPathNames`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({ xgFile, dataPath })
+    //   });
+    //   // We need to do all our parsing here, if we expect the catch to catch errors.
+    //   let pathNames = json.pathNames;
+    //   if (!(pathNames instanceof Array)) {
+    //     throw new Error("Server did not send back an array of path names");
+    //   }
+    //   this.setState(state => {
+    //     const pathSelect = pathNames.includes(state.pathSelect)
+    //       ? state.pathSelect
+    //       : pathNames[0];
+    //     return {
+    //       pathSelectOptions: pathNames,
+    //       pathSelect
+    //     };
+    //   });
+    // } catch (error) {
+    //   console.log(`POST to ${this.props.apiUrl}/getPathNames failed:`, error);
+    //   this.setState({ error: error });
+    // }
   };
 
   resetPathNames = () => {
