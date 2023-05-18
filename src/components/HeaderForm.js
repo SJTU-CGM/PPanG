@@ -24,8 +24,6 @@ const dataTypes = {
 
 class HeaderForm extends Component {
   state = {
-    // xgSelectOptions: ['none'],
-    // xgSelect: 'none',
     xgSelectOptions: [],
     xgSelect: '',
 
@@ -201,7 +199,7 @@ class HeaderForm extends Component {
   };
 
   getPathNames = (xgFile, dataPath) => {
-    const chrId = xgFile.substring(0, xgFile.indexOf(".chr"))
+    const chrId = xgFile.substring(0, xgFile.indexOf(".xg"))
     const pathNames = []
     accessions.forEach(accession => pathNames.push(`${accession}.${chrId}`))
     this.setState(state => {
@@ -213,33 +211,6 @@ class HeaderForm extends Component {
         pathSelect
       };
     });
-    // this.setState({ error: null });
-    // try {
-    //   const json = await fetchAndParse(`${this.props.apiUrl}/getPathNames`, {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({ xgFile, dataPath })
-    //   });
-    //   // We need to do all our parsing here, if we expect the catch to catch errors.
-    //   let pathNames = json.pathNames;
-    //   if (!(pathNames instanceof Array)) {
-    //     throw new Error("Server did not send back an array of path names");
-    //   }
-    //   this.setState(state => {
-    //     const pathSelect = pathNames.includes(state.pathSelect)
-    //       ? state.pathSelect
-    //       : pathNames[0];
-    //     return {
-    //       pathSelectOptions: pathNames,
-    //       pathSelect
-    //     };
-    //   });
-    // } catch (error) {
-    //   console.log(`POST to ${this.props.apiUrl}/getPathNames failed:`, error);
-    //   this.setState({ error: error });
-    // }
   };
 
   resetPathNames = () => {
@@ -428,18 +399,6 @@ class HeaderForm extends Component {
         </option>
       );
     });
-    // dataSourceDropdownOptions.push(
-    //   <option value="syntheticExamples" key="syntheticExamples">
-    //     synthetic data examples
-    //   </option>,
-    //   <option value="customFileUpload" key="customFileUpload">
-    //     custom (file upload)
-    //   </option>,
-    //   <option value="customMounted" key="customMounted">
-    //     {/*custom (mounted files)*/}
-    //     select chromosome
-    //   </option>
-    // );
 
     const mountedFilesFlag = this.state.dataType === dataTypes.MOUNTED_FILES;
     const uploadFilesFlag = this.state.dataType === dataTypes.FILE_UPLOAD;
@@ -452,8 +411,8 @@ class HeaderForm extends Component {
         {errorDiv}
         <Container fluid={true}>
           <Row>
-            <Col md="auto">
-              {/*<img src="./logo.png" alt="Logo" />*/}
+            <Col md="2">
+              <img src="./logo.png" alt="Logo" />
             </Col>
             <Col>
               <Form inline>
@@ -542,6 +501,7 @@ class HeaderForm extends Component {
                   handleGoButton={this.handleGoButton}
                   uploadInProgress={this.state.uploadInProgress}
                   isGoNextDisabled={!this.state.region || !this.state.region.includes(":")}
+                  clearJBView={this.props.clearJBView}
                 />
               )}
             </Col>
@@ -557,7 +517,8 @@ HeaderForm.propTypes = {
   dataOrigin: PropTypes.string.isRequired,
   setColorSetting: PropTypes.func.isRequired,
   setDataOrigin: PropTypes.func.isRequired,
-  setFetchParams: PropTypes.func.isRequired
+  setFetchParams: PropTypes.func.isRequired,
+  clearJBView: PropTypes.func.isRequired
 };
 
 export default HeaderForm;

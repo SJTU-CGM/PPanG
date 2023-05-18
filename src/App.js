@@ -109,7 +109,7 @@ class App extends Component {
     } catch (e) {
       console.error(e);
     }
-    if (tubeMap.update()) this.clearJBrowseViews();
+    tubeMap.update();
   }
 
   jbrowseNav() {
@@ -202,7 +202,7 @@ class App extends Component {
   }
 
   addJBrowseView = (trackName) => {
-    if (trackName in this.state.jbrowseViewStates) return
+    if (this.state.jbrowseViewStates[trackName] !== undefined) return
     const accession = trackName.substring(0, trackName.indexOf(".chr"))
     const assembly = getAssembly(accession)
     const tracks = getTracks(accession)
@@ -235,32 +235,25 @@ class App extends Component {
           setColorSetting={this.setColorSetting}
           dataOrigin={this.state.dataOrigin}
           apiUrl={this.props.apiUrl}
+          clearJBView={this.clearJBrowseViews}
         />
-        <TubeMapContainer
-          fetchParams={this.state.fetchParams}
-          dataOrigin={this.state.dataOrigin}
-          apiUrl={this.props.apiUrl}
-          loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
-          handleChangeRegion={this.handleChangeRegion}
-          handleTrackDoubleClick={this.addJBrowseView}
-        />
-        <div style={{margin: "20px"}}>
-          <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
-            {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
-              return <div>
-                <div style={{textAlign: "right"}}>
-                  <Cross onClick={() => {
-                    this.setState((state) => ({
-                      jbrowseViewStates: {
-                        ...state.jbrowseViewStates,
-                        [e[0]]: undefined
-                      }
-                    }))
-                  }}></Cross>
+        <div id="Pangenome browser">
+          <TubeMapContainer
+            fetchParams={this.state.fetchParams}
+            dataOrigin={this.state.dataOrigin}
+            apiUrl={this.props.apiUrl}
+            loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
+            handleChangeRegion={this.handleChangeRegion}
+            handleTrackDoubleClick={this.addJBrowseView}
+          />
+          <div style={{margin: "-20px 20px 20px 20px"}}>
+            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
+              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
+                return <div>
+                  <JBrowseLinearGenomeView viewState={e[1]}/>
                 </div>
-                <JBrowseLinearGenomeView viewState={e[1]}/>
-              </div>
-            })}
+              })}
+          </div>
         </div>
         <CustomizationAccordion
           visOptions={this.state.visOptions}
