@@ -3661,9 +3661,8 @@ function trackDoubleClick() {
     index += 1;
   }
   if (index >= inputTracks.length) return;
-  const name = inputTracks[index].name
-  const accession = name.substring(0, name.indexOf('.chr'))
-  handleTrackDoubleClick(accession);
+  const trackName = inputTracks[index].name
+  handleTrackDoubleClick(trackName);
   // if (DEBUG) console.log(`moving index: ${index}`);
   // moveTrackToFirstPosition(index);
   // createTubeMap();

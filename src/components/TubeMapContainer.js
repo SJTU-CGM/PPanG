@@ -116,7 +116,7 @@ class TubeMapContainer extends Component {
           let length = 0
           path.mapping.forEach(item => length += item["edit"][0]["from_length"])
           let index = pathName.lastIndexOf('.')
-          regions[pathName.substring(0, index)] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
+          regions[trackName] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
         })
         this.props.handleChangeRegion(regions);
         for (let geneId in transcripts) {

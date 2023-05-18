@@ -201,14 +201,15 @@ class App extends Component {
     }))
   }
 
-  addJBrowseView = (accession) => {
-    if (accession in this.state.jbrowseViewStates) return
+  addJBrowseView = (trackName) => {
+    if (trackName in this.state.jbrowseViewStates) return
+    const accession = trackName.substring(0, trackName.indexOf(".chr"))
     const assembly = getAssembly(accession)
     const tracks = getTracks(accession)
     const defaultSession = getDefaultSession(accession)
     let location;
-    if (accession in this.props.regions) {
-      location = this.props.regions[accession]
+    if (trackName in this.props.regions) {
+      location = this.props.regions[trackName]
     }
     this.setState((state) => ({
       jbrowseViewStates: {
