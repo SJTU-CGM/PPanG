@@ -214,7 +214,7 @@ class App extends Component {
     this.setState((state) => ({
       jbrowseViewStates: {
         ...state.jbrowseViewStates,
-        [accession]: createViewState({
+        [trackName]: createViewState({
           assembly,
           tracks,
           defaultSession,
