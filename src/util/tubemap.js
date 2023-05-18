@@ -422,9 +422,7 @@ export function setMappingQualityCutoff(value) {
 
 export function update() {
   const tr = createTubeMap();
-  if (tr === false) return false;
   if (!config.hideLegendFlag && tr) drawLegend(tr);
-  return true;
 }
 
 // main
@@ -433,7 +431,8 @@ function createTubeMap() {
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
-  if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig === configStr) return false;
+
+  if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig === configStr) return;
   lastInputNodes = nodesStr
   lastInputTracks = tracksStr
   lastConfig = configStr

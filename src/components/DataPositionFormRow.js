@@ -10,6 +10,7 @@ import {
   faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 import * as tubeMap from '../util/tubemap';
+import html2canvas from "html2canvas";
 
 const ZOOM_FACTOR = 2.0;
 
@@ -18,7 +19,8 @@ class DataPositionFormRow extends Component {
     super();
     this.onKeyUp = this.onKeyUp.bind(this);
     this.state = {
-      isCompress: false
+      isCompress: false,
+      isDownloading: false
     }
   }
 
@@ -41,19 +43,14 @@ class DataPositionFormRow extends Component {
   }
 
   handleDownloadButton = () => {
-    const svgN = document.getElementById('svg');
-    const svgData = new XMLSerializer().serializeToString(svgN);
-    const svgBlob = new Blob([svgData], {
-      type: 'image/svg+xml;charset=utf-8'
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-
-    const downloadLink = document.createElement('a');
-    downloadLink.href = svgUrl;
-    downloadLink.download = 'graph.svg';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    this.setState({isDownloading: true})
+    html2canvas(document.getElementById('Pangenome browser')).then(canvas => {
+      const downloadLink = document.createElement('a');
+      downloadLink.href = canvas.toDataURL("image/png");
+      downloadLink.download = 'RPGB.png';
+      downloadLink.click();
+      this.setState({isDownloading: false})
+    })
   };
 
   onKeyUp(event) {
@@ -146,9 +143,17 @@ class DataPositionFormRow extends Component {
         <Button
           color="primary"
           id="downloadButton"
-          onClick={this.handleDownloadButton}
+          onClick={this.props.clearJBView}
         >
-          Download Image
+          Clear Linear Views
+        </Button>
+        <Button
+          color="primary"
+          id="downloadButton"
+          onClick={this.handleDownloadButton}
+          disabled={this.state.isDownloading}
+        >
+          {this.state.isDownloading ? "Processing..." : "Download Image"}
         </Button>
       </Form>
     );
@@ -162,7 +167,8 @@ DataPositionFormRow.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
   region: PropTypes.string.isRequired,
   uploadInProgress: PropTypes.bool.isRequired,
-  isGoNextDisabled: PropTypes.bool.isRequired
+  isGoNextDisabled: PropTypes.bool.isRequired,
+  clearJBView: PropTypes.func.isRequired
 };
 
 export default DataPositionFormRow;
