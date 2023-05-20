@@ -3704,38 +3704,11 @@ export function parseTranscriptsFromAnnotations(annotations, trackName) {
   let transcripts = {};
   for (let name in annotations) {
     annotations[name].forEach(line => {
-      let transcript_id, gene_id;
-      if (line.attributes.transcript_id) {
-        transcript_id = line.attributes.transcript_id.startsWith("aug")
-          ? line.attributes.transcript_id.substring(
-            line.attributes.transcript_id.indexOf("-") + 1,
-            line.attributes.transcript_id.lastIndexOf("-"))
-          : line.attributes.transcript_id;
-        gene_id = line.attributes.gene_id;
+      const transcript_id = `${line.attributes.Parent} (${line.strand})`;
+      if (!transcripts.hasOwnProperty(name)) {
+        transcripts[name] = new Set([transcript_id])
       } else {
-        transcript_id = line.attributes.Parent;
-        if (transcript_id.includes("-mRNA")) {
-          gene_id = transcript_id.split("-mRNA")[0];
-        } else {
-          gene_id = transcript_id.split(".")[0];
-        }
-      }
-      transcript_id += ` (${line.strand})`
-      if (!transcripts.hasOwnProperty(gene_id)) {
-        transcripts[gene_id] = {
-          transcripts: [transcript_id],
-          exons_length: line.length,
-          track_name: name
-        };
-      } else if (transcripts[gene_id].transcripts.indexOf(transcript_id) === -1) {
-        transcripts[gene_id].transcripts.push(transcript_id);
-      }
-      transcripts[gene_id].exons_length += line.length;
-      if (name === trackName) {
-        transcripts[gene_id].start = transcripts[gene_id].start
-          ? Math.min(transcripts[gene_id].start, line.start) : line.start;
-        transcripts[gene_id].end = transcripts[gene_id].end
-          ? Math.max(transcripts[gene_id].end, line.end) : line.end;
+        transcripts[name].add(transcript_id);
       }
     })
   }
