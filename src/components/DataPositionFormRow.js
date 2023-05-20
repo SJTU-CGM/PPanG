@@ -42,6 +42,10 @@ class DataPositionFormRow extends Component {
     this.setState({isCompress: false})
   }
 
+  resetCompress = () => {
+    this.setState({isCompress: false})
+  }
+
   handleDownloadButton = () => {
     this.setState({isDownloading: true})
     setTimeout(() => html2canvas(document.getElementById('Pangenome browser')).then(canvas => {

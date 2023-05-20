@@ -162,6 +162,7 @@ let trackForRuler;
 let bed;
 
 let handleTrackDoubleClick;
+let resetCompress;
 // main function to call from outside
 // which starts the process of creating a tube map visualization
 export function create(params) {
@@ -179,6 +180,7 @@ export function create(params) {
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
   handleTrackDoubleClick = params.handleTrackDoubleClick;
+  resetCompress = params.resetCompress;
   update();
 }
 

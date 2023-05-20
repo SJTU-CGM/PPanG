@@ -209,7 +209,8 @@ TubeMapContainer.propTypes = {
   fetchParams: PropTypes.object.isRequired,
   loadTranscriptSelectOptions: PropTypes.func.isRequired,
   handleChangeRegion: PropTypes.func.isRequired,
-  handleTrackDoubleClick: PropTypes.func.isRequired
+  handleTrackDoubleClick: PropTypes.func.isRequired,
+  resetCompress: PropTypes.func.isRequired
 };
 
 export default TubeMapContainer;

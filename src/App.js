@@ -201,6 +201,10 @@ class App extends Component {
     }))
   }
 
+  resetCompress = () => {
+    this.HeaderForm.resetCompress()
+  }
+
   addJBrowseView = (trackName) => {
     if (this.state.jbrowseViewStates[trackName] !== undefined) return
     const accession = trackName.substring(0, trackName.indexOf(".chr"))
@@ -236,6 +240,7 @@ class App extends Component {
           dataOrigin={this.state.dataOrigin}
           apiUrl={this.props.apiUrl}
           clearJBView={this.clearJBrowseViews}
+          ref={node => this.HeaderForm = node}
         />
         <div id="Pangenome browser">
           <TubeMapContainer
@@ -245,6 +250,7 @@ class App extends Component {
             loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
             handleChangeRegion={this.handleChangeRegion}
             handleTrackDoubleClick={this.addJBrowseView}
+            resetCompress={this.resetCompress}
           />
           <div style={{margin: "-20px 20px 20px 20px"}}>
             <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>

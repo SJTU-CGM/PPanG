@@ -374,6 +374,10 @@ class HeaderForm extends Component {
     };
   };
 
+  resetCompress = () => {
+    this.DataPositionFormRow.resetCompress()
+  }
+
   render() {
     let errorDiv = null;
     if (this.state.error) {
@@ -502,6 +506,7 @@ class HeaderForm extends Component {
                   uploadInProgress={this.state.uploadInProgress}
                   isGoNextDisabled={!this.state.region || !this.state.region.includes(":")}
                   clearJBView={this.props.clearJBView}
+                  ref={node => this.DataPositionFormRow = node}
                 />
               )}
             </Col>

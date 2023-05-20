@@ -15,7 +15,8 @@ class TubeMap extends Component {
       reads: this.props.reads,
       region: this.props.region,
       annotations: this.props.annotations,
-      handleTrackDoubleClick: this.props.handleTrackDoubleClick
+      handleTrackDoubleClick: this.props.handleTrackDoubleClick,
+      resetCompress: this.props.resetCompress
     });
   };
 
