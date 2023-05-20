@@ -44,13 +44,13 @@ class DataPositionFormRow extends Component {
 
   handleDownloadButton = () => {
     this.setState({isDownloading: true})
-    html2canvas(document.getElementById('Pangenome browser')).then(canvas => {
+    setTimeout(() => html2canvas(document.getElementById('Pangenome browser')).then(canvas => {
       const downloadLink = document.createElement('a');
       downloadLink.href = canvas.toDataURL("image/png");
       downloadLink.download = 'RPGB.png';
       downloadLink.click();
       this.setState({isDownloading: false})
-    })
+    }), 300)
   };
 
   onKeyUp(event) {
