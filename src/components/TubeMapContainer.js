@@ -120,16 +120,15 @@ class TubeMapContainer extends Component {
           regions[label] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
         })
         this.props.handleChangeRegion(regions);
-        for (let geneId in transcripts) {
-          const trackName = transcripts[geneId].track_name
-          transcripts[geneId].transcripts.forEach(transcriptId => {
-            transcriptSelectOptions.push(`[${trackName}] ${transcriptId}`)
+        for (let trackName in transcripts) {
+          transcripts[trackName].forEach(transcriptId => {
+            transcriptSelectOptions.push(`${trackName}: ${transcriptId}`)
           });
         }
         transcriptSelectOptions.sort((a, b) => {
-          if (a.includes("[IRGSP") && b.includes("IRGSP")) return a.localeCompare(b);
-          if (a.includes("[IRGSP")) return -1;
-          if (b.includes("[IRGSP")) return 1;
+          if (a.includes("IRGSP") && b.includes("IRGSP")) return a.localeCompare(b);
+          if (a.includes("IRGSP")) return -1;
+          if (b.includes("IRGSP")) return 1;
           return a.localeCompare(b);
         });
         this.props.loadTranscriptSelectOptions(transcriptSelectOptions, transcripts);
