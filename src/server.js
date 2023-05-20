@@ -737,7 +737,7 @@ function loadGFFAnnotationFiles(req, res, next) {
     let regionLength = req.regionArr[2] - req.regionArr[1];
     while(i < req.graph.path.length) {
       // coordinate starts with 1 in gff while 0 in vg
-      if(req.graph.path[i].name.startsWith(tmp[1])) {
+      if(req.graph.path[i].name.startsWith(`${tmp[1]}.chr`)) {
         let pathStart = Number(req.graph.path[i].indexOfFirstBase ?? req.graph.path[i].name.substring(
           req.graph.path[i].name.indexOf('[') + 1, req.graph.path[i].name.indexOf(']'))) + 1;
         regionStart = Math.min(regionStart, pathStart);
