@@ -425,6 +425,7 @@ export function setMappingQualityCutoff(value) {
 export function update() {
   const tr = createTubeMap();
   if (!config.hideLegendFlag && tr) drawLegend(tr);
+  resetCompress();
 }
 
 // main
