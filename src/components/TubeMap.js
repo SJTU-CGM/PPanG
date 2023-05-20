@@ -31,7 +31,8 @@ TubeMap.propTypes = {
   reads: PropTypes.array.isRequired,
   region: PropTypes.array.isRequired,
   annotations: PropTypes.array.isRequired,
-  handleTrackDoubleClick: PropTypes.func.isRequired
+  handleTrackDoubleClick: PropTypes.func.isRequired,
+  resetCompress: PropTypes.func.isRequired
 };
 
 export default TubeMap;

@@ -79,6 +79,7 @@ class TubeMapContainer extends Component {
             region={this.state.region}
             annotations={this.state.annotations}
             handleTrackDoubleClick={this.props.handleTrackDoubleClick}
+            resetCompress={this.props.resetCompress}
           />
         </div>
       </div>
