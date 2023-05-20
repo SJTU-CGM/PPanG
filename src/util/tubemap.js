@@ -2324,7 +2324,7 @@ function addTrackFeatures() {
   if (annotations != null) {
     for (let trackName in annotations) {
       for (let i = 0; i < numberOfTracks; i++) {
-        if (tracks[i].name.startsWith(trackName)) {
+        if (tracks[i].name.startsWith(`${trackName}.chr`)) {
           let regionStart = getTrackStart(tracks[i])
           annotations[trackName].forEach(line => {
             let isSelected = true;
