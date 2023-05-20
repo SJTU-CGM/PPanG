@@ -1,5 +1,5 @@
 {
-  "BACKEND_URL": "https://cgm.sjtu.edu.cn/public/rice-maker/9ref",
+  "BACKEND_URL": "https://cgm.sjtu.edu.cn/public/rice-maker/visualization",
   "DATA_SOURCES": [
     {
       "name": "chr01",
