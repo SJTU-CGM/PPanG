@@ -35,7 +35,6 @@ const allAccessions = [
   "SE-3",
   "SE-33",
   "Sadri",
-  "Suijing18",
   "TG1",
   "TG10",
   "TG11",
