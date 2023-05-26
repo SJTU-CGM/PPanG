@@ -2445,9 +2445,8 @@ function getColorSet(colorSetName) {
 }
 
 function getTrackColor(track, isFeature) {
-  let index = 0
-  const colors = isFeature ? greys : lightColors
-  if (track.id !== 0) index = ((track.id - 1) % (colors.length - 1)) + 1
+  const colors = isFeature ? exonColors : haplotypeColors
+  const index = track.id % colors.length
   return colors[index]
 }
 
@@ -2467,13 +2466,8 @@ function generateTrackColor(track, highlight) {
       }
     }
   } else {
-    if (config.showExonsFlag === false || highlight !== 'plain') {
-      // don't repeat the color of the first track (reference) to highilight is better
-      if(track.id === 0){
-	trackColor = haplotypeColors[0];
-      } else {
-	trackColor = haplotypeColors[((track.id - 1) % (haplotypeColors.length - 1)) + 1];
-      }
+    if (config.showExonsFlag === false) {
+      trackColor = haplotypeColors[track.id % haplotypeColors.length];
     } else {
       trackColor = exonColors[track.id % exonColors.length];
     }
