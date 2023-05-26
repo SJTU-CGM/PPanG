@@ -425,7 +425,6 @@ export function setMappingQualityCutoff(value) {
 export function update() {
   const tr = createTubeMap();
   if (!config.hideLegendFlag && tr) drawLegend(tr);
-  resetCompress();
 }
 
 // main
@@ -460,6 +459,7 @@ function createTubeMap() {
   // changed before any graph has been rendered
   if (inputNodes.length === 0 || inputTracks.length === 0) return;
 
+  if (resetCompress) resetCompress();
   straightenTrack(0);
   nodes = JSON.parse(nodesStr); // deep copy (can add stuff to copy and leave original unchanged)
   tracks = JSON.parse(tracksStr);
