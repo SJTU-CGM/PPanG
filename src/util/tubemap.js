@@ -431,6 +431,7 @@ export function update() {
 // main
 function createTubeMap() {
   // if nodes, tracks, config are not changed, the svg won't update
+  console.log(inputTracks)
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
@@ -2445,7 +2446,7 @@ function getColorSet(colorSetName) {
 }
 
 function getTrackColor(track, isFeature) {
-  const colors = isFeature ? exonColors : haplotypeColors
+  const colors = isFeature ? haplotypeColors : exonColors;
   const index = track.id % colors.length
   return colors[index]
 }
@@ -2466,7 +2467,7 @@ function generateTrackColor(track, highlight) {
       }
     }
   } else {
-    if (config.showExonsFlag === false) {
+    if (config.showExonsFlag === false || highlight !== 'plain') {
       trackColor = haplotypeColors[track.id % haplotypeColors.length];
     } else {
       trackColor = exonColors[track.id % exonColors.length];
