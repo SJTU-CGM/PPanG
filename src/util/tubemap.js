@@ -16,13 +16,15 @@ import {accessions9Ref} from "../accessions";
 const DEBUG = false;
 
 const greys = [
-  '#d9d9d9',
-  '#bdbdbd',
-  '#969696',
-  '#737373',
-  '#525252',
-  '#252525',
-  '#000000'
+  '#d8d8d8',
+  '#c0c0c0',
+  '#a8a8a8',
+  '#909090',
+  '#787878',
+  '#606060',
+  '#484848',
+  '#303030',
+  '#181818'
 ];
 
 const ygreys = [
@@ -430,7 +432,6 @@ export function update() {
 // main
 function createTubeMap() {
   // if nodes, tracks, config are not changed, the svg won't update
-  console.log(inputTracks)
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
@@ -3763,6 +3764,13 @@ function generateNodeWidth() {
 // extract track info from vg-json
 export function vgExtractTracks(vg) {
   const result = [];
+  for (let i = 0; i < vg.path.length; i++) {
+    if (vg.path[i].hasOwnProperty('indexOfFirstBase')) {
+      vg.path.unshift(vg.path[i])
+      vg.path.splice(i + 1, 1)
+      break;
+    }
+  }
   vg.path.forEach((path, index) => {
     const sequence = [];
     let isCompletelyReverse = true;
