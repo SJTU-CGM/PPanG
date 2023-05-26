@@ -43,6 +43,7 @@ class DataPositionFormRow extends Component {
   }
 
   resetCompress = () => {
+    this.props.clearJBView()
     this.setState({isCompress: false})
   }
 
