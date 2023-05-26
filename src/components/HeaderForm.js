@@ -286,6 +286,7 @@ class HeaderForm extends Component {
       dataPath: this.state.dataPath,
     };
     this.props.setFetchParams(fetchParams);
+    this.props.clearJBView();
   };
 
   handleInputChange = event => {
