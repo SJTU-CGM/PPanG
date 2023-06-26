@@ -18,6 +18,11 @@ export const defaultConfiguration = {
     "logoPath": {
       "uri": "path/to/my/custom-logo.svg"
     },
+    "typography": {
+      "h3": {
+        "fontSize": 18
+      }
+    },
     "spacing": 0
   }
 }

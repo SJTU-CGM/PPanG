@@ -92,6 +92,7 @@ const lightColors = [
 // "Courier", and because tools like Inkscape can't interpret the text properly
 // if they don't have the first font named here.
 const fonts = '"Courier New", "Courier", "Lucida Console", monospace';
+const rulerFonts = 'Arial';
 
 let haplotypeColors = [];
 let forwardReadColors = [];
@@ -3263,14 +3264,15 @@ function drawRuler() {
 }
 
 function drawRulerMarking(sequencePosition, xCoordinate) {
-  const tickText = config.drawTextFlag ? `|${sequencePosition}` : '|';
+  const tickText = config.drawTextFlag ? `| ${sequencePosition.toLocaleString()}` : '|';
   svg
     .append('text')
     .attr('x', xCoordinate)
     .attr('y', minYCoordinate - 13)
     .text(tickText)
-    .attr('font-family', fonts)
+    .attr('font-family', rulerFonts)
     .attr('font-size', '12px')
+    .attr('opacity', 0.82)
     .attr('fill', 'black')
     .style('pointer-events', 'none');
 }
