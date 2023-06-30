@@ -1,5 +1,5 @@
 {
-  "BACKEND_URL": "https://cgm.sjtu.edu.cn/ppang",
+  "BACKEND_URL": "https://cgm.sjtu.edu.cn/PPanG",
   "DATA_SOURCES": [
     {
       "name": "chr01",
