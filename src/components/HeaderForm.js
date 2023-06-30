@@ -416,8 +416,8 @@ class HeaderForm extends Component {
         {errorDiv}
         <Container fluid={true}>
           <Row>
-            <Col md="2">
-              <img src="./logo.png" alt="Logo" />
+            <Col md="1.5" style={{marginLeft: "20px"}}>
+              <img src="./logo.png" style={{height: "70px"}} alt="Logo" />
             </Col>
             <Col>
               <Form inline>

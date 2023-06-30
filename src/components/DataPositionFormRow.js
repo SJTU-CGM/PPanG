@@ -51,7 +51,7 @@ class DataPositionFormRow extends Component {
     setTimeout(() => html2canvas(document.getElementById('Pangenome browser')).then(canvas => {
       const downloadLink = document.createElement('a');
       downloadLink.href = canvas.toDataURL("image/png");
-      downloadLink.download = 'RPGB.png';
+      downloadLink.download = 'PPanG.png';
       downloadLink.click();
       this.setState({isDownloading: false})
     }), 300)
