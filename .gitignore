@@ -11,3 +11,6 @@ tmp
 yarn.lock
 vg
 src/config.json
+riceData/
+jbrowse/
+deploy.sh
