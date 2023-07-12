@@ -1,5 +1,4 @@
 {
-  "BACKEND_URL": "https://cgm.sjtu.edu.cn/PPanG/visualization",
   "DATA_SOURCES": [
     {
       "name": "chr01",
@@ -88,5 +87,9 @@
   "vgPath": "",
   "dataPath": "./riceData",
   "internalDataPath": "./exampleData/internal/",
-  "serverPort": 3001
+  "reference": {
+    "name": "IRGSP-1.0",
+    "alias": "Nipponbare",
+    "annotation": "msu7"
+  }
 }

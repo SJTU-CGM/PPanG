@@ -5,6 +5,7 @@ import { Container, Row, Alert } from 'reactstrap';
 import * as tubeMap from '../util/tubemap';
 import { dataOriginTypes } from '../enums';
 import { fetchAndParse } from '../fetchAndParse';
+import config from '../config.json';
 
 class TubeMapContainer extends Component {
   state = {
@@ -117,7 +118,7 @@ class TubeMapContainer extends Component {
           let length = 0
           path.mapping.forEach(item => length += item["edit"][0]["from_length"])
           let index = pathName.indexOf('.chr')
-          const label = trackName.startsWith("IRGSP") ? "IRGSP-1.0" : trackName
+          const label = trackName.startsWith(config.reference.name) ? config.reference.name : trackName
           regions[label] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
         })
         this.props.handleChangeRegion(regions);
@@ -127,9 +128,9 @@ class TubeMapContainer extends Component {
           });
         }
         transcriptSelectOptions.sort((a, b) => {
-          if (a.includes("IRGSP") && b.includes("IRGSP")) return a.localeCompare(b);
-          if (a.includes("IRGSP")) return -1;
-          if (b.includes("IRGSP")) return 1;
+          if (a.startsWith(config.reference.name) && b.startsWith(config.reference.name)) return a.localeCompare(b);
+          if (a.startsWith(config.reference.name)) return -1;
+          if (b.startsWith(config.reference.name)) return 1;
           return a.localeCompare(b);
         });
         this.props.loadTranscriptSelectOptions(transcriptSelectOptions, transcripts);

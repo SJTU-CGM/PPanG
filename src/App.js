@@ -77,7 +77,7 @@ class App extends Component {
         transcripts: {}
       },
       jbrowseViewStates: {
-        "IRGSP-1.0": createViewState({
+        [config.reference.name]: createViewState({
           assembly,
           tracks,
           defaultSession,
@@ -196,7 +196,7 @@ class App extends Component {
   clearJBrowseViews = () => {
     this.setState((state) => ({
       jbrowseViewStates: {
-        'IRGSP-1.0': state.jbrowseViewStates['IRGSP-1.0']
+        [config.reference.name]: state.jbrowseViewStates[config.reference.name]
       },
     }))
   }
@@ -253,8 +253,8 @@ class App extends Component {
             resetCompress={this.resetCompress}
           />
           <div style={{margin: "-20px 20px 20px 20px"}}>
-            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates['IRGSP-1.0']}/>
-              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith("IRGSP") && e[1] !== undefined).map(e => {
+            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates[config.reference.name]}/>
+              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith(config.reference.name) && e[1] !== undefined).map(e => {
                 return <div>
                   <JBrowseLinearGenomeView viewState={e[1]}/>
                 </div>

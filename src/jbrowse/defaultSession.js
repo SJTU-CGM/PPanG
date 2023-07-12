@@ -1,3 +1,4 @@
+import config from '../config.json'
 const session = {
   name: 'this session',
   margin: 0,
@@ -5,7 +6,7 @@ const session = {
     id: 'linearGenomeView',
     minimized: false,
     type: 'LinearGenomeView',
-    displayName: "IRGSP-1.0",
+    displayName: config.reference.name,
     tracks: [
       {
         id: 'T6uhrtY40O',

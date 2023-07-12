@@ -1,19 +1,20 @@
+import config from '../config.json'
 const tracks = [
   {
     type: 'FeatureTrack',
     trackId: 'genes',
-    name: 'MSU gene annotation',
-    assemblyNames: ['IRGSP-1.0'],
+    name: 'Reference gene annotation',
+    assemblyNames: [config.reference.name],
     category: ['Genes'],
     adapter: {
       type: 'Gff3TabixAdapter',
       gffGzLocation: {
-        uri: 'msu7.gff.gz',
+        uri: `${config.reference.annotation}.gff.gz`,
         locationType: 'UriLocation',
       },
       index: {
         location: {
-          uri: 'msu7.gff.gz.tbi',
+          uri: `${config.reference.annotation}.gff.gz.tbi`,
           locationType: 'UriLocation',
         },
         indexType: 'TBI',
@@ -27,7 +28,7 @@ export const getTracks = (accession) => {
     {
       type: 'FeatureTrack',
       trackId: 'genes',
-      name: 'MAKER gene annotation',
+      name: 'gene annotation',
       assemblyNames: [accession],
       category: ['Genes'],
       adapter: {

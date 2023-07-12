@@ -39,7 +39,6 @@
     "webpack-dev-server": "3.11.1",
     "websocket": "^1.0.26"
   },
-  "homepage": "/PPanG/visualization/",
   "scripts": {
     "start": "concurrently -n frontend,backend -c red,green 'HOST=${HOST:=127.0.0.1} PORT=${PORT:=3001} react-scripts start' 'npm:serve'",
     "build": "react-scripts build && ln jbrowse/* build/",
@@ -47,7 +46,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "serve": "node ./src/server.js --port 3001",
+    "serve": "node ./src/server.js",
     "postinstall": "patch-package"
   },
   "eslintConfig": {

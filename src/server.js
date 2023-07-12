@@ -31,17 +31,18 @@ const SERVER_BIND_ADDRESS = config.serverBindAddress || undefined;
 
 // This holds a collection of all the absolute path root directories that the
 // server is allowed to access on behalf of users.
-const ALLOWED_DATA_DIRECTORIES = [MOUNTED_DATA_PATH, INTERNAL_DATA_PATH, UPLOAD_DATA_PATH, SCRATCH_DATA_PATH].map((p) => path.resolve(p));
+const ALLOWED_DATA_DIRECTORIES = [MOUNTED_DATA_PATH, INTERNAL_DATA_PATH,
+  UPLOAD_DATA_PATH, SCRATCH_DATA_PATH].map((p) => path.resolve(p));
 
 // Make sure that the scratch directory exists at startup, so multiple requests
 // can't fight over its creation.
 fs.mkdirSync(SCRATCH_DATA_PATH, {recursive: true});
 
 var storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, UPLOAD_DATA_PATH);
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     let ext = file.originalname.substring(
       file.originalname.lastIndexOf('.'),
       file.originalname.length
@@ -54,7 +55,7 @@ var limits = {
   files: 1, // allow only 1 file per request
   fileSize: 1024 * 1024 * 5 // 5 MB (max file size)
 };
-var upload = multer({ storage, limits });
+var upload = multer({storage, limits});
 
 const app = express();
 
@@ -90,13 +91,13 @@ api.use((req, res, next) => {
 api.post('/xgFileSubmission', upload.single('xgFile'), (req, res) => {
   console.log('/xgFileSubmission');
   console.log(req.file);
-  res.json({ path: path.relative(UPLOAD_DATA_PATH, req.file.path) });
+  res.json({path: path.relative(UPLOAD_DATA_PATH, req.file.path)});
 });
 
 api.post('/gbwtFileSubmission', upload.single('gbwtFile'), (req, res) => {
   console.log('/gbwtFileSubmission');
   console.log(req.file);
-  res.json({ path: path.relative(UPLOAD_DATA_PATH, req.file.path) });
+  res.json({path: path.relative(UPLOAD_DATA_PATH, req.file.path)});
 });
 
 api.post('/gamFileSubmission', upload.single('gamFile'), (req, res) => {
@@ -121,13 +122,13 @@ function indexGamSorted(req, res) {
     console.log(`err data: ${data}`);
   });
 
-  vgIndexChild.stdout.on('data', function(data) {
+  vgIndexChild.stdout.on('data', function (data) {
     sortedGamFile.write(data);
   });
 
   vgIndexChild.on('close', () => {
     sortedGamFile.end();
-    res.json({ path: path.relative(UPLOAD_DATA_PATH, prefix + '.sorted.gam') });
+    res.json({path: path.relative(UPLOAD_DATA_PATH, prefix + '.sorted.gam')});
   });
 }
 
@@ -137,15 +138,15 @@ api.post('/getChunkedData', (req, res, next) => {
   console.time('request-duration');
   console.log('http POST getChunkedData received');
 
+  req.chrId = req.body.xgFile.substring(0, req.body.xgFile.lastIndexOf("."))
   try {
     req.body.region.split(":");
     getChunkedData(req, res, next);
   } catch (e) {
     let geneId = req.body.region;
     console.log(`No coordinate provided, try to search gene ${geneId}`)
-    let dataPath = pickDataPath(req.body.dataPath);
-    let params = [path.join(dataPath, "msu7.gff")]
-    params = params.concat(getChrIds(req.body.xgFile))
+    let params = [path.join("jbrowse", `${config.reference.annotation}.gff.gz`)]
+    params = params.concat(req.chrId)
     params.push(req.body.region)
     if (geneId.includes(".")) {
       params.push("mRNA");
@@ -164,10 +165,12 @@ api.post('/getChunkedData', (req, res, next) => {
         return next(new VgExecutionError('search gene failed'));
       }
       if (target === '') {
-        return next(new VgExecutionError('parse region failed: region invalid or geneId not found'));
+        return next(new VgExecutionError(
+          'parse region failed: region invalid or geneId not found'));
       }
       let cols = target.split('\t');
-      req.body.region = `IRGSP-1.0.${cols[0]}:${cols[3] - 1}-${cols[4] - 1}`
+      req.body.region = `${config.reference.name}.${cols[0]}:${cols[3]
+      - 1}-${cols[4] - 1}`
       getChunkedData(req, res, next);
     });
   }
@@ -223,8 +226,9 @@ function getChunkedData(req, res, next) {
   // parse region
   // either a range -> seq:start-end
   // or a position and distance -> seq:post+distance
-  if (!(region.includes(':'))){
-    throw new BadRequestError("Wrong query: region doesn't contain a ':'. See ? button above.");
+  if (!(region.includes(':'))) {
+    throw new BadRequestError(
+      "Wrong query: region doesn't contain a ':'. See ? button above.");
   }
   let region_col = region.split(":");
   let start_end = region_col[1].split("-");
@@ -232,31 +236,32 @@ function getChunkedData(req, res, next) {
   let r_start = -1;
   let r_end = -1;
   let distance = -1;
-  if(start_end.length == 2){
+  if (start_end.length == 2) {
     r_start = Number(start_end[0]);
     r_end = Number(start_end[1]);
-  } else if(pos_dist.length == 2){
+  } else if (pos_dist.length == 2) {
     r_start = Number(pos_dist[0]);
     distance = Number(pos_dist[1]);
   } else {
-     throw new BadRequestError("Wrong query: coordinates must be in the form 'X:Y-Z' or 'X:Y+Y'. See ? button above.");
+    throw new BadRequestError(
+      "Wrong query: coordinates must be in the form 'X:Y-Z' or 'X:Y+Y'. See ? button above.");
   }
 
   // check the bed file if this region has been pre-fetched
   let chunkPath = '';
-  if(req.withBed){
+  if (req.withBed) {
     // We need to parse the BED file we have been referred to so we can look up
     // the pre-parsed chunk. We don't want the client re-uploading the BED to
     // us on every request.
     let regionInfo = getBedRegions(bedFile, dataPath);
 
-    for (let i = 0; i < regionInfo['desc'].length; i++){
+    for (let i = 0; i < regionInfo['desc'].length; i++) {
       let region_chr = regionInfo['chr'][i];
       let region_start = regionInfo['start'][i];
       let region_end = regionInfo['end'][i];
-      if(region_chr.concat(':', region_start, '-', region_end) === region){
+      if (region_chr.concat(':', region_start, '-', region_end) === region) {
         // A BED entry is defined for this region exactly
-        if(regionInfo['chunk'][i] !== ''){
+        if (regionInfo['chunk'][i] !== '') {
           // And a chunk file is stored for it, so use that.
           chunkPath = regionInfo['chunk'][i]
           break;
@@ -265,15 +270,15 @@ function getChunkedData(req, res, next) {
     }
     // check that the 'chunk.vg' file exists in the chunk folder
     chunkPath = `${dataPath}${chunkPath}`;
-    if(chunkPath.endsWith('/')){
-      chunkPath = chunkPath.substring(0, chunkPath.length-1);
+    if (chunkPath.endsWith('/')) {
+      chunkPath = chunkPath.substring(0, chunkPath.length - 1);
     }
     let chunk_file = `${chunkPath}/chunk.vg`;
-    if(!isAllowedPath(chunk_file)){
+    if (!isAllowedPath(chunk_file)) {
       // We need to check allowed-ness before we check existence.
       throw new BadRequestError("Path to chunk not allowed: " + chunkPath);
     }
-    if(fs.existsSync(chunk_file)){
+    if (fs.existsSync(chunk_file)) {
       console.log(`found pre-fetched chunk at ${chunk_file}`);
     } else {
       console.log(`couldn't find pre-fetched chunk at ${chunk_file}`);
@@ -281,14 +286,14 @@ function getChunkedData(req, res, next) {
     }
   }
 
-  if(chunkPath === ''){
+  if (chunkPath === '') {
     // call 'vg chunk' to generate graph
     let vgChunkParams = ['chunk'];
     // double-check that the file is a .xg and allowed
-    if (!xgFile.endsWith('.xg')){
+    if (!xgFile.endsWith('.xg')) {
       throw new BadRequestError("XG file doesn't end in .xg: " + xgFile);
     }
-    if(!isAllowedPath(`${dataPath}${xgFile}`)){
+    if (!isAllowedPath(`${dataPath}${xgFile}`)) {
       throw new BadRequestError("XG file path not allowed: " + xgFile);
     }
     // TODO: Use same variable for check and command line?
@@ -296,10 +301,10 @@ function getChunkedData(req, res, next) {
 
     if (req.withGam) {
       // double-check that the file is a .gam and allowed
-      if (!gamFile.endsWith('.gam')){
+      if (!gamFile.endsWith('.gam')) {
         throw new BadRequestError("GAM file doesn't end in .gam: " + gamFile);
       }
-      if(!isAllowedPath(`${dataPath}${gamFile}`)){
+      if (!isAllowedPath(`${dataPath}${gamFile}`)) {
         throw new BadRequestError("GAM file path not allowed: " + gamFile);
       }
       // Use a GAM index
@@ -307,25 +312,26 @@ function getChunkedData(req, res, next) {
     }
     if (req.withGbwt) {
       // double-check that the file is a .gbwt and allowed
-      if (!gbwtFile.endsWith('.gbwt')){
-        throw new BadRequestError("GBWT file doesn't end in .gbwt: " + gbwtFile);
+      if (!gbwtFile.endsWith('.gbwt')) {
+        throw new BadRequestError(
+          "GBWT file doesn't end in .gbwt: " + gbwtFile);
       }
-      if(!isAllowedPath(`${dataPath}${gbwtFile}`)){
+      if (!isAllowedPath(`${dataPath}${gbwtFile}`)) {
         throw new BadRequestError("GBWT file path not allowed: " + gbwtFile);
       }
       // Use a GBWT haplotype database
       vgChunkParams.push('--gbwt-name', `${dataPath}${gbwtFile}`);
     }
     // to seach by node ID use "node" for the sequence name, e.g. 'node:1-10'
-    if (region_col[0] === "node"){
-      if(distance > -1){
+    if (region_col[0] === "node") {
+      if (distance > -1) {
         vgChunkParams.push('-r', r_start, '-c', distance);
       } else {
         vgChunkParams.push('-r', ''.concat(r_start, ":", r_end), '-c', 5);
       }
     } else {
       // reformat pos+dist into start-end range
-      if(distance > -1){
+      if (distance > -1) {
         r_end = r_start + distance;
         region = region_col[0].concat(':', r_start, '-', r_end);
       }
@@ -352,8 +358,10 @@ function getChunkedData(req, res, next) {
     let graphAsString = '';
     req.error = new Buffer(0);
 
-    vgChunkCall.on('error', function(err) {
-      console.log('Error executing ' + VG_PATH + 'vg ' + vgChunkParams.join(' ') + ': ' + err);
+    vgChunkCall.on('error', function (err) {
+      console.log(
+        'Error executing ' + VG_PATH + 'vg ' + vgChunkParams.join(' ') + ': '
+        + err);
       if (!sentResponse) {
         sentResponse = true;
         return next(new VgExecutionError('vg chunk failed'));
@@ -366,7 +374,7 @@ function getChunkedData(req, res, next) {
       req.error += data;
     });
 
-    vgChunkCall.stdout.on('data', function(data) {
+    vgChunkCall.stdout.on('data', function (data) {
       vgViewCall.stdin.write(data);
     });
 
@@ -383,7 +391,7 @@ function getChunkedData(req, res, next) {
       }
     });
 
-    vgViewCall.on('error', function(err) {
+    vgViewCall.on('error', function (err) {
       console.log('Error executing "vg view": ' + err);
       if (!sentResponse) {
         sentResponse = true;
@@ -396,7 +404,7 @@ function getChunkedData(req, res, next) {
       console.log(`vg view err data: ${data}`);
     });
 
-    vgViewCall.stdout.on('data', function(data) {
+    vgViewCall.stdout.on('data', function (data) {
       graphAsString += data.toString();
     });
 
@@ -431,10 +439,11 @@ function getChunkedData(req, res, next) {
     // We're using a shared directory for this request, so leave it in place
     // when the request finishes.
     req.rmChunk = false;
-    const vgViewCall = spawn(`${VG_PATH}vg`, ['view', '-j', `${req.chunkDir}/chunk.vg`]);
+    const vgViewCall = spawn(`${VG_PATH}vg`,
+      ['view', '-j', `${req.chunkDir}/chunk.vg`]);
     let graphAsString = '';
     req.error = new Buffer(0);
-    vgViewCall.on('error', function(err) {
+    vgViewCall.on('error', function (err) {
       console.log('Error executing "vg view": ' + err);
       if (!sentResponse) {
         sentResponse = true;
@@ -447,7 +456,7 @@ function getChunkedData(req, res, next) {
       console.log(`vg view err data: ${data}`);
     });
 
-    vgViewCall.stdout.on('data', function(data) {
+    vgViewCall.stdout.on('data', function (data) {
       graphAsString += data.toString();
     });
 
@@ -464,7 +473,8 @@ function getChunkedData(req, res, next) {
       if (graphAsString === '') {
         if (!sentResponse) {
           sentResponse = true;
-          return next(new VgExecutionError('vg view produced empty graph failed'));
+          return next(
+            new VgExecutionError('vg view produced empty graph failed'));
         }
         return;
       }
@@ -528,7 +538,7 @@ function returnErrorMiddleware(err, req, res, next) {
   }
   if (err instanceof TubeMapError) {
     // We have an error we want to send back to the user.
-    const result = { error: ''};
+    const result = {error: ''};
     if (err.message) {
       // We have an error message to pass along.
       result.error += err.message;
@@ -620,32 +630,33 @@ function processGamFile(req, res, next) {
       }
     });
 
-    if(!isAllowedPath(req.gamFile)){
+    if (!isAllowedPath(req.gamFile)) {
       // This is probably under SCRATCH_DATA_PATH
       throw new BadRequestError("Path to GAM file not allowed: " + req.gamFile);
     }
 
     // call 'vg view' to transform gam to json
-    const vgViewChild = spawn(`${VG_PATH}vg`, ['view', '-j', '-a', req.gamFile]);
+    const vgViewChild = spawn(`${VG_PATH}vg`,
+      ['view', '-j', '-a', req.gamFile]);
 
     vgViewChild.stderr.on('data', data => {
       console.log(`err data: ${data}`);
     });
 
     let gamJSON = '';
-    vgViewChild.stdout.on('data', function(data) {
+    vgViewChild.stdout.on('data', function (data) {
       gamJSON += data.toString();
     });
 
     vgViewChild.on('close', () => {
       req.gamArr = gamJSON
-        .split('\n')
-        .filter(function(a) {
-          return a != '';
-        })
-        .map(function(a) {
-          return JSON.parse(a);
-        });
+      .split('\n')
+      .filter(function (a) {
+        return a != '';
+      })
+      .map(function (a) {
+        return JSON.parse(a);
+      });
       console.timeEnd('processing gam file');
       processRegionFile(req, res, next);
     });
@@ -658,8 +669,9 @@ function processRegionFile(req, res, next) {
   try {
     console.time('processing region file');
     const regionFile = `${req.chunkDir}/regions.tsv`;
-    if(!isAllowedPath(regionFile)){
-      throw new BadRequestError("Path to region file not allowed: " + regionFile);
+    if (!isAllowedPath(regionFile)) {
+      throw new BadRequestError(
+        "Path to region file not allowed: " + regionFile);
     }
 
     const lineReader = rl.createInterface({
@@ -671,7 +683,9 @@ function processRegionFile(req, res, next) {
       const arr = line.replace(/\s+/g, ' ').split(' ');
       req.regionArr = arr;
       req.graph.path.forEach(p => {
-        if (p.name === arr[0]) p.indexOfFirstBase = arr[1];
+        if (p.name === arr[0]) {
+          p.indexOfFirstBase = arr[1];
+        }
       });
     });
 
@@ -684,120 +698,72 @@ function processRegionFile(req, res, next) {
   }
 }
 
-function getChrIds(filename) {
-  let chrId = undefined;
-  const chrIdMap = {
-    chr01: ['chr01', 'Chr1'],
-    chr02: ['chr02', 'Chr2'],
-    chr03: ['chr03', 'Chr3'],
-    chr04: ['chr04', 'Chr4'],
-    chr05: ['chr05', 'Chr5'],
-    chr06: ['chr06', 'Chr6'],
-    chr07: ['chr07', 'Chr7'],
-    chr08: ['chr08', 'Chr8'],
-    chr09: ['chr09', 'Chr9'],
-    chr10: ['chr10', 'Chr10'],
-    chr11: ['chr11', 'Chr11'],
-    chr12: ['chr12', 'Chr12'],
-  }
-  for (let key in chrIdMap) {
-    if (filename.includes(key)) {
-      chrId = key;
-      break;
-    }
-  }
-  if (chrId === undefined) {
-    return []
-  }
-  return chrIdMap[chrId]
-}
 function loadGFFAnnotationFiles(req, res, next) {
-
-  // extend query range 500bp larger than ref seq
-  let dataPath = pickDataPath(req.body.dataPath);
-  let annotationConfigPath = path.join(dataPath, "annotation.config");
-  if (!fs.existsSync(annotationConfigPath)) {
-    console.log("No annotation config provided, skip")
-    return cleanUpAndSendResult(req, res, next);
-  }
-  let annotationConfig = fs.readFileSync(annotationConfigPath).toString().trim().split('\n');
+  console.time("Load annotations");
   let annotations = {};
   let count = 0;
   let extraBases = 0;
 
   const excludedAnnotationType = ['remark', 'region', 'gene', 'mRNA'];
 
-  annotationConfig.forEach(e => {
-    let tmp = e.split(':');
-    let i = 0;
-    let regionStart = Infinity;
-    let regionEnd = 0;
-    // separator in gtf is " " while in gff is "="
-    let separator = tmp[0].endsWith('gtf') ? " " : "=";
+  req.graph.path.forEach(e => {
+    let separator = /[ =]/;
     let regionLength = req.regionArr[2] - req.regionArr[1];
-    while(i < req.graph.path.length) {
-      // coordinate starts with 1 in gff while 0 in vg
-      if(req.graph.path[i].name.startsWith(`${tmp[1]}.chr`)) {
-        let pathStart = Number(req.graph.path[i].indexOfFirstBase ?? req.graph.path[i].name.substring(
-          req.graph.path[i].name.indexOf('[') + 1, req.graph.path[i].name.indexOf(']'))) + 1;
-        regionStart = Math.min(regionStart, pathStart);
-        regionEnd = Math.max(regionEnd, pathStart + regionLength);
-      }
-      i++;
+    // coordinate starts with 1 in gff while 0 in vg
+    let pathStart = Number(e.indexOfFirstBase ?? e.name.substring(
+      e.name.indexOf('[') + 1, e.name.indexOf(']'))) + 1;
+    const regionStart = pathStart;
+    const regionEnd = pathStart + regionLength;
+    const accession = e.name.split(".chr")[0]
+    let annotation = accession
+    if (accession.startsWith(config.reference.name)) {
+      annotation = config.reference.annotation;
     }
-    if(regionStart < Infinity) {
-      let params = [path.join(dataPath, tmp[0]), regionStart - extraBases, regionEnd + extraBases];
-      const chrIds = getChrIds(req.body.xgFile)
-      params = params.concat(chrIds);
-      let queryAnnotationCall = spawn('./scripts/query_annotations.sh', params);
-      queryAnnotationCall.stdout.pipe(concat(data => {
-        annotations[tmp[1]] = []
-        data.toString().trim().split('\n').forEach(row => {
-          let cols = row.split('\t');
-          if(cols.length === 9) {
-            let attributes = {}
-            if(excludedAnnotationType.indexOf(cols[2]) === -1) {
-              cols[8].split(';').forEach(attribute => {
-                let attributeArray = attribute.trim().split(separator)
-                if (attributeArray.length === 2) {
-                  attributes[attributeArray[0]] = attributeArray[1].replace(/"/g, '');
-                }
-              })
-              if (cols[2] === 'exon') {
-                annotations[tmp[1]].push({
-                  seqid: cols[0],
-                  source: cols[1],
-                  type: cols[2],
-                  start: cols[3],
-                  end: cols[4],
-                  score: cols[5],
-                  strand: cols[6],
-                  phase: cols[7],
-                  attributes: attributes,
-                  length: cols[4] - cols[3] + 1
-                })
+    const chrId = req.chrId
+    let region = `${chrId}:${regionStart - extraBases}-${regionEnd
+    + extraBases}`
+    let params = [path.join("jbrowse", `${annotation}.gff.gz`), region];
+    let queryAnnotationCall = spawn('tabix', params);
+    queryAnnotationCall.stdout.pipe(concat(data => {
+      annotations[accession] = []
+      data.toString().trim().split('\n').forEach(row => {
+        let cols = row.split('\t');
+        if (cols.length === 9) {
+          let attributes = {}
+          if (excludedAnnotationType.indexOf(cols[2]) === -1) {
+            cols[8].split(';').forEach(attribute => {
+              let attributeArray = attribute.trim().split(separator)
+              if (attributeArray.length === 2) {
+                attributes[attributeArray[0]] = attributeArray[1].replace(/"/g,
+                  '');
               }
+            })
+            if (cols[2] === 'exon') {
+              annotations[accession].push({
+                seqid: cols[0],
+                source: cols[1],
+                type: cols[2],
+                start: cols[3],
+                end: cols[4],
+                score: cols[5],
+                strand: cols[6],
+                phase: cols[7],
+                attributes: attributes,
+                length: cols[4] - cols[3] + 1
+              })
             }
           }
-        })
-      }));
-
-      queryAnnotationCall.on("close", () => {
-        count++;
-        console.log(`annotations found in file${count}: ${tmp[0]}`);
-        if (count === annotationConfig.length) {
-          req.annotations = annotations;
-          cleanUpAndSendResult(req, res, next);
         }
       })
-    } else {
+    }));
+    queryAnnotationCall.on("close", () => {
       count++;
-      console.log(`no annotation found in file${count}: ${tmp[0]}`);
-      if (count === annotationConfig.length) {
+      if (count === req.graph.path.length) {
         req.annotations = annotations;
+        console.timeEnd("Load annotations");
         cleanUpAndSendResult(req, res, next);
       }
-    }
+    })
   });
 }
 
@@ -805,7 +771,7 @@ function loadGFFAnnotationFiles(req, res, next) {
 // May throw.
 // TODO: Use as a middleware?
 function cleanUpChunkIfOwned(req, res) {
-  if(req.rmChunk){
+  if (req.rmChunk) {
     // Don't clean up individual files in the directory manually; it's too
     // fiddly, and we could have gotten here because we generated those paths
     // and they were outside our acceptable directory tree.
@@ -840,7 +806,8 @@ function cleanUpAndSendResult(req, res, next) {
 function isAllowedPath(inputPath) {
   // Note that thing.param..xg is a perfectly good filename and contains ..; we
   // need to check for it as a path component.
-  if (inputPath.includes('//') || inputPath.includes('\\\\') || inputPath.includes('/\\') || inputPath.includes('\\/')) {
+  if (inputPath.includes('//') || inputPath.includes('\\\\')
+    || inputPath.includes('/\\') || inputPath.includes('\\/')) {
     // Prohibit double delimiters (probably mostly from internal errors)
     return false;
   }
@@ -874,15 +841,19 @@ function isAllowedPath(inputPath) {
 // Make sure that, at server startup, all the important directories are
 // allowed. We don't want the config file to list one of these as having .. or
 // something in it and break on every user request.
-assert(isAllowedPath(MOUNTED_DATA_PATH), "Configured dataPath is not acceptable; does it contain .. or //?");
-assert(isAllowedPath(INTERNAL_DATA_PATH), "Configured internalDataPath is not acceptable; does it contain .. or //?");
-assert(isAllowedPath(UPLOAD_DATA_PATH), "Upload data path is not acceptable; does it contain .. or //?");
-assert(isAllowedPath(SCRATCH_DATA_PATH), "Scratch path is not acceptable; does it contain .. or //?");
+assert(isAllowedPath(MOUNTED_DATA_PATH),
+  "Configured dataPath is not acceptable; does it contain .. or //?");
+assert(isAllowedPath(INTERNAL_DATA_PATH),
+  "Configured internalDataPath is not acceptable; does it contain .. or //?");
+assert(isAllowedPath(UPLOAD_DATA_PATH),
+  "Upload data path is not acceptable; does it contain .. or //?");
+assert(isAllowedPath(SCRATCH_DATA_PATH),
+  "Scratch path is not acceptable; does it contain .. or //?");
 
 // Decide where to pull the data from
 // (builtin examples, mounted user data folder or uploaded data).
 // Returned path is guaranteed to pass isAllowedPath().
-function pickDataPath(reqDataPath){
+function pickDataPath(reqDataPath) {
   let dataPath;
   switch (reqDataPath) {
     case 'mounted':
@@ -898,12 +869,12 @@ function pickDataPath(reqDataPath){
       // User supplied an impermissible option.
       throw new BadRequestError("Unrecognized data path type: " + reqDataPath);
   }
-  if(!dataPath.endsWith('/')){
+  if (!dataPath.endsWith('/')) {
     dataPath = dataPath + '/';
   }
   // This path will always be allowed. Caller does not need to check.
   assert(isAllowedPath(dataPath));
-  return(dataPath);
+  return (dataPath);
 }
 
 api.get('/getFilenames', (req, res) => {
@@ -915,7 +886,7 @@ api.get('/getFilenames', (req, res) => {
     bedFiles: []
   };
 
-  if(isAllowedPath(MOUNTED_DATA_PATH)){
+  if (isAllowedPath(MOUNTED_DATA_PATH)) {
     // list files in folder
     fs.readdirSync(MOUNTED_DATA_PATH).forEach(file => {
       if (file.endsWith('.xg')) {
@@ -934,7 +905,8 @@ api.get('/getFilenames', (req, res) => {
   } else {
     // Somehow MOUNTED_DATA_PATH isn't one of our ALLOWED_DATA_DIRECTORIES (anymore?).
     // Perhaps the server administrator has put a .. in it.
-    throw new InternalServerError("MOUNTED_DATA_PATH not allowed. Server is misconfigured.");
+    throw new InternalServerError(
+      "MOUNTED_DATA_PATH not allowed. Server is misconfigured.");
   }
 
   console.log(result);
@@ -953,13 +925,15 @@ api.post('/getPathNames', (req, res, next) => {
   // call 'vg paths' to get path name information
   const xgFile = `${dataPath}${req.body.xgFile}`;
 
-  if (!isAllowedPath(xgFile)){
+  if (!isAllowedPath(xgFile)) {
     // Spit back the provided user data in the error, not the generated and
     // possibly absolute path full of cool facts about the server setup.
-    throw new BadRequestError("Path to XG file not allowed: " + req.body.xgFile);
+    throw new BadRequestError(
+      "Path to XG file not allowed: " + req.body.xgFile);
   }
   if (!xgFile.endsWith(".xg")) {
-    throw new BadRequestError("Path to XG file does not end in .xg: " + req.body.xgFile);
+    throw new BadRequestError(
+      "Path to XG file does not end in .xg: " + req.body.xgFile);
   }
 
   const vgViewChild = spawn(`${VG_PATH}vg`, ['paths', '-L', '-x', xgFile]);
@@ -969,11 +943,11 @@ api.post('/getPathNames', (req, res, next) => {
   });
 
   let pathNames = '';
-  vgViewChild.stdout.on('data', function(data) {
+  vgViewChild.stdout.on('data', function (data) {
     pathNames += data.toString();
   });
 
-  vgViewChild.on('error', function(err) {
+  vgViewChild.on('error', function (err) {
     console.log('Error executing "vg view": ' + err);
     if (!sentResponse) {
       sentResponse = true;
@@ -991,7 +965,7 @@ api.post('/getPathNames', (req, res, next) => {
       }
       return;
     }
-    result.pathNames = pathNames.split('\n').filter(function(a) {
+    result.pathNames = pathNames.split('\n').filter(function (a) {
       // Eliminate empty names or underscore-prefixed internal names (like _alt paths)
       return a != '' && !a.startsWith('_');
     }).sort();
@@ -1010,7 +984,7 @@ api.post('/getBedRegions', (req, res) => {
     error: null
   };
 
-  if(req.body.bedFile != 'none'){
+  if (req.body.bedFile != 'none') {
     let dataPath = pickDataPath(req.body.dataPath);
     let bed_info = getBedRegions(req.body.bedFile, dataPath);
     console.log('bed reading done');
@@ -1031,30 +1005,30 @@ function getBedRegions(bedFile, dataPath) {
 
   // Work out what file we're talking about
   let bed_path = path.join(dataPath, bedFile);
-  if (!isAllowedPath(bed_path)){
+  if (!isAllowedPath(bed_path)) {
     throw new BadRequestError("BED file path not allowed: " + bedFile);
   }
-  if(!fs.existsSync(bed_path)){
+  if (!fs.existsSync(bed_path)) {
     result.error = "BED file not found: " + bedFile;
   }
 
-  let bed_info = {chr:[], start:[], end:[], desc:[], chunk:[]};
+  let bed_info = {chr: [], start: [], end: [], desc: [], chunk: []};
 
   // Load and parse the BED file
   let bed_data = fs.readFileSync(bed_path).toString().trim();
   let lines = bed_data.split('\n');
-  lines.map(function(line){
+  lines.map(function (line) {
     let records = line.split("\t");
     bed_info['chr'].push(records[0]);
     bed_info['start'].push(records[1]);
     bed_info['end'].push(records[2]);
     let desc = records.join('_');
-    if (records.length > 3){
+    if (records.length > 3) {
       desc = records[3];
     }
     bed_info['desc'].push(desc);
     let chunk = '';
-    if (records.length > 4){
+    if (records.length > 4) {
       chunk = records[4];
     }
     bed_info['chunk'].push(chunk);
@@ -1067,7 +1041,8 @@ function getBedRegions(bedFile, dataPath) {
 // server is listening, with HTTP scheme.
 function getServerURL(server) {
   let address = server.address();
-  return 'http://' + (address.family == 'IPv6' ? ('[' + address.address + ']') : address.address) + ':' + address.port;
+  return 'http://' + (address.family == 'IPv6' ? ('[' + address.address + ']')
+    : address.address) + ':' + address.port;
 }
 
 // Start the server. Returns a promise that resolves when the server is ready.
@@ -1106,6 +1081,7 @@ function start() {
               setTimeout(stopIfReady, 10);
             }
           }
+
           stopIfReady();
         });
 
@@ -1125,8 +1101,8 @@ function start() {
     // If the state fields are all filled in, resolve the promise for the closeable server object.
     function resolveIfReady() {
       if (state.server !== undefined &&
-          state.wss !== undefined &&
-          state.watcher !== undefined) {
+        state.wss !== undefined &&
+        state.watcher !== undefined) {
         resolve(state);
       }
     }
@@ -1142,19 +1118,20 @@ function start() {
     });
     // Create the WebSocketServer, for watching for updated files, using the HTTP server instance
     // Note that all websocket connections on any path end up here!
-    const wss = new WebSocketServer({ httpServer: server });
+    const wss = new WebSocketServer({httpServer: server});
 
     // Set that holds all the WebSocketConnection instances that
     // notify the client of file directory changes
     state.connections = new Set();
 
-    wss.on('request', function(request) {
+    wss.on('request', function (request) {
       // We recieved a websocket connection request and we need to accept it.
-      console.log(new Date() + ' Connection from origin ' + request.origin + '.');
+      console.log(
+        new Date() + ' Connection from origin ' + request.origin + '.');
       const connection = request.accept(null, request.origin);
       // We save the connection so that we can notify them when there is a change in the file system
       state.connections.add(connection);
-      connection.on('close', function(reasonCode, description) {
+      connection.on('close', function (reasonCode, description) {
         // When the websocket connection closes, we delete it from our set of open connections
         state.connections.delete(connection);
         console.log('A connection has been closed');
@@ -1165,7 +1142,7 @@ function start() {
     state.wss = wss;
 
     // Start a watch. We can stop it by closing the watcher.
-    const watcher = fs.watch(MOUNTED_DATA_PATH, function(event, filename) {
+    const watcher = fs.watch(MOUNTED_DATA_PATH, function (event, filename) {
       // // There was a change in the file directory
       // console.log('Directory has been changed');
       // for (let conn of state.connections) {

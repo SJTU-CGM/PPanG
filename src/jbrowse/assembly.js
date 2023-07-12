@@ -1,19 +1,21 @@
+import config from '../config.json'
+
 const assembly = {
-  name: 'IRGSP-1.0',
-  aliases: ['Nipponbare'],
+  name: config.reference.name,
+  aliases: [config.reference.alias],
   sequence: {
     type: 'ReferenceSequenceTrack',
-    trackId: 'Nipponbare-ReferenceSequenceTrack',
+    trackId: `${config.reference.alias}-ReferenceSequenceTrack`,
     adapter: {
       type: 'BgzipFastaAdapter',
       fastaLocation: {
-        uri: 'Nipponbare.fasta.gz'
+        uri: `${config.reference.alias}.fasta.gz`
       },
       faiLocation: {
-        uri: 'Nipponbare.fasta.gz.fai'
+        uri: `${config.reference.alias}.fasta.gz.fai`
       },
       gziLocation: {
-        uri: 'Nipponbare.fasta.gz.gzi'
+        uri: `${config.reference.alias}.fasta.gz.gzi`
       },
     },
   }

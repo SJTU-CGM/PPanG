@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Container, Row, Col, Form, Label, Input, Alert } from 'reactstrap';
-import { dataOriginTypes } from '../enums';
-import { fetchAndParse } from '../fetchAndParse';
+import {Container, Row, Col, Form, Label, Input, Alert} from 'reactstrap';
+import {dataOriginTypes} from '../enums';
+import {fetchAndParse} from '../fetchAndParse';
 // import defaultConfig from '../config.default.json';
 import config from '../config.json';
 import DataPositionFormRow from './DataPositionFormRow';
@@ -72,10 +72,10 @@ class HeaderForm extends Component {
     const dataPath = ds.useMountedPath ? 'mounted' : 'default';
 
     this.setState(state => {
-      if (bedSelect !== 'none'){
+      if (bedSelect !== 'none') {
         this.getBedRegions(bedSelect, dataPath);
       }
-      if (xgSelect !== 'none'){
+      if (xgSelect !== 'none') {
         this.getPathNames(xgSelect, dataPath);
       }
       return {
@@ -93,7 +93,7 @@ class HeaderForm extends Component {
   }
 
   getMountedFilenames = async () => {
-    this.setState({ error: null });
+    this.setState({error: null});
     try {
       const json = await fetchAndParse(`${this.props.apiUrl}/getFilenames`, {
         method: 'GET',
@@ -104,31 +104,31 @@ class HeaderForm extends Component {
       if (json.xgFiles === undefined) {
         // We did not get back a graph, only (possibly) an error.
         const error = json.error || 'Listing file names';
-        this.setState({ error: error });
+        this.setState({error: error});
       } else {
         //json.xgFiles.unshift('none');
         json.gbwtFiles.unshift('none');
         json.gamIndices.unshift('none');
         json.bedFiles.unshift('none');
 
-        if(this.state.dataPath === 'mounted'){
+        if (this.state.dataPath === 'mounted') {
           this.setState(state => {
             const xgSelect = json.xgFiles.includes(state.xgSelect)
-                  ? state.xgSelect
-                  : 'none';
+              ? state.xgSelect
+              : 'none';
             const gbwtSelect = json.gbwtFiles.includes(state.gbwtSelect)
-                  ? state.gbwtSelect
-                  : 'none';
+              ? state.gbwtSelect
+              : 'none';
             const gamSelect = json.gamIndices.includes(state.gamSelect)
-                  ? state.gamSelect
-                  : 'none';
+              ? state.gamSelect
+              : 'none';
             const bedSelect = json.bedFiles.includes(state.bedSelect)
-                  ? state.bedSelect
-                  : 'none';
-            if (bedSelect !== 'none'){
+              ? state.bedSelect
+              : 'none';
+            if (bedSelect !== 'none') {
               this.getBedRegions(bedSelect, 'mounted');
             }
-            if (xgSelect !== 'none'){
+            if (xgSelect !== 'none') {
               this.getPathNames(xgSelect, 'mounted');
             }
             return {
@@ -154,25 +154,26 @@ class HeaderForm extends Component {
         }
       }
     } catch (error) {
-      this.setState({ error: error });
+      this.setState({error: error});
       console.log(`GET to ${this.props.apiUrl}/getFilenames failed:`, error);
     }
   };
 
   getBedRegions = async (bedFile, dataPath) => {
-    this.setState({ error: null });
+    this.setState({error: null});
     try {
       const json = await fetchAndParse(`${this.props.apiUrl}/getBedRegions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ bedFile, dataPath })
+        body: JSON.stringify({bedFile, dataPath})
       });
       // We need to do all our parsing here, if we expect the catch to catch errors.
       let bedRegionsDesc = json.bedRegions['desc'];
       if (!(bedRegionsDesc instanceof Array)) {
-        throw new Error("Server did not send back an array of BED region descriptions");
+        throw new Error(
+          "Server did not send back an array of BED region descriptions");
       }
       this.setState(state => {
         const regionSelect = bedRegionsDesc.includes(state.regionSelect)
@@ -186,7 +187,7 @@ class HeaderForm extends Component {
       });
     } catch (error) {
       console.log(`POST to ${this.props.apiUrl}/getBedRegions failed:`, error);
-      this.setState({ error: error });
+      this.setState({error: error});
     }
   };
 
@@ -226,7 +227,7 @@ class HeaderForm extends Component {
       if (ds.name === value) {
         let dataPath = ds.useMountedPath ? 'mounted' : 'default';
         let bedSelect = 'none';
-        if(ds.bedFile){
+        if (ds.bedFile) {
           this.getBedRegions(ds.bedFile, dataPath);
           bedSelect = ds.bedFile;
         }
@@ -268,7 +269,7 @@ class HeaderForm extends Component {
         };
       });
     } else if (value === 'syntheticExamples') {
-      this.setState({ dataType: dataTypes.EXAMPLES });
+      this.setState({dataType: dataTypes.EXAMPLES});
     }
   };
 
@@ -292,28 +293,32 @@ class HeaderForm extends Component {
   handleInputChange = event => {
     const id = event.target.id;
     const value = event.target.value;
-    this.setState({ [id]: value });
+    this.setState({[id]: value});
     if (id === 'xgSelect') {
       this.getPathNames(value, this.state.dataPath);
-      this.setState({ xgFile: value });
+      this.setState({xgFile: value});
     } else if (id === 'gbwtSelect') {
-      this.setState({ gbwtFile: value });
+      this.setState({gbwtFile: value});
     } else if (id === 'gamSelect') {
-      this.setState({ gamFile: value });
+      this.setState({gamFile: value});
     } else if (id === 'bedSelect') {
       this.getBedRegions(value, this.state.dataPath);
-      this.setState({ bedFile: value });
+      this.setState({bedFile: value});
     } else if (id === 'pathSelect') {
-      this.setState({ region: value.concat(':') });
+      this.setState({region: value.concat(':')});
     } else if (id === 'regionSelect') {
       // find which region corresponds to this region label/desc
       let i = 0;
-      while (i < this.state.regionInfo['desc'].length && this.state.regionInfo['desc'][i] !== value) i += 1;
-      if (i < this.state.regionInfo['desc'].length){
+      while (i < this.state.regionInfo['desc'].length
+      && this.state.regionInfo['desc'][i] !== value) {
+        i += 1;
+      }
+      if (i < this.state.regionInfo['desc'].length) {
         let region_chr = this.state.regionInfo['chr'][i];
         let region_start = this.state.regionInfo['start'][i];
         let region_end = this.state.regionInfo['end'][i];
-        this.setState({ region: region_chr.concat(':', region_start, '-', region_end) });
+        this.setState(
+          {region: region_chr.concat(':', region_start, '-', region_end)});
       }
     }
   };
@@ -351,15 +356,15 @@ class HeaderForm extends Component {
   };
 
   handleFileUpload = (fileType, fileName) => {
-    this.setState({ [fileType]: fileName });
+    this.setState({[fileType]: fileName});
   };
 
   showFileSizeAlert = () => {
-    this.setState({ fileSizeAlert: true });
+    this.setState({fileSizeAlert: true});
   };
 
   setUploadInProgress = val => {
-    this.setState({ uploadInProgress: val });
+    this.setState({uploadInProgress: val});
   };
 
   setUpWebsocket = () => {
@@ -383,7 +388,8 @@ class HeaderForm extends Component {
     let errorDiv = null;
     if (this.state.error) {
       console.log("Header error: " + this.state.error);
-      const message = this.state.error.message ? this.state.error.message : this.state.error;
+      const message = this.state.error.message ? this.state.error.message
+        : this.state.error;
       // We drop the error message into a div and leave most of the UI so the
       // user can potentially recover by picking something else.
       errorDiv = (
@@ -417,7 +423,9 @@ class HeaderForm extends Component {
         <Container fluid={true}>
           <Row>
             <Col md="1.5" style={{marginLeft: "20px"}}>
-              <img src="./logo.png" style={{height: "70px"}} alt="Logo" />
+              <a href="https://cgm.sjtu.edu.cn/PPanG/" target="_blank">
+                <img src="./logo.png" style={{height: "70px"}} alt="Logo"/>
+              </a>
             </Col>
             <Col>
               <Form inline>
@@ -484,7 +492,7 @@ class HeaderForm extends Component {
                 color="danger"
                 isOpen={this.state.fileSizeAlert}
                 toggle={() => {
-                  this.setState({ fileSizeAlert: false });
+                  this.setState({fileSizeAlert: false});
                 }}
                 className="mt-3"
               >
@@ -505,7 +513,8 @@ class HeaderForm extends Component {
                   handleGoRight={this.handleGoRight}
                   handleGoButton={this.handleGoButton}
                   uploadInProgress={this.state.uploadInProgress}
-                  isGoNextDisabled={!this.state.region || !this.state.region.includes(":")}
+                  isGoNextDisabled={!this.state.region
+                    || !this.state.region.includes(":")}
                   clearJBView={this.props.clearJBView}
                   ref={node => this.DataPositionFormRow = node}
                 />
