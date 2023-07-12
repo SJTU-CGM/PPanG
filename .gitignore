@@ -1,0 +1,16 @@
+node_modules
+.tmp
+.DS_store
+.publish
+.vscode
+.idea
+build/
+*.swp
+*~
+tmp
+yarn.lock
+vg
+src/config.json
+riceData/
+jbrowse/
+deploy.sh

@@ -1,0 +1,23 @@
+diff --git a/node_modules/@jbrowse/react-linear-genome-view/esm/JBrowseLinearGenomeView/ViewContainer.js b/node_modules/@jbrowse/react-linear-genome-view/esm/JBrowseLinearGenomeView/ViewContainer.js
+index 79c8142..6371852 100644
+--- a/node_modules/@jbrowse/react-linear-genome-view/esm/JBrowseLinearGenomeView/ViewContainer.js
++++ b/node_modules/@jbrowse/react-linear-genome-view/esm/JBrowseLinearGenomeView/ViewContainer.js
+@@ -62,14 +62,9 @@ const ViewContainer = observer(function ({ view, children, }) {
+                     edge: 'start',
+                 }, IconProps: { className: classes.icon } }),
+             React.createElement("div", { className: classes.grow }),
+-            displayName ? (React.createElement(Typography, { variant: "body2", className: classes.displayName }, displayName)) : null,
+-            React.createElement("div", { className: classes.grow }),
+-            React.createElement(IconButton, { onClick: () => setDlgOpen(true) },
+-                React.createElement("div", { style: { width: 22, height: 22 } },
+-                    React.createElement(Logomark, { variant: "white" })))),
+-        React.createElement(Paper, null, children),
+-        dlgOpen ? (React.createElement(Suspense, { fallback: React.createElement("div", null) },
+-            React.createElement(AboutDialog, { open: true, onClose: () => setDlgOpen(false) }))) : null));
++            displayName ? (React.createElement(Typography, { variant: "h3", className: classes.displayName, style: { margin: "auto" } }, displayName)) : null,
++            React.createElement("div", { className: classes.grow })),
++        React.createElement(Paper, null, children)));
+ });
+ export default ViewContainer;
+ //# sourceMappingURL=ViewContainer.js.map
+\ No newline at end of file

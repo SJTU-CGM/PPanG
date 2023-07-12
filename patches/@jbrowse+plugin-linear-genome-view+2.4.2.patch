@@ -1,0 +1,13 @@
+diff --git a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js b/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js
+index 1eb1c3e..d860fe7 100644
+--- a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js
++++ b/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js
+@@ -12,8 +12,6 @@ const MiniControls = observer((props) => {
+     const [anchorEl, setAnchorEl] = useState();
+     return hideHeader ? (React.createElement("div", { style: { position: 'absolute', right: '0px', zIndex: '1001' } },
+         React.createElement(Paper, { style: { background: '#aaa7' } },
+-            React.createElement(IconButton, { onClick: event => setAnchorEl(event.currentTarget) },
+-                React.createElement(ArrowDown, { fontSize: "small" })),
+             React.createElement(IconButton, { "data-testid": "zoom_out", onClick: () => model.zoom(bpPerPx * 2), disabled: bpPerPx >= maxBpPerPx - 0.0001 || scaleFactor !== 1 },
+                 React.createElement(ZoomOut, { fontSize: "small" })),
+             React.createElement(IconButton, { "data-testid": "zoom_in", onClick: () => model.zoom(model.bpPerPx / 2), disabled: bpPerPx <= minBpPerPx + 0.0001 || scaleFactor !== 1 },
