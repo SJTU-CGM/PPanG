@@ -10,16 +10,24 @@ import {
   Input,
   Label
 } from 'reactstrap';
+// TODO: use datagrid to show features
+import { DataGrid } from '@mui/x-data-grid';
 import SelectionDropdown from "./SelectionDropdown";
 
 class VisualizationOptions extends Component {
   state = {
     isOpenLegend: false,
-    isOpenVisualizationOptions: true
+    isOpenVisualizationOptions: true,
+    isOpenFeatureCard: false
   };
 
   toggleLegend = e => {
     this.setState({ isOpenLegend: !this.state.isOpenLegend });
+    e.preventDefault();
+  };
+
+  toggleFeatureCard = e => {
+    this.setState({ isOpenFeatureCard: !this.state.isOpenFeatureCard });
     e.preventDefault();
   };
 
@@ -50,6 +58,20 @@ class VisualizationOptions extends Component {
     return (
       <Container>
         <div id="accordion">
+          <Card>
+            <CardHeader id="feature" onClick={this.toggleFeatureCard}>
+              <h5 className="mb-0">
+                <a href="#collapse" onClick={this.toggleFeatureCard}>
+                  Features
+                </a>
+              </h5>
+            </CardHeader>
+            <Collapse isOpen={this.state.isOpenFeatureCard}>
+              <CardBody>
+                <div id="featureCard" />
+              </CardBody>
+            </Collapse>
+          </Card>
           <Card>
             <CardHeader id="legendCard" onClick={this.toggleLegend}>
               <h5 className="mb-0">

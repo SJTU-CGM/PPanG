@@ -738,24 +738,22 @@ function loadGFFAnnotationFiles(req, res, next) {
                   '');
               }
             })
-            if (cols[2] === 'exon') {
-              annotations[accession].push({
-                seqid: cols[0],
-                source: cols[1],
-                type: cols[2],
-                start: cols[3],
-                end: cols[4],
-                score: cols[5],
-                strand: cols[6],
-                phase: cols[7],
-                attributes: attributes,
-                length: cols[4] - cols[3] + 1
-              })
-            }
+            annotations[accession].push({
+              chr: cols[0],
+              source: cols[1],
+              type: cols[2],
+              start: cols[3],
+              end: cols[4],
+              score: cols[5],
+              strand: cols[6],
+              phase: cols[7],
+              attributes: attributes,
+              length: cols[4] - cols[3] + 1
+            })
           }
         }
       })
-    }));
+    }))
     queryAnnotationCall.on("close", () => {
       count++;
       if (count === req.graph.path.length) {
@@ -784,6 +782,7 @@ function cleanUpChunkIfOwned(req, res) {
 function cleanUpAndSendResult(req, res, next) {
   try {
     cleanUpChunkIfOwned(req, res);
+    req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
 
     const result = {};
     // TODO: Any standard error output will make an error response.
