@@ -140,8 +140,7 @@ class VisualizationOptions extends Component {
                 {this.state.blatResult !== undefined && (
                   typeof this.state.blatResult === 'string'
                     ? this.state.blatResult :
-                    (<div style={{height: 500, width: '100%', margin: '15px 0'}}>
-                      <h6>Just copy the tRegion in "Region" box above for visualization in PPanG</h6>
+                    (<div style={{height: 500, width: '100%', margin: '20px 0'}}>
                       <DataGrid
                         rows={this.state.blatResult}
                         columns={blatCols}
@@ -153,6 +152,7 @@ class VisualizationOptions extends Component {
                           },
                         }}
                       />
+                      <h6>Just select the chromosome and copy the tRegion into "Region" box above for visualization in PPanG</h6>
                     </div>)
                 )}
               </CardBody>
