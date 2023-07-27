@@ -267,6 +267,7 @@ class App extends Component {
           handleMappingQualityCutoffChange={
             this.handleMappingQualityCutoffChange
           }
+          apiUrl={this.props.apiUrl}
           handleSelectTranscript={this.handleSelectTranscript}
           setColorSetting={this.setColorSetting}
         />

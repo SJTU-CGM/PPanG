@@ -346,6 +346,7 @@ VisualizationOptions.propTypes = {
   handleMappingQualityCutoffChange: PropTypes.func.isRequired,
   setColorSetting: PropTypes.func.isRequired,
   handleSelectTranscript: PropTypes.func.isRequired,
+  apiUrl: PropTypes.string.isRequired
 };
 
 export default VisualizationOptions;
