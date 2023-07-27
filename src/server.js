@@ -132,6 +132,55 @@ function indexGamSorted(req, res) {
   });
 }
 
+api.post('/blatSearch', (req, res, next) => {
+  console.time('blat')
+  let seq = req.body.seq
+  if (!seq.startsWith('>')) {
+    seq = '>query\n' + seq
+  }
+  const tmpFasta = `tmp/${new Date().getTime()}.fasta`
+  fs.writeFileSync(tmpFasta, seq)
+  let params = [tmpFasta]
+  if (req.body.full) {
+    params.push('-f')
+  }
+  const blatCall = spawn('./blat/blatQuery', params);
+  let result = '';
+  blatCall.stdout.on('data', data => {
+    result += data.toString();
+  })
+  blatCall.stderr.on('data', data => {
+    console.log(`err data: ${data}`);
+  });
+  blatCall.on('close', code => {
+    if (code !== 0) {
+      return next(new VgExecutionError('blat search failed'));
+    }
+    let blatResult = [];
+    const rows = result.trim().split('\n')
+    let count = rows.length;
+    if (req.body.count !== undefined) {
+      count = Math.min(count, Number(req.body.count))
+    }
+    for (let i = 0; i < count; i++) {
+      const cols = rows[i].split('\t');
+      blatResult.push({
+        match: cols[0],
+        mismatch: cols[1],
+        qGapCount: cols[2],
+        qGapBases: cols[3],
+        tGapCount: cols[4],
+        tGapBases: cols[5],
+        strand: cols[6],
+        qRegion: `${cols[7]}:${Number(cols[8]) + 1}-${Number(cols[9]) + 1}`,
+        tRegion: `${cols[10]}:${Number(cols[11]) + 1}-${Number(cols[12]) + 1}`
+      })
+    }
+    console.timeEnd('blat')
+    res.json({result: blatResult})
+  })
+})
+
 api.post('/getChunkedData', (req, res, next) => {
   // We only want to have one downstream callback chain out of here.
   // TODO: Does Express let us next(err) multiple times if multiple errors happen concurrently???

@@ -3738,7 +3738,7 @@ const annotationCols = ['chr', 'source', 'type', 'start', 'end', 'score', 'stran
   'phase', 'attributes']
 
 function showFeatureCard() {
-  let content = '<button style="margin-left: 5px;" id="downloadfeatures">Download</button>'
+  let content = '<button style="margin-left: 5px;" id="downloadfeatures">Download All</button>'
     + '<table class="table-sm table-condensed table-nonfluid"><thead><tr><th>Sample</th>';
   annotationCols.forEach(col => content += `<th>${titleCase(col)}</th>`)
   content += "</tr></thead>";

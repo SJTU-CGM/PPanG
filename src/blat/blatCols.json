@@ -1,0 +1,44 @@
+[
+  {
+    "field": "qRegion",
+    "width": 180
+  },
+  {
+    "field": "tRegion",
+    "width": 300
+  },
+  {
+    "field": "strand",
+    "width": 60
+  },
+  {
+    "field": "match",
+    "width": 70,
+    "type": "number"
+  },
+  {
+    "field": "mismatch",
+    "width": 80,
+    "type": "number"
+  },
+  {
+    "field": "qGapCount",
+    "width": 90,
+    "type": "number"
+  },
+  {
+    "field": "qGapBases",
+    "width": 90,
+    "type": "number"
+  },
+  {
+    "field": "tGapCount",
+    "width": 90,
+    "type": "number"
+  },
+  {
+    "field": "tGapBases",
+    "width": 90,
+    "type": "number"
+  }
+]
