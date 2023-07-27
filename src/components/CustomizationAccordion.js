@@ -106,7 +106,7 @@ class VisualizationOptions extends Component {
               <CardBody>
                 <Input
                   type="textarea"
-                  style={{marginBottom: "8px", height: "100px"}}
+                  style={{marginBottom: "8px", height: "200px"}}
                   value={this.state.blatQuery}
                   placeholder="Input the query sequence here"
                   size="500"
@@ -140,7 +140,7 @@ class VisualizationOptions extends Component {
                 {this.state.blatResult !== undefined && (
                   typeof this.state.blatResult === 'string'
                     ? this.state.blatResult :
-                    (<div style={{height: 500, width: '100%', margin: '0 15px'}}>
+                    (<div style={{height: 500, width: '100%', margin: '15px 0'}}>
                       <h6>Just copy the tRegion in "Region" box above for visualization in PPanG</h6>
                       <DataGrid
                         rows={this.state.blatResult}
