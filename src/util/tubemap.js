@@ -126,6 +126,9 @@ let lastInputNodes;
 let lastInputTracks;
 let lastConfig;
 
+let globalTicks;
+let jbrowseNav = undefined;
+
 const config = {
   mergeNodesFlag: true,
   transparentNodesFlag: false,
@@ -184,6 +187,7 @@ export function create(params) {
   config.clickableNodesFlag = params.clickableNodes || false;
   config.hideLegendFlag = params.hideLegend || false;
   handleTrackDoubleClick = params.handleTrackDoubleClick;
+  jbrowseNav = params.jbrowseNav;
   resetCompress = params.resetCompress;
   update();
 }
@@ -278,6 +282,18 @@ function straightenTrack(index) {
         .join('');
     }
   });
+}
+
+function getXCoord(sequencePos) {
+  if (globalTicks) {
+    for (let i = 1; i < globalTicks.length; i++) {
+      if (globalTicks[i][1] >= sequencePos) {
+        return Math.round(globalTicks[i - 1][0] + (globalTicks[i][0] - globalTicks[i - 1][0])
+          / (globalTicks[i][1] - globalTicks[i - 1][1]) * (sequencePos - globalTicks[i - 1][1]))
+      }
+    }
+    return globalTicks[globalTicks.length - 1][0];
+  }
 }
 
 export function selectTranscript(value) {
@@ -1257,6 +1273,9 @@ function alignSVG() {
     );
     // adjust width to compensate for verical scroll bar appearing
     svg2.attr('width', document.getElementById('tubeMapSVG').clientWidth);
+    const regionStart = getXCoord(-transform.x / transform.kx)
+    const regionEnd = getXCoord((-transform.x + parentElement.offsetWidth) / transform.kx)
+    if (jbrowseNav !== undefined && regionStart !== undefined) jbrowseNav(regionStart, regionEnd)
   }
 
   const minZoom = Math.min(
@@ -3415,7 +3434,7 @@ function drawRuler() {
 
   // Plot all the ticks
   ticks.forEach(tick => drawRulerMarking(tick[0], tick[1]));
-
+  globalTicks = ticks;
 }
 
 function drawRulerMarking(sequencePosition, xCoordinate) {

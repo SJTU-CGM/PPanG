@@ -528,6 +528,7 @@ function getChunkedData(req, res, next) {
         return;
       }
       req.graph = JSON.parse(graphAsString);
+      req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
       req.region = [r_start, r_end];
       if (!sentResponse) {
         sentResponse = true;
@@ -831,7 +832,6 @@ function cleanUpChunkIfOwned(req, res) {
 function cleanUpAndSendResult(req, res, next) {
   try {
     cleanUpChunkIfOwned(req, res);
-    req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
 
     const result = {};
     // TODO: Any standard error output will make an error response.
