@@ -774,7 +774,7 @@ function loadGFFAnnotationFiles(req, res, next) {
     let params = [path.join("jbrowse", `${annotation}.gff.gz`), region];
     let queryAnnotationCall = spawn('tabix', params);
     queryAnnotationCall.stdout.pipe(concat(data => {
-      annotations[accession] = []
+      if (!(accession in annotations)) annotations[accession] = []
       data.toString().trim().split('\n').forEach(row => {
         let cols = row.split('\t');
         if (cols.length === 9) {
