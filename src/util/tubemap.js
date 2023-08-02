@@ -190,6 +190,9 @@ export function create(params) {
   jbrowseNav = params.jbrowseNav;
   resetCompress = params.resetCompress;
   update();
+  const regionStart = getXCoord(0)
+  const regionEnd = getXCoord(document.getElementById(svgID.substring(1)).parentNode.offsetWidth)
+  if (jbrowseNav !== undefined && regionStart !== undefined) jbrowseNav(regionStart, regionEnd)
 }
 
 // Return true if the given name names a reverse strand node, and false otherwise.

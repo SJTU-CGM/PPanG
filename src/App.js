@@ -224,7 +224,7 @@ class App extends Component {
 
   jbrowseNav = (regionStart, regionEnd) => {
     const graphStart = this.props.indexOfFirstBase
-    const chrId = graphStart.substring(graphStart.indexOf('chr'), graphStart.indexOf(':'));
+    const chrId = graphStart.match(/chr\d+/)[0];
     const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
     this.props.regions = {}
     for (let accession in this.props.pathCoords) {

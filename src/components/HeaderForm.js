@@ -200,7 +200,7 @@ class HeaderForm extends Component {
   };
 
   getPathNames = (xgFile, dataPath) => {
-    const chrId = xgFile.substring(0, xgFile.indexOf(".xg"))
+    const chrId = xgFile.match(/chr\d+/)[0]
     const pathNames = []
     accessions.forEach(accession => pathNames.push(`${accession}.${chrId}`))
     this.setState(state => {

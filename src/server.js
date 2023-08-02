@@ -187,7 +187,7 @@ api.post('/getChunkedData', (req, res, next) => {
   console.time('request-duration');
   console.log('http POST getChunkedData received');
 
-  req.chrId = req.body.xgFile.substring(0, req.body.xgFile.lastIndexOf("."))
+  req.chrId = req.body.xgFile.match(/chr\d+/)[0]
   try {
     req.body.region.split(":");
     getChunkedData(req, res, next);
