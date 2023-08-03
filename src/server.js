@@ -172,8 +172,8 @@ api.post('/blatSearch', (req, res, next) => {
         tGapCount: cols[4],
         tGapBases: cols[5],
         strand: cols[6],
-        qRegion: `${cols[7]}:${Number(cols[8]) + 1}-${Number(cols[9]) + 1}`,
-        tRegion: `${cols[10]}:${Number(cols[11]) + 1}-${Number(cols[12]) + 1}`
+        qRegion: `${cols[7]}:${Number(cols[8])}-${Number(cols[9])}`,
+        tRegion: `${cols[10]}:${Number(cols[11])}-${Number(cols[12])}`
       })
     }
     console.timeEnd('blat')
