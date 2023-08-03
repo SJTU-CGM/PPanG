@@ -172,8 +172,8 @@ api.post('/blatSearch', (req, res, next) => {
         tGapCount: cols[4],
         tGapBases: cols[5],
         strand: cols[6],
-        qRegion: `${cols[7]}:${Number(cols[8])}-${Number(cols[9])}`,
-        tRegion: `${cols[10]}:${Number(cols[11])}-${Number(cols[12])}`
+        qRegion: `${cols[7]}:${Number(cols[8]) + 1}-${Number(cols[9]) + 1}`,
+        tRegion: `${cols[10]}:${Number(cols[11]) + 1}-${Number(cols[12]) + 1}`
       })
     }
     console.timeEnd('blat')
@@ -220,7 +220,7 @@ api.post('/getChunkedData', (req, res, next) => {
       let cols = target.split('\t');
       req.body.region = `${config.reference.name}.${cols[0]}:${cols[3]
       - 1}-${cols[4] - 1}`
-      getChunkedData(req, res, next);v
+      getChunkedData(req, res, next);
     });
   }
 });
