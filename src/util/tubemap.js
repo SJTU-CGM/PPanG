@@ -1623,6 +1623,7 @@ function generateNodeOrder() {
     }
   }
 
+  minOrder = Math.min(minOrder, getMinOrder())
   // adjust all nodes if necessary, so that no order<0
   if (minOrder < 0) {
     increaseOrderForAllNodes(-minOrder);
@@ -1659,6 +1660,16 @@ function getMaxOrder() {
     }
   });
   return max;
+}
+
+function getMinOrder() {
+  let min = Infinity;
+  nodes.forEach(node => {
+    if (node.hasOwnProperty('order') && node.order < min) {
+      min = node.order;
+    }
+  });
+  return min;
 }
 
 // generates sequence keeping the order but switching all reversed (negative) nodes to forward nodes
