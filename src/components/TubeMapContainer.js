@@ -80,6 +80,7 @@ class TubeMapContainer extends Component {
             region={this.state.region}
             annotations={this.state.annotations}
             handleTrackDoubleClick={this.props.handleTrackDoubleClick}
+            jbrowseNav={this.props.jbrowseNav}
             resetCompress={this.props.resetCompress}
           />
         </div>
@@ -110,18 +111,20 @@ class TubeMapContainer extends Component {
         const trackName = json.trackName;
         const transcripts = tubeMap.parseTranscriptsFromAnnotations(annotations, trackName);
         let transcriptSelectOptions = [];
-        const regions = {}
+        const pathCoords = {}
+        let indexOfFirstBase = "";
         json.graph.path.forEach(path => {
           const trackName = path.name
-          const pathName = trackName.substring(0, trackName.indexOf('[')) || trackName
-          const start = Number(path.indexOfFirstBase) - 1 || Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
-          let length = 0
-          path.mapping.forEach(item => length += item["edit"][0]["from_length"])
-          let index = pathName.indexOf('.chr')
-          const label = trackName.startsWith(config.reference.name) ? config.reference.name : trackName
-          regions[label] = `${pathName.substring(index+1)}:${start+1}-${start + length}`
+          let start = Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
+          let label = trackName
+          if (path.indexOfFirstBase) {
+            start = Number(path.indexOfFirstBase)
+            label = config.reference.name
+            indexOfFirstBase = `${trackName}:${path.indexOfFirstBase}`;
+          }
+          pathCoords[label] = start
         })
-        this.props.handleChangeRegion(regions);
+        this.props.handleChangeRegion(pathCoords, indexOfFirstBase);
         for (let trackName in transcripts) {
           transcripts[trackName].forEach(transcriptId => {
             transcriptSelectOptions.push(`${trackName}: ${transcriptId}`)
@@ -211,6 +214,7 @@ TubeMapContainer.propTypes = {
   fetchParams: PropTypes.object.isRequired,
   loadTranscriptSelectOptions: PropTypes.func.isRequired,
   handleChangeRegion: PropTypes.func.isRequired,
+  jbrowseNav: PropTypes.func.isRequired,
   handleTrackDoubleClick: PropTypes.func.isRequired,
   resetCompress: PropTypes.func.isRequired
 };

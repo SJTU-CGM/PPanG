@@ -16,6 +16,7 @@ class TubeMap extends Component {
       region: this.props.region,
       annotations: this.props.annotations,
       handleTrackDoubleClick: this.props.handleTrackDoubleClick,
+      jbrowseNav: this.props.jbrowseNav,
       resetCompress: this.props.resetCompress
     });
   };
@@ -32,6 +33,7 @@ TubeMap.propTypes = {
   region: PropTypes.array.isRequired,
   annotations: PropTypes.array.isRequired,
   handleTrackDoubleClick: PropTypes.func.isRequired,
+  jbrowseNav: PropTypes.func.isRequired,
   resetCompress: PropTypes.func.isRequired
 };
 

@@ -83,7 +83,7 @@ class App extends Component {
           defaultSession,
           configuration: defaultConfiguration,
           disableAddTracks: true,
-          location: 'chr01:38382380-38385640',
+          location: 'chr01:38382380-38382540',
         })
       },
     };
@@ -110,14 +110,6 @@ class App extends Component {
       console.error(e);
     }
     tubeMap.update();
-  }
-
-  jbrowseNav() {
-    for (let accession in this.props.regions) {
-      if (accession in this.state.jbrowseViewStates) {
-        this.state.jbrowseViewStates[accession].session.view.navToLocString(this.props.regions[accession])
-      }
-    }
   }
 
   setFetchParams = fetchParams => {
@@ -188,9 +180,9 @@ class App extends Component {
     }));
   }
 
-  handleChangeRegion = (region) => {
-    this.props.regions = region
-    this.jbrowseNav()
+  handleChangeRegion = (pathCoords, indexOfFirstBase) => {
+    this.props.pathCoords = pathCoords
+    this.props.indexOfFirstBase = indexOfFirstBase
   }
 
   clearJBrowseViews = () => {
@@ -230,6 +222,20 @@ class App extends Component {
     }))
   }
 
+  jbrowseNav = (regionStart, regionEnd) => {
+    const graphStart = this.props.indexOfFirstBase
+    const chrId = graphStart.match(/chr\d+/)[0];
+    const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
+    this.props.regions = {}
+    for (let accession in this.props.pathCoords) {
+      const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
+      this.props.regions[accession] = region
+      if (accession in this.state.jbrowseViewStates) {
+        this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
+      }
+    }
+  }
+
   render() {
     return (
       <div>
@@ -250,6 +256,7 @@ class App extends Component {
             loadTranscriptSelectOptions={this.loadTranscriptSelectOptions}
             handleChangeRegion={this.handleChangeRegion}
             handleTrackDoubleClick={this.addJBrowseView}
+            jbrowseNav={this.jbrowseNav}
             resetCompress={this.resetCompress}
           />
           <div style={{margin: "-20px 20px 20px 20px"}}>
@@ -267,6 +274,7 @@ class App extends Component {
           handleMappingQualityCutoffChange={
             this.handleMappingQualityCutoffChange
           }
+          apiUrl={this.props.apiUrl}
           handleSelectTranscript={this.handleSelectTranscript}
           setColorSetting={this.setColorSetting}
         />
@@ -277,7 +285,9 @@ class App extends Component {
 
 App.propTypes = {
   apiUrl: PropTypes.string,
+  pathCoords: PropTypes.object,
   regions: PropTypes.object,
+  indexOfFirstBase: PropTypes.number
 }
 
 App.defaultProps = {
@@ -286,6 +296,7 @@ App.defaultProps = {
   // browser testing environment to point to a real testing backend.
   // Note that host includes the port.
   apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0',
+  regions: {}
 };
 
 export default App;

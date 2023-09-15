@@ -1,25 +1,46 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
   Collapse,
-  Container,
+  Container, Form,
   FormGroup,
   Input,
   Label
 } from 'reactstrap';
+// TODO: use datagrid to show features
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import SelectionDropdown from "./SelectionDropdown";
+import blatCols from '../blat/blatCols.json'
+import {fetchAndParse} from "../fetchAndParse";
 
 class VisualizationOptions extends Component {
   state = {
     isOpenLegend: false,
-    isOpenVisualizationOptions: true
+    isOpenVisualizationOptions: true,
+    isOpenFeatureCard: false,
+    isOpenBlat: false,
+    isFullBlat: false,
+    blatQuery: "",
+    blatCount: 25,
+    blatResult: undefined
   };
 
   toggleLegend = e => {
     this.setState({ isOpenLegend: !this.state.isOpenLegend });
+    e.preventDefault();
+  };
+
+  toggleFeatureCard = e => {
+    this.setState({ isOpenFeatureCard: !this.state.isOpenFeatureCard });
+    e.preventDefault();
+  };
+
+  toggleBlat = e => {
+    this.setState({ isOpenBlat: !this.state.isOpenBlat });
     e.preventDefault();
   };
 
@@ -30,12 +51,35 @@ class VisualizationOptions extends Component {
     e.preventDefault();
   };
 
+  toggleFullBlat = () => {
+    this.setState({isFullBlat: !this.state.isFullBlat})
+  }
+
   handleMappingQualityCutoffChange = event => {
     this.props.handleMappingQualityCutoffChange(event.target.value);
   };
 
   handleSelectTranscript = event => {
     this.props.handleSelectTranscript(event.target.value);
+  }
+
+  handleBlat = async () => {
+    this.setState({blatResult: "BLAT searching..."})
+    fetchAndParse(`${this.props.apiUrl}/blatSearch`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        seq: this.state.blatQuery,
+        full: this.state.isFullBlat,
+        count: this.state.blatCount
+      })
+    }).then(res => {
+      this.setState({blatResult: res.result})
+    }).catch(() => {
+      this.setState({blatResult: "BLAT search failed"})
+    });
   }
 
   render() {
@@ -50,6 +94,84 @@ class VisualizationOptions extends Component {
     return (
       <Container>
         <div id="accordion">
+          <Card>
+            <CardHeader onClick={this.toggleBlat}>
+              <h5 className="mb-0">
+                <a href="#blat" onClick={this.toggleBlat}>
+                  BLAT - Search for your interested sequence
+                </a>
+              </h5>
+            </CardHeader>
+            <Collapse isOpen={this.state.isOpenBlat}>
+              <CardBody>
+                <Input
+                  type="textarea"
+                  style={{marginBottom: "8px", height: "200px"}}
+                  value={this.state.blatQuery}
+                  placeholder="Input the query sequence here"
+                  size="500"
+                  onChange={e => this.setState({blatQuery: e.target.value})}
+                />
+                <Form inline>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      value={this.state.isFullBlat}
+                      onChange={this.toggleFullBlat}
+                    />
+                    Search all samples (9 references default)
+                  </Label>
+                  <Label
+                  style={{margin: "0 5px 0 20px"}}>
+                    BLAT result count:
+                  </Label>
+                  <SelectionDropdown
+                    value={this.state.blatCount}
+                    onChange={event => this.setState({blatCount: event.target.value})}
+                    options={[25, 50, 100]}
+                  />
+                  <Button
+                    color="primary"
+                    onClick={this.handleBlat}
+                  >
+                    Search
+                  </Button>
+                </Form>
+                {this.state.blatResult !== undefined && (
+                  typeof this.state.blatResult === 'string'
+                    ? this.state.blatResult :
+                    (<div style={{height: 500, width: '100%', margin: '20px 0'}}>
+                      <DataGrid
+                        rows={this.state.blatResult}
+                        columns={blatCols}
+                        getRowId={row => row.tRegion}
+                        components={{Toolbar: GridToolbar}}
+                        initialState={{
+                          pagination: {
+                            pageSize: 25,
+                          },
+                        }}
+                      />
+                      <h6>Just select the chromosome and copy the tRegion into "Region" box above for visualization in PPanG</h6>
+                    </div>)
+                )}
+              </CardBody>
+            </Collapse>
+          </Card>
+          <Card>
+            <CardHeader id="feature" onClick={this.toggleFeatureCard}>
+              <h5 className="mb-0">
+                <a href="#collapse" onClick={this.toggleFeatureCard}>
+                  Features
+                </a>
+              </h5>
+            </CardHeader>
+            <Collapse isOpen={this.state.isOpenFeatureCard}>
+              <CardBody>
+                <div id="featureCard" />
+              </CardBody>
+            </Collapse>
+          </Card>
           <Card>
             <CardHeader id="legendCard" onClick={this.toggleLegend}>
               <h5 className="mb-0">
@@ -223,7 +345,8 @@ class VisualizationOptions extends Component {
 VisualizationOptions.propTypes = {
   handleMappingQualityCutoffChange: PropTypes.func.isRequired,
   setColorSetting: PropTypes.func.isRequired,
-  handleSelectTranscript: PropTypes.func.isRequired
+  handleSelectTranscript: PropTypes.func.isRequired,
+  apiUrl: PropTypes.string.isRequired
 };
 
 export default VisualizationOptions;

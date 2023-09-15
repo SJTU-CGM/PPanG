@@ -7,3 +7,6 @@ export function parseTranscripts(value) {
 
 export const getTrackStart = (track) => track.indexOfFirstBase ?? Number(
   track.name.substring(track.name.indexOf('[') + 1, track.name.indexOf(']')))
+
+
+export const titleCase = (s) => s.slice(0, 1).toUpperCase() + s.slice(1);

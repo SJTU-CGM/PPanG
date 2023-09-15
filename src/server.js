@@ -132,13 +132,62 @@ function indexGamSorted(req, res) {
   });
 }
 
+api.post('/blatSearch', (req, res, next) => {
+  console.time('blat')
+  let seq = req.body.seq
+  if (!seq.startsWith('>')) {
+    seq = '>query\n' + seq
+  }
+  const tmpFasta = `tmp/${new Date().getTime()}.fasta`
+  fs.writeFileSync(tmpFasta, seq)
+  let params = [tmpFasta]
+  if (req.body.full) {
+    params.push('-f')
+  }
+  const blatCall = spawn('./blat/blatQuery', params);
+  let result = '';
+  blatCall.stdout.on('data', data => {
+    result += data.toString();
+  })
+  blatCall.stderr.on('data', data => {
+    console.log(`err data: ${data}`);
+  });
+  blatCall.on('close', code => {
+    if (code !== 0) {
+      return next(new VgExecutionError('blat search failed'));
+    }
+    let blatResult = [];
+    const rows = result.trim().split('\n')
+    let count = rows.length;
+    if (req.body.count !== undefined) {
+      count = Math.min(count, Number(req.body.count))
+    }
+    for (let i = 0; i < count; i++) {
+      const cols = rows[i].split('\t');
+      blatResult.push({
+        match: cols[0],
+        mismatch: cols[1],
+        qGapCount: cols[2],
+        qGapBases: cols[3],
+        tGapCount: cols[4],
+        tGapBases: cols[5],
+        strand: cols[6],
+        qRegion: `${cols[7]}:${Number(cols[8])}-${Number(cols[9]) - 1}`,
+        tRegion: `${cols[10]}:${Number(cols[11])}-${Number(cols[12]) - 1}`
+      })
+    }
+    console.timeEnd('blat')
+    res.json({result: blatResult})
+  })
+})
+
 api.post('/getChunkedData', (req, res, next) => {
   // We only want to have one downstream callback chain out of here.
   // TODO: Does Express let us next(err) multiple times if multiple errors happen concurrently???
   console.time('request-duration');
   console.log('http POST getChunkedData received');
 
-  req.chrId = req.body.xgFile.substring(0, req.body.xgFile.lastIndexOf("."))
+  req.chrId = req.body.xgFile.match(/chr\d+/)[0]
   try {
     req.body.region.split(":");
     getChunkedData(req, res, next);
@@ -479,6 +528,7 @@ function getChunkedData(req, res, next) {
         return;
       }
       req.graph = JSON.parse(graphAsString);
+      req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
       req.region = [r_start, r_end];
       if (!sentResponse) {
         sentResponse = true;
@@ -725,7 +775,7 @@ function loadGFFAnnotationFiles(req, res, next) {
     let params = [path.join("jbrowse", `${annotation}.gff.gz`), region];
     let queryAnnotationCall = spawn('tabix', params);
     queryAnnotationCall.stdout.pipe(concat(data => {
-      annotations[accession] = []
+      if (!(accession in annotations)) annotations[accession] = []
       data.toString().trim().split('\n').forEach(row => {
         let cols = row.split('\t');
         if (cols.length === 9) {
@@ -738,24 +788,22 @@ function loadGFFAnnotationFiles(req, res, next) {
                   '');
               }
             })
-            if (cols[2] === 'exon') {
-              annotations[accession].push({
-                seqid: cols[0],
-                source: cols[1],
-                type: cols[2],
-                start: cols[3],
-                end: cols[4],
-                score: cols[5],
-                strand: cols[6],
-                phase: cols[7],
-                attributes: attributes,
-                length: cols[4] - cols[3] + 1
-              })
-            }
+            annotations[accession].push({
+              chr: cols[0],
+              source: cols[1],
+              type: cols[2],
+              start: cols[3],
+              end: cols[4],
+              score: cols[5],
+              strand: cols[6],
+              phase: cols[7],
+              attributes: attributes,
+              length: cols[4] - cols[3] + 1
+            })
           }
         }
       })
-    }));
+    }))
     queryAnnotationCall.on("close", () => {
       count++;
       if (count === req.graph.path.length) {
