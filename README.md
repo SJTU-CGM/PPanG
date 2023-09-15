@@ -11,8 +11,6 @@ alignment, and it is unavailable to visualize multiple genome annotations simult
 Here we report a new pangenome browser called PPanG, precise pangenome browser combining linear and graph-based
 pangenome. We used rice pangenome as an example to show it.
 
-The PPanG visualization is https://cgm.sjtu.edu.cn/PPanG/visualization/.
-
 The PPanG homepage is https://cgm.sjtu.edu.cn/PPanG/.
 
 ## 2. User guide

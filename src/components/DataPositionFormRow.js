@@ -45,6 +45,10 @@ class DataPositionFormRow extends Component {
   resetCompress = () => {
     this.setState({isCompress: false})
   }
+  
+  toAboutPage = () => {
+    window.open("https://cgm.sjtu.edu.cn/PPanG/about/")
+  }
 
   handleDownloadButton = () => {
     this.setState({isDownloading: true})
@@ -144,13 +148,13 @@ class DataPositionFormRow extends Component {
         >
           Reset
         </Button>
-        <Button
-          color="primary"
-          id="downloadButton"
-          onClick={this.props.clearJBView}
-        >
-          Clear Linear Views
-        </Button>
+        {/*<Button*/}
+        {/*  color="primary"*/}
+        {/*  id="downloadButton"*/}
+        {/*  onClick={this.props.clearJBView}*/}
+        {/*>*/}
+        {/*  Clear Linear Views*/}
+        {/*</Button>*/}
         <Button
           color="primary"
           id="downloadButton"
@@ -158,6 +162,13 @@ class DataPositionFormRow extends Component {
           disabled={this.state.isDownloading}
         >
           {this.state.isDownloading ? "Processing..." : "Download Image"}
+        </Button>
+	<Button
+          color="primary"
+          id="aboutButton"
+          onClick={this.toAboutPage}
+        >
+          About & Manual
         </Button>
       </Form>
     );

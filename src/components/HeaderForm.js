@@ -423,7 +423,7 @@ class HeaderForm extends Component {
         <Container fluid={true}>
           <Row>
             <Col md="1.5" style={{marginLeft: "20px"}}>
-              <a href="https://cgm.sjtu.edu.cn/PPanG/" target="_blank">
+              <a href="https://cgm.sjtu.edu.cn/PPanG/about/" target="_blank">
                 <img src="./logo.png" style={{height: "70px"}} alt="Logo"/>
               </a>
             </Col>

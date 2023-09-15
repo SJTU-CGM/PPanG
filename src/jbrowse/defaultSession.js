@@ -17,7 +17,7 @@ const session = {
           {
             id: 'AD3gqvG0_6',
             type: 'LinearBasicDisplay',
-            heightPreConfig: 70
+            heightPreConfig: 40
           },
         ],
       },
@@ -52,7 +52,7 @@ export const getDefaultSession = (accession) => {
             {
               id: 'AD3gqvG0_6',
               type: 'LinearBasicDisplay',
-              heightPreConfig: 70
+              heightPreConfig: 40
             },
           ],
         },
