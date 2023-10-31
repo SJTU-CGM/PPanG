@@ -7,9 +7,9 @@ import CustomizationAccordion from './components/CustomizationAccordion';
 import { dataOriginTypes } from './enums';
 import * as tubeMap from './util/tubemap';
 import config from './config.json';
-import assembly, {getAssembly} from './jbrowse/assembly'
-import tracks, {getTracks} from './jbrowse/tracks'
-import defaultSession, {getDefaultSession} from './jbrowse/defaultSession'
+import {getAssembly} from './jbrowse/assembly'
+import {getTracks} from './jbrowse/tracks'
+import {getDefaultSession} from './jbrowse/defaultSession'
 
 import {
   createViewState,
@@ -77,14 +77,8 @@ class App extends Component {
         transcripts: {}
       },
       jbrowseViewStates: {
-        [config.reference.name]: createViewState({
-          assembly,
-          tracks,
-          defaultSession,
-          configuration: defaultConfiguration,
-          disableAddTracks: true,
-          location: 'chr01:38382380-38382540',
-        })
+        [this.props.reference]: this.getJBrowseViewState(this.props.reference,
+          'chr01:38382380-38382540')
       },
     };
   }
@@ -180,7 +174,8 @@ class App extends Component {
     }));
   }
 
-  handleChangeRegion = (pathCoords, indexOfFirstBase) => {
+  handleChangeRegion = (reference, pathCoords, indexOfFirstBase) => {
+    this.props.reference = reference
     this.props.pathCoords = pathCoords
     this.props.indexOfFirstBase = indexOfFirstBase
   }
@@ -188,7 +183,7 @@ class App extends Component {
   clearJBrowseViews = () => {
     this.setState((state) => ({
       jbrowseViewStates: {
-        [config.reference.name]: state.jbrowseViewStates[config.reference.name]
+        // [this.props.reference]: state.jbrowseViewStates[this.props.reference]
       },
     }))
   }
@@ -197,41 +192,50 @@ class App extends Component {
     this.HeaderForm.resetCompress()
   }
 
-  addJBrowseView = (trackName) => {
-    if (this.state.jbrowseViewStates[trackName] !== undefined) return
+  getJBrowseViewState = (trackName, location) => {
     const accession = trackName.substring(0, trackName.indexOf(".chr"))
     const assembly = getAssembly(accession)
     const tracks = getTracks(accession)
     const defaultSession = getDefaultSession(accession)
-    let location;
-    if (trackName in this.props.regions) {
+    if (location === undefined && trackName in this.props.regions) {
       location = this.props.regions[trackName]
     }
+    return createViewState({
+      assembly,
+      tracks,
+      defaultSession,
+      configuration: defaultConfiguration,
+      disableAddTracks: true,
+      location: location
+    })
+  }
+
+  addJBrowseView = (trackName, location) => {
+    if (this.state.jbrowseViewStates[trackName] !== undefined) return
     this.setState((state) => ({
       jbrowseViewStates: {
         ...state.jbrowseViewStates,
-        [trackName]: createViewState({
-          assembly,
-          tracks,
-          defaultSession,
-          configuration: defaultConfiguration,
-          disableAddTracks: true,
-          location: location
-        })
+        [trackName]: this.getJBrowseViewState(trackName, location)
       },
     }))
   }
 
   jbrowseNav = (regionStart, regionEnd) => {
-    const graphStart = this.props.indexOfFirstBase
-    const chrId = graphStart.match(/chr\d+/)[0];
-    const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
-    this.props.regions = {}
-    for (let accession in this.props.pathCoords) {
-      const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
-      this.props.regions[accession] = region
-      if (accession in this.state.jbrowseViewStates) {
-        this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
+    if (this.props.indexOfFirstBase !== undefined) {
+
+      const graphStart = this.props.indexOfFirstBase
+      const chrId = graphStart.match(/chr\d+/)[0];
+      const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
+      this.props.regions = {}
+      for (let accession in this.props.pathCoords) {
+        const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
+        this.props.regions[accession] = region
+        if (accession === this.props.reference) {
+          this.addJBrowseView(accession, region)
+        }
+        if (accession in this.state.jbrowseViewStates) {
+          this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
+        }
       }
     }
   }
@@ -259,14 +263,15 @@ class App extends Component {
             jbrowseNav={this.jbrowseNav}
             resetCompress={this.resetCompress}
           />
-          <div style={{margin: "-20px 20px 20px 20px"}}>
-            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates[config.reference.name]}/>
-              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith(config.reference.name) && e[1] !== undefined).map(e => {
+          {Object.keys(this.state.jbrowseViewStates).length > 0 &&
+            <div style={{margin: "-20px 20px 20px 20px"}}>
+            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates[this.props.reference]}/>
+              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith(this.props.reference) && e[1] !== undefined).map(e => {
                 return <div>
                   <JBrowseLinearGenomeView viewState={e[1]}/>
                 </div>
               })}
-          </div>
+          </div>}
         </div>
         <CustomizationAccordion
           visOptions={this.state.visOptions}
@@ -287,7 +292,8 @@ App.propTypes = {
   apiUrl: PropTypes.string,
   pathCoords: PropTypes.object,
   regions: PropTypes.object,
-  indexOfFirstBase: PropTypes.number
+  indexOfFirstBase: PropTypes.number,
+  reference: PropTypes.string
 }
 
 App.defaultProps = {
@@ -296,6 +302,7 @@ App.defaultProps = {
   // browser testing environment to point to a real testing backend.
   // Note that host includes the port.
   apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0',
+  reference: `${config.reference.name}.chr01[38382380]`,
   regions: {}
 };
 

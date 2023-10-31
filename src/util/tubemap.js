@@ -190,6 +190,10 @@ export function create(params) {
   jbrowseNav = params.jbrowseNav;
   resetCompress = params.resetCompress;
   update();
+  jbNav();
+}
+
+export function jbNav() {
   const regionStart = getXCoord(0)
   const regionEnd = getXCoord(document.getElementById(svgID.substring(1)).parentNode.offsetWidth)
   if (jbrowseNav !== undefined && regionStart !== undefined) jbrowseNav(regionStart, regionEnd)

@@ -113,18 +113,20 @@ class TubeMapContainer extends Component {
         let transcriptSelectOptions = [];
         const pathCoords = {}
         let indexOfFirstBase = "";
+        let reference = undefined
         json.graph.path.forEach(path => {
           const trackName = path.name
           let start = Number(trackName.substring(trackName.indexOf('[') + 1, trackName.indexOf(']')))
           let label = trackName
           if (path.indexOfFirstBase) {
             start = Number(path.indexOfFirstBase)
-            label = config.reference.name
+            reference = `${trackName}[${path.indexOfFirstBase}]`
+            label = reference
             indexOfFirstBase = `${trackName}:${path.indexOfFirstBase}`;
           }
           pathCoords[label] = start
         })
-        this.props.handleChangeRegion(pathCoords, indexOfFirstBase);
+        this.props.handleChangeRegion(reference, pathCoords, indexOfFirstBase);
         for (let trackName in transcripts) {
           transcripts[trackName].forEach(transcriptId => {
             transcriptSelectOptions.push(`${trackName}: ${transcriptId}`)
