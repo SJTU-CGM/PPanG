@@ -69,7 +69,7 @@ gray and cannot be distinguished. In this case, it is needed to select the genes
 
   The configuration of SequenceTubeMap view is in `src/config.json`, `dataPath` should be set to your own data folder (
   in PPanG `dataPath` is `riceData/`) and `DATA_SOURCES` correspond to the xg files in your `dataPath`. The reference is
-  set in `reference` (`alias` and `annotation` just remain the same to `name` if no alias). `bedFile` is only available
+  set in `reference`. `bedFile` is only available
   if vg chunks are pre-processed, otherwise it should be removed. Other detailed configuration is available in
   SequenceTubeMap.
 

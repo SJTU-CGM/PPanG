@@ -194,7 +194,7 @@ api.post('/getChunkedData', (req, res, next) => {
   } catch (e) {
     let geneId = req.body.region;
     console.log(`No coordinate provided, try to search gene ${geneId}`)
-    let params = [path.join("jbrowse", `${config.reference.annotation}.gff.gz`)]
+    let params = [path.join("jbrowse", `${config.reference.name}.gff.gz`)]
     params = params.concat(req.chrId)
     params.push(req.body.region)
     if (geneId.includes(".")) {
@@ -766,9 +766,6 @@ function loadGFFAnnotationFiles(req, res, next) {
     const regionEnd = pathStart + regionLength;
     const accession = e.name.split(".chr")[0]
     let annotation = accession
-    if (accession.startsWith(config.reference.name)) {
-      annotation = config.reference.annotation;
-    }
     const chrId = req.chrId
     let region = `${chrId}:${regionStart - extraBases}-${regionEnd
     + extraBases}`

@@ -1,26 +1,3 @@
-import config from '../config.json'
-
-const assembly = {
-  name: config.reference.name,
-  aliases: [config.reference.alias],
-  sequence: {
-    type: 'ReferenceSequenceTrack',
-    trackId: `${config.reference.alias}-ReferenceSequenceTrack`,
-    adapter: {
-      type: 'BgzipFastaAdapter',
-      fastaLocation: {
-        uri: `${config.reference.alias}.fasta.gz`
-      },
-      faiLocation: {
-        uri: `${config.reference.alias}.fasta.gz.fai`
-      },
-      gziLocation: {
-        uri: `${config.reference.alias}.fasta.gz.gzi`
-      },
-    },
-  }
-}
-
 export const getAssembly = (accession) => {
   return {
     name: accession,
@@ -42,5 +19,3 @@ export const getAssembly = (accession) => {
     }
   }
 }
-
-export default assembly
