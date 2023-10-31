@@ -655,6 +655,15 @@ function createTubeMap() {
   return tracks;
 }
 
+const sd1 = ['H7L1', 'H7L26', 'H7L27', 'H7L28', 'H7L29', 'H7L30', 'H7L32', 'H7L33', 'IR64', 'IR8', 'PR106', 'R498', 'SE-134', 'SE-19',
+  'SE-3', 'SE-33', 'TG45', 'TG51', 'TG68', 'TG76', 'TG77', 'TG78', 'TG85', 'TG82', 'TG83', 'TG88', 'TG86', 'WSSM']
+const isSd1 = d => {
+  for (let i in sd1) {
+    if (d.name.startsWith(sd1[i])) return d.xStart >= 4070 && d.xStart <= 8429;
+  }
+  return false;
+}
+
 // generates attributes (node.y, node.contentHeight) for nodes without tracks, only reads
 function generateReadOnlyNodeAttributes() {
   nodesPerOrder = [];
@@ -3496,6 +3505,7 @@ function drawTrackRectangles(rectangles, type) {
   .attr('y', d => d.yStart)
   .attr('width', d => d.xEnd - d.xStart + 1)
   .attr('height', d => d.yEnd - d.yStart + 1)
+  //.style('fill', d => isSd1(d) ? 'url(#dashed)' : d.color)
   .style('fill', d => d.color)
   .attr('trackID', d => d.id)
   .attr('class', d => `track${d.id}`)
@@ -3541,6 +3551,17 @@ function defineSVGPatterns() {
   pattern
   .append('rect')
   .attrs({x: '4', y: '4', width: '3', height: '3', fill: '#505050'});
+
+  pattern = defs.append('pattern').attrs({
+    id: 'dashed',
+    width: '25',
+    height: '7',
+    patternUnits: 'userSpaceOnUse',
+  });
+
+  pattern
+  .append('rect')
+  .attrs({ x: '0', y: '0', width: '18', height: '7', fill: '#A0A0A0' });
 
   pattern = defs.append('pattern').attrs({
     id: 'patternB',
@@ -3733,6 +3754,7 @@ function drawTrackCurves(type) {
   .enter()
   .append('path')
   .attr('d', d => d.path)
+  //.style('fill', d => isSd1(d) ? 'url(#dashed)' : d.color)
   .style('fill', d => d.color)
   .attr('trackID', d => d.id)
   .attr('class', d => `track${d.id}`)
