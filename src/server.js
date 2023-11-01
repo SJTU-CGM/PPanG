@@ -476,6 +476,7 @@ function getChunkedData(req, res, next) {
         return;
       }
       req.graph = JSON.parse(graphAsString);
+      req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
       req.region = [r_start, r_end];
       if (!sentResponse) {
         sentResponse = true;

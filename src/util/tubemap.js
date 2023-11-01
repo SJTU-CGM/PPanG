@@ -362,7 +362,7 @@ export function set9RefTrackVisible(isUpdate) {
   })
   for (let index in accessions9Ref) {
     for (let i = 0; i < inputTracks.length; i++) {
-      if (inputTracks[i].name.startsWith(accessions9Ref[index])) {
+      if (inputTracks[i].name.startsWith(accessions9Ref[index]) || inputTracks[i].hasOwnProperty('indexOfFirstBase')) {
         inputTracks[i].hidden = false
         let checkbox = document.getElementById(`showTrack${i}`);
         if (checkbox) {
