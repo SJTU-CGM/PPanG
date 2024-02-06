@@ -77,10 +77,7 @@ class App extends Component {
         transcriptSelectOptions: [],
         transcripts: {}
       },
-      jbrowseViewStates: {
-        [this.props.reference]: this.getJBrowseViewState(this.props.reference,
-          'chr01:38382380-38382540')
-      },
+      jbrowseViewStates: {},
       showReorderLinearViewModel: false
     };
   }
