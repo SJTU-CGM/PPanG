@@ -15,7 +15,7 @@ class BedRegionsFormRow extends Component {
         </Label>
         <SelectionDropdown
           className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
-          id="regionSelect"
+          id="builtinGenes"
           value={this.props.regionSelect}
           onChange={this.props.handleInputChange}
           options={this.props.regionSelectOptions}

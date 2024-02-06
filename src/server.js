@@ -138,6 +138,11 @@ api.post('/blatSearch', (req, res, next) => {
   if (!seq.startsWith('>')) {
     seq = '>query\n' + seq
   }
+  const sequence = seq.substring(seq.indexOf('\n') + 1)
+  if (sequence.length < 30 || sequence.length > 20100) {
+    return next(new VgExecutionError('BLAT search failed: Input length for blat search is limited to 30~20000bp'));
+  }
+
   const tmpFasta = `tmp/${new Date().getTime()}.fasta`
   fs.writeFileSync(tmpFasta, seq)
   let params = [tmpFasta]
@@ -154,14 +159,17 @@ api.post('/blatSearch', (req, res, next) => {
   });
   blatCall.on('close', code => {
     if (code !== 0) {
-      return next(new VgExecutionError('blat search failed'));
+      return next(new VgExecutionError('BLAT search failed'));
     }
     let blatResult = [];
     const rows = result.trim().split('\n')
-    let count = rows.length;
-    if (req.body.count !== undefined) {
-      count = Math.min(count, Number(req.body.count))
+    if (rows.length === 0) {
+      return next(new VgExecutionError('BLAT search finished: No segment matches'));
     }
+    let count = Math.min(rows.length, 200);
+    // if (req.body.count !== undefined) {
+    //   count = Math.min(count, Number(req.body.count))
+    // }
     for (let i = 0; i < count; i++) {
       const cols = rows[i].split('\t');
       blatResult.push({
@@ -379,6 +387,9 @@ function getChunkedData(req, res, next) {
         vgChunkParams.push('-r', ''.concat(r_start, ":", r_end), '-c', 5);
       }
     } else {
+      if (distance > 30000) {
+        throw new VgExecutionError("The length of region is limited to 30000bp")
+      }
       // reformat pos+dist into start-end range
       if (distance > -1) {
         r_end = r_start + distance;

@@ -15,7 +15,7 @@ import {
   createViewState,
   JBrowseLinearGenomeView,
 } from '@jbrowse/react-linear-genome-view'
-import {Button, Form} from "reactstrap";
+import {Button, ButtonGroup, Form, Modal, ModalBody, ModalFooter, ModalHeader, Table} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
 import {setDrawTextFlag, update} from "./util/tubemap";
@@ -67,7 +67,8 @@ class App extends Component {
         showExons: true,
         showReads: false,
         showSoftClips: true,
-        haplotypeColors: 'greys',
+        haplotypeColors: 'lightColors',
+        exonColors: 'greys',
         forwardReadColors: 'reds',
         reverseReadColors: 'blues',
         colorReadsByMappingQuality: false,
@@ -80,6 +81,7 @@ class App extends Component {
         [this.props.reference]: this.getJBrowseViewState(this.props.reference,
           'chr01:38382380-38382540')
       },
+      showReorderLinearViewModel: false
     };
   }
 
@@ -94,6 +96,7 @@ class App extends Component {
     tubeMap.setColorSet('haplotypeColors', visOptions.haplotypeColors);
     tubeMap.setColorSet('forwardReadColors', visOptions.forwardReadColors);
     tubeMap.setColorSet('reverseReadColors', visOptions.reverseReadColors);
+    tubeMap.setColorSet('exonColors', visOptions.exonColors);
     tubeMap.setColorReadsByMappingQualityFlag(
       visOptions.colorReadsByMappingQuality
     );
@@ -112,6 +115,10 @@ class App extends Component {
       dataOrigin: dataOriginTypes.API
     });
   };
+
+  handleClickReorder = () => {
+    this.setState({showReorderLinearViewModel: !this.state.showReorderLinearViewModel})
+  }
 
   toggleVisOptionFlag = flagName => {
     if (flagName === "showExons") {
@@ -188,6 +195,20 @@ class App extends Component {
     }))
   }
 
+  clearJBrowseView = (trackName) => {
+    let jbrowseViewStates = this.state.jbrowseViewStates
+    delete jbrowseViewStates[trackName]
+    this.setState({jbrowseViewStates: jbrowseViewStates})
+  }
+
+  moveJBrowseViewBehind = (i) => {
+    const jbrowseViews = this.getJBrowseViewList()
+    let tmp = jbrowseViews[i]
+    jbrowseViews[i] = jbrowseViews[i + 1]
+    jbrowseViews[i + 1] = tmp
+    this.setState({jbrowseViewStates: Object.fromEntries(jbrowseViews)})
+  }
+
   resetCompress = () => {
     this.HeaderForm.resetCompress()
   }
@@ -210,8 +231,13 @@ class App extends Component {
     })
   }
 
-  addJBrowseView = (trackName, location) => {
-    if (this.state.jbrowseViewStates[trackName] !== undefined) return
+  getJBrowseViewList = () => {
+    return Object.entries(this.state.jbrowseViewStates).filter(e => e[1] !== undefined)
+  }
+
+  addJBrowseView = (trackName, location, addReference=false) => {
+    if ((!addReference && trackName.includes(config.reference.name)) ||
+      this.state.jbrowseViewStates[trackName] !== undefined) return
     this.setState((state) => ({
       jbrowseViewStates: {
         ...state.jbrowseViewStates,
@@ -231,9 +257,9 @@ class App extends Component {
         const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
         this.props.regions[accession] = region
         if (accession === this.props.reference) {
-          this.addJBrowseView(accession, region)
+          this.addJBrowseView(accession, region, true)
         }
-        if (accession in this.state.jbrowseViewStates) {
+        if (this.state.jbrowseViewStates[accession] !== undefined) {
           this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
         }
       }
@@ -263,14 +289,40 @@ class App extends Component {
             jbrowseNav={this.jbrowseNav}
             resetCompress={this.resetCompress}
           />
-          {Object.keys(this.state.jbrowseViewStates).length > 0 &&
+          {(this.getJBrowseViewList().length > 0) &&
             <div style={{margin: "-20px 20px 20px 20px"}}>
-            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates[this.props.reference]}/>
-              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith(this.props.reference) && e[1] !== undefined).map(e => {
+              {this.getJBrowseViewList().map(e => {
                 return <div>
                   <JBrowseLinearGenomeView viewState={e[1]}/>
                 </div>
               })}
+              <Modal isOpen={this.state.showReorderLinearViewModel} toggle={this.handleClickReorder}>
+                <ModalHeader toggle={this.handleClickReorder}>Rearrange Linear Views</ModalHeader>
+                <ModalBody>
+                  <Table hover>
+                    <thead><tr>
+                      <th>Order</th><th>Trackname</th><th>Operation</th>
+                    </tr></thead>
+                    <tbody>
+                    {this.getJBrowseViewList().map((e, index) =>
+                      <tr>
+                      <th scope="row">{index}</th>
+                        {e[0].startsWith(this.props.reference) ? <th scope="row">{e[0]}</th> : <td>{e[0]}</td>}
+                      <td><ButtonGroup>
+                        <Button disabled={index===0} color="primary" size="sm" onClick={() => {this.moveJBrowseViewBehind(index - 1)}}>↑</Button>
+                        <Button disabled={index===this.getJBrowseViewList().length-1} color="primary" size="sm" onClick={() => {this.moveJBrowseViewBehind(index)}}>↓</Button>
+                        {!e[0].startsWith(this.props.reference) && (<Button color="danger" size="sm" onClick={() => {this.clearJBrowseView(e[0])}}>×</Button>)}
+                      </ButtonGroup></td>
+                    </tr>)}
+                    </tbody>
+                  </Table>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onClick={this.handleClickReorder}>
+                    Done
+                  </Button>
+                </ModalFooter>
+              </Modal>
           </div>}
         </div>
         <CustomizationAccordion
@@ -282,6 +334,7 @@ class App extends Component {
           apiUrl={this.props.apiUrl}
           handleSelectTranscript={this.handleSelectTranscript}
           setColorSetting={this.setColorSetting}
+          handleClickReorder={this.handleClickReorder}
         />
       </div>
     );

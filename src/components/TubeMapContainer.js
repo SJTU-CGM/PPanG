@@ -149,7 +149,7 @@ class TubeMapContainer extends Component {
         });
       }
     } catch (error) {
-      this.setState({ error: error, isLoading: false });
+      this.setState({ error: "Fetch data failed, maybe either the data is too large or the network connection is unstable. Please check and refresh the browser.", isLoading: false });
     }
   };
 

@@ -7,11 +7,12 @@ import {fetchAndParse} from '../fetchAndParse';
 import config from '../config.json';
 import DataPositionFormRow from './DataPositionFormRow';
 import MountedDataFormRow from './MountedDataFormRow';
-import BedRegionsFormRow from './BedRegionsFormRow';
 import PathNamesFormRow from './PathNamesFormRow';
 import FileUploadFormRow from './FileUploadFormRow';
 import ExampleSelectButtons from './ExampleSelectButtons';
 import accessions from "../accessions";
+import builtinGenes from "../builtin_genes.json";
+import refGenes from "../reference_genes.json"
 
 const DATA_SOURCES = config.DATA_SOURCES;
 const MAX_UPLOAD_SIZE_DESCRIPTION = '5 MB';
@@ -53,6 +54,7 @@ class HeaderForm extends Component {
     region: undefined,
 
     dataType: dataTypes.BUILT_IN,
+    navigationType: "builtinGenes",
     fileSizeAlert: false,
     uploadInProgress: false,
     error: null
@@ -70,6 +72,15 @@ class HeaderForm extends Component {
     const xgSelect = ds.xgFile ? ds.xgFile : 'none';
     const bedSelect = ds.bedFile ? ds.bedFile : 'none';
     const dataPath = ds.useMountedPath ? 'mounted' : 'default';
+
+    const _builtinGenes = Object.keys(builtinGenes[ds.xgFile])
+    const _refGenes = Object.keys(refGenes[ds.xgFile])
+    this.DataPositionFormRow.setState({
+      builtInGeneSelect: _builtinGenes[0],
+      builtInGeneSelectOptions: _builtinGenes,
+      refGeneSelect: _refGenes[0],
+      refGeneSelectOptions: _refGenes
+    })
 
     this.setState(state => {
       if (bedSelect !== 'none') {
@@ -221,6 +232,12 @@ class HeaderForm extends Component {
     });
   };
 
+  handleNavigationTypeChange = event => {
+    const value = event.target.value;
+    this.setState({navigationType: value})
+    this.DataPositionFormRow.setState({navigationType: value})
+  }
+
   handleDataSourceChange = event => {
     const value = event.target.value;
     DATA_SOURCES.forEach(ds => {
@@ -232,6 +249,15 @@ class HeaderForm extends Component {
           bedSelect = ds.bedFile;
         }
         this.getPathNames(ds.xgFile, dataPath);
+        const _builtinGenes = Object.keys(builtinGenes[ds.xgFile])
+        const _refGenes = Object.keys(refGenes[ds.xgFile])
+        this.DataPositionFormRow.setState({
+          navigationType: "builtinGenes",
+          builtInGeneSelect: _builtinGenes[0],
+          builtInGeneSelectOptions: _builtinGenes,
+          refGeneSelect: _refGenes[0],
+          refGeneSelectOptions: _refGenes
+        })
         this.setState({
           xgFile: ds.xgFile,
           xgSelect: ds.xgFile,
@@ -241,7 +267,8 @@ class HeaderForm extends Component {
           bedSelect: bedSelect,
           dataPath: dataPath,
           region: ds.defaultPosition,
-          dataType: dataTypes.BUILT_IN
+          dataType: dataTypes.BUILT_IN,
+          navigationType: "builtinGenes"
         });
         return;
       }
@@ -293,32 +320,38 @@ class HeaderForm extends Component {
   handleInputChange = event => {
     const id = event.target.id;
     const value = event.target.value;
-    this.setState({[id]: value});
-    if (id === 'xgSelect') {
-      this.getPathNames(value, this.state.dataPath);
-      this.setState({xgFile: value});
-    } else if (id === 'gbwtSelect') {
-      this.setState({gbwtFile: value});
-    } else if (id === 'gamSelect') {
-      this.setState({gamFile: value});
-    } else if (id === 'bedSelect') {
-      this.getBedRegions(value, this.state.dataPath);
-      this.setState({bedFile: value});
-    } else if (id === 'pathSelect') {
-      this.setState({region: value.concat(':')});
-    } else if (id === 'regionSelect') {
-      // find which region corresponds to this region label/desc
-      let i = 0;
-      while (i < this.state.regionInfo['desc'].length
-      && this.state.regionInfo['desc'][i] !== value) {
-        i += 1;
-      }
-      if (i < this.state.regionInfo['desc'].length) {
-        let region_chr = this.state.regionInfo['chr'][i];
-        let region_start = this.state.regionInfo['start'][i];
-        let region_end = this.state.regionInfo['end'][i];
-        this.setState(
-          {region: region_chr.concat(':', region_start, '-', region_end)});
+    if (id === 'builtinGenes') {
+      this.setState({region: builtinGenes[this.state.xgFile][value]})
+    } else if (id === 'refGenes') {
+      this.setState({region: refGenes[this.state.xgFile][value]})
+    }{
+      this.setState({[id]: value});
+      if (id === 'xgSelect') {
+        this.getPathNames(value, this.state.dataPath);
+        this.setState({xgFile: value});
+      } else if (id === 'gbwtSelect') {
+        this.setState({gbwtFile: value});
+      } else if (id === 'gamSelect') {
+        this.setState({gamFile: value});
+      } else if (id === 'bedSelect') {
+        this.getBedRegions(value, this.state.dataPath);
+        this.setState({bedFile: value});
+      } else if (id === 'pathSelect') {
+        this.setState({region: value.concat(':')});
+      } else if (id === 'regionSelect') {
+        // find which region corresponds to this region label/desc
+        let i = 0;
+        while (i < this.state.regionInfo['desc'].length
+        && this.state.regionInfo['desc'][i] !== value) {
+          i += 1;
+        }
+        if (i < this.state.regionInfo['desc'].length) {
+          let region_chr = this.state.regionInfo['chr'][i];
+          let region_start = this.state.regionInfo['start'][i];
+          let region_end = this.state.regionInfo['end'][i];
+          this.setState(
+            {region: region_chr.concat(':', region_start, '-', region_end)});
+        }
       }
     }
   };
@@ -423,7 +456,7 @@ class HeaderForm extends Component {
         <Container fluid={true}>
           <Row>
             <Col md="1.5" style={{marginLeft: "20px"}}>
-              <a href="https://cgm.sjtu.edu.cn/PPanG/about/" target="_blank">
+              <a href="https://cgm.sjtu.edu.cn/PPanG" target="_blank">
                 <img src="./logo.png" style={{height: "70px"}} alt="Logo"/>
               </a>
             </Col>
@@ -443,6 +476,23 @@ class HeaderForm extends Component {
                 >
                   {dataSourceDropdownOptions}
                 </Input>
+                <Label
+                  className="tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
+                  for="dataSourceSelect"
+                >
+                  Navigation Type:
+                </Label>
+                <Input
+                  type="select"
+                  id="navigationTypeSelect"
+                  className="custom-select mb-2 mr-sm-4 mb-sm-0"
+                  value={this.state.navigationType}
+                  onChange={this.handleNavigationTypeChange}
+                  >
+                  <option value="builtinGenes">built-in genes</option>
+                  <option value="refGeneID">reference annotation gene ID</option>
+                  <option value="customRegion">custom region</option>
+                </Input>
                 {mountedFilesFlag && (
                   <MountedDataFormRow
                     xgSelect={this.state.xgSelect}
@@ -460,14 +510,7 @@ class HeaderForm extends Component {
                     handleInputChange={this.handleInputChange}
                   />
                 )}
-                {bedRegionsFlag && (
-                  <BedRegionsFormRow
-                    regionSelect={this.state.regionSelect}
-                    regionSelectOptions={this.state.regionSelectOptions}
-                    handleInputChange={this.handleInputChange}
-                  />
-                )}
-                {pathNamesFlag && (
+                {pathNamesFlag && this.state.navigationType === "customRegion" && (
                   <PathNamesFormRow
                     pathSelect={this.state.pathSelect}
                     pathSelectOptions={this.state.pathSelectOptions}
@@ -513,10 +556,11 @@ class HeaderForm extends Component {
                   handleGoRight={this.handleGoRight}
                   handleGoButton={this.handleGoButton}
                   uploadInProgress={this.state.uploadInProgress}
-                  isGoNextDisabled={!this.state.region
-                    || !this.state.region.includes(":")}
+                  isGoNextDisabled={false}
+                  dataSelected={this.state.dataPath}
                   clearJBView={this.props.clearJBView}
                   ref={node => this.DataPositionFormRow = node}
+                  navigationType={this.props.navigationType}
                 />
               )}
             </Col>

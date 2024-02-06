@@ -497,7 +497,6 @@ function createTubeMap() {
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
-
   if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig
     === configStr) {
     return;
@@ -520,14 +519,13 @@ function createTubeMap() {
   trackForRuler = undefined;
 
   svg = d3.select(svgID);
-  svg.selectAll('*').remove(); // clear svg for (re-)drawing
-
+  // clear svg for (re-)drawing
   // early exit is necessary when visualization options such as colors are
   // changed before any graph has been rendered
   if (inputNodes.length === 0 || inputTracks.length === 0) {
     return;
   }
-
+  svg.selectAll('*').remove();
   if (resetCompress) {
     resetCompress();
   }
@@ -2618,7 +2616,7 @@ function getColorSet(colorSetName) {
 }
 
 function getTrackColor(track, isFeature) {
-  const colors = isFeature ? haplotypeColors : exonColors;
+  const colors = isFeature ? exonColors : haplotypeColors;
   const index = track.id % colors.length
   return colors[index]
 }
@@ -2641,10 +2639,10 @@ function generateTrackColor(track, highlight) {
       }
     }
   } else {
-    if (config.showExonsFlag === false || highlight !== 'plain') {
-      trackColor = haplotypeColors[track.id % haplotypeColors.length];
-    } else {
+    if (config.showExonsFlag && highlight !== 'plain') {
       trackColor = exonColors[track.id % exonColors.length];
+    } else {
+      trackColor = haplotypeColors[track.id % haplotypeColors.length];
     }
   }
   return trackColor;
