@@ -47,7 +47,7 @@ class DataPositionFormRow extends Component {
   }
   
   toAboutPage = () => {
-    window.open("https://cgm.sjtu.edu.cn/PPanG/about/")
+    window.open("https://cgm.sjtu.edu.cn/PPanG/")
   }
 
   handleDownloadButton = () => {
