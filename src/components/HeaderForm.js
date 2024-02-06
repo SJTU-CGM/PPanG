@@ -78,7 +78,7 @@ class HeaderForm extends Component {
     this.DataPositionFormRow.setState({
       builtInGeneSelect: _builtinGenes[0],
       builtInGeneSelectOptions: _builtinGenes,
-      refGeneSelect: _refGenes[0],
+      refGeneSelect: "",
       refGeneSelectOptions: _refGenes
     })
 
@@ -255,7 +255,7 @@ class HeaderForm extends Component {
           navigationType: "builtinGenes",
           builtInGeneSelect: _builtinGenes[0],
           builtInGeneSelectOptions: _builtinGenes,
-          refGeneSelect: _refGenes[0],
+          refGeneSelect: "",
           refGeneSelectOptions: _refGenes
         })
         this.setState({
