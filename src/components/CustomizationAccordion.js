@@ -117,18 +117,18 @@ class VisualizationOptions extends Component {
                   <Label check>
                     <Input
                       type="radio"
-                      value={false}
                       checked={!this.state.isFullBlat}
-                      onChange={e => this.setState({isFullBlat: e.target.value})}
+                      onChange={(e) => this.setState({isFullBlat: false})}
                       />
                     Search 9 reference genomes
+                  </Label>
+                  <Label check style={{margin: "0 10px"}}>
                     <Input
                       type="radio"
-                      value={true}
                       checked={this.state.isFullBlat}
-                      onChange={e => this.setState({isFullBlat: e.target.value})}
+                      onChange={() => this.setState({isFullBlat: true})}
                     />
-                    Search all genomes
+                    Search all genomes (maybe over the time limit)
                   </Label>
                   {/*<Label*/}
                   {/*// style={{margin: "0 5px 0 20px"}}>*/}
