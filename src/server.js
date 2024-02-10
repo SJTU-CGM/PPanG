@@ -138,6 +138,11 @@ api.post('/blatSearch', (req, res, next) => {
   if (!seq.startsWith('>')) {
     seq = '>query\n' + seq
   }
+  const sequence = seq.substring(seq.indexOf('\n') + 1)
+  if (sequence.length < 30 || sequence.length > 20100) {
+    return next(new VgExecutionError('BLAT search failed: Input length for blat search is limited to 30~20000bp'));
+  }
+
   const tmpFasta = `tmp/${new Date().getTime()}.fasta`
   fs.writeFileSync(tmpFasta, seq)
   let params = [tmpFasta]
@@ -154,14 +159,17 @@ api.post('/blatSearch', (req, res, next) => {
   });
   blatCall.on('close', code => {
     if (code !== 0) {
-      return next(new VgExecutionError('blat search failed'));
+      return next(new VgExecutionError('BLAT search failed'));
     }
     let blatResult = [];
     const rows = result.trim().split('\n')
-    let count = rows.length;
-    if (req.body.count !== undefined) {
-      count = Math.min(count, Number(req.body.count))
+    if (rows.length === 0) {
+      return next(new VgExecutionError('BLAT search finished: No segment matches'));
     }
+    let count = Math.min(rows.length, 200);
+    // if (req.body.count !== undefined) {
+    //   count = Math.min(count, Number(req.body.count))
+    // }
     for (let i = 0; i < count; i++) {
       const cols = rows[i].split('\t');
       blatResult.push({
@@ -194,7 +202,7 @@ api.post('/getChunkedData', (req, res, next) => {
   } catch (e) {
     let geneId = req.body.region;
     console.log(`No coordinate provided, try to search gene ${geneId}`)
-    let params = [path.join("jbrowse", `${config.reference.annotation}.gff.gz`)]
+    let params = [path.join("jbrowse", `${config.reference.name}.gff.gz`)]
     params = params.concat(req.chrId)
     params.push(req.body.region)
     if (geneId.includes(".")) {
@@ -379,6 +387,9 @@ function getChunkedData(req, res, next) {
         vgChunkParams.push('-r', ''.concat(r_start, ":", r_end), '-c', 5);
       }
     } else {
+      if (distance > 30000) {
+        throw new VgExecutionError("The length of region is limited to 30000bp")
+      }
       // reformat pos+dist into start-end range
       if (distance > -1) {
         r_end = r_start + distance;
@@ -476,6 +487,7 @@ function getChunkedData(req, res, next) {
         return;
       }
       req.graph = JSON.parse(graphAsString);
+      req.graph.path = req.graph.path.filter(e => !e.name.includes("MINIGRAPH"))
       req.region = [r_start, r_end];
       if (!sentResponse) {
         sentResponse = true;
@@ -766,9 +778,6 @@ function loadGFFAnnotationFiles(req, res, next) {
     const regionEnd = pathStart + regionLength;
     const accession = e.name.split(".chr")[0]
     let annotation = accession
-    if (accession.startsWith(config.reference.name)) {
-      annotation = config.reference.annotation;
-    }
     const chrId = req.chrId
     let region = `${chrId}:${regionStart - extraBases}-${regionEnd
     + extraBases}`

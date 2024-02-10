@@ -11,6 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import * as tubeMap from '../util/tubemap';
 import html2canvas from "html2canvas";
+import SelectionDropdown from "./SelectionDropdown";
 
 const ZOOM_FACTOR = 2.0;
 
@@ -20,7 +21,12 @@ class DataPositionFormRow extends Component {
     this.onKeyUp = this.onKeyUp.bind(this);
     this.state = {
       isCompress: false,
-      isDownloading: false
+      isDownloading: false,
+      builtInGeneSelect: "none",
+      refGeneSelect: "none",
+      builtInGeneSelectOptions: [],
+      refGeneSelectOptions: [],
+      navigationType: "builtinGenes",
     }
   }
 
@@ -45,9 +51,9 @@ class DataPositionFormRow extends Component {
   resetCompress = () => {
     this.setState({isCompress: false})
   }
-  
+
   toAboutPage = () => {
-    window.open("https://cgm.sjtu.edu.cn/PPanG/about/")
+    window.open("https://cgm.sjtu.edu.cn/PPanG")
   }
 
   handleDownloadButton = () => {
@@ -77,33 +83,78 @@ class DataPositionFormRow extends Component {
     popup.classList.toggle("show");
   }
 
+  handleBuiltinGeneChange = (e) => {
+    this.setState({builtInGeneSelect: e.target.value})
+    this.props.handleInputChange(e)
+  }
+
+  handlerefGeneChange = (e) => {
+    this.setState({refGeneSelect: e.target.value})
+    this.props.handleInputChange(e)
+  }
+
   render() {
     return (
       <Form inline>
-        <Label className="tight-label mb-2 mr-sm-2 mb-sm-0 ml-2" for="region">
-          Region:
-        </Label>
-        <Input
-          type="text"
-          className="custom-input form-control mb-2 mr-sm-4 mb-sm-0"
-          id="region"
-          size="36"
-          value={this.props.region}
-          onChange={this.props.handleInputChange}
-	  onKeyPress={this.onKeyUp}
-        />
-        &nbsp;
-        {this.props.uploadInProgress && (
-          <div className="smallLoader" id="fileUploadSpinner" />
+        {this.state.navigationType === "builtinGenes" && (
+          <React.Fragment>
+            <Label
+              for="regionSelect"
+              className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
+            >
+              Built-in Gene:
+            </Label>
+            <SelectionDropdown
+              className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
+              id="builtinGenes"
+              value={this.state.builtInGeneSelect}
+              onChange={this.handleBuiltinGeneChange}
+              options={this.state.builtInGeneSelectOptions}
+            />
+          </React.Fragment>
         )}
-        <div className="popup" onClick={this.helpPopupFunction}>
-          <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
-          <span className="popuptext" id="helpPopup">
+        {this.state.navigationType === "refGeneID" && (
+          <React.Fragment>
+            <Label
+              for="regionSelect"
+              className="customData tight-label mb-2 mr-sm-2 mb-sm-0 ml-2"
+            >
+              MSU RGAP7 Gene ID:
+            </Label>
+            <SelectionDropdown
+              className="customDataMounted dropdown mb-2 mr-sm-4 mb-sm-0"
+              id="refGenes"
+              value={this.state.refGeneSelect}
+              onChange={this.handlerefGeneChange}
+              options={this.state.refGeneSelectOptions}
+            />
+
+          </React.Fragment>
+        )}
+        {this.state.navigationType === "customRegion" && (
+          <React.Fragment>
+            <Label className="tight-label mb-2 mr-sm-2 mb-sm-0 ml-2" for="region">
+              Region:
+            </Label>
+            <Input
+              type="text"
+              className="custom-input form-control mb-2 mr-sm-4 mb-sm-0"
+              id="region"
+              size="36"
+              value={this.props.region}
+              onChange={this.props.handleInputChange}
+              onKeyPress={this.onKeyUp}/>
+            &nbsp;
+            {this.props.uploadInProgress && (
+              <div className="smallLoader" id="fileUploadSpinner" />
+            )}
+            <div className="popup" onClick={this.helpPopupFunction}>
+              <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
+              <span className="popuptext" id="helpPopup">
             Coordinate: Search for a coordinate range (e.g. "IRGSP-1.0.chr01:1-100"), or a start position and a distance (e.g. "IRGSP-1.0.chr01:1+100"). Note that the coordinate starts from 0.
-            <br/>
-            Gene/Transcript Id: Search the gene/transcript id (e.g. "LOC_Os01g66100") in msu7 in selected chromosome and find the gene region.
           </span>
-        </div>
+            </div>
+          </React.Fragment>)}
         <Button
           color="primary"
           id="goButton"
@@ -163,6 +214,7 @@ class DataPositionFormRow extends Component {
         >
           {this.state.isDownloading ? "Processing..." : "Download Image"}
         </Button>
+
 	<Button
           color="primary"
           id="aboutButton"

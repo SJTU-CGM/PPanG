@@ -1,3 +1,16 @@
+diff --git a/node_modules/@jbrowse/plugin-linear-genome-view/dist/LinearGenomeView/components/TrackContainer.js b/node_modules/@jbrowse/plugin-linear-genome-view/dist/LinearGenomeView/components/TrackContainer.js
+index 6cd948e..78d3b88 100644
+--- a/node_modules/@jbrowse/plugin-linear-genome-view/dist/LinearGenomeView/components/TrackContainer.js
++++ b/node_modules/@jbrowse/plugin-linear-genome-view/dist/LinearGenomeView/components/TrackContainer.js
+@@ -74,7 +74,7 @@ const useStyles = (0, mui_1.makeStyles)()({
+         position: 'absolute',
+     },
+     trackRenderingContainer: {
+-        overflowY: 'auto',
++        overflowY: 'hidden',
+         overflowX: 'hidden',
+         whiteSpace: 'nowrap',
+         position: 'relative',
 diff --git a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js b/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js
 index 1eb1c3e..d860fe7 100644
 --- a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/MiniControls.js
@@ -11,3 +24,29 @@ index 1eb1c3e..d860fe7 100644
              React.createElement(IconButton, { "data-testid": "zoom_out", onClick: () => model.zoom(bpPerPx * 2), disabled: bpPerPx >= maxBpPerPx - 0.0001 || scaleFactor !== 1 },
                  React.createElement(ZoomOut, { fontSize: "small" })),
              React.createElement(IconButton, { "data-testid": "zoom_in", onClick: () => model.zoom(model.bpPerPx / 2), disabled: bpPerPx <= minBpPerPx + 0.0001 || scaleFactor !== 1 },
+diff --git a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/TrackContainer.js b/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/TrackContainer.js
+index b4c653d..f122aba 100644
+--- a/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/TrackContainer.js
++++ b/node_modules/@jbrowse/plugin-linear-genome-view/esm/LinearGenomeView/components/TrackContainer.js
+@@ -46,7 +46,7 @@ const useStyles = makeStyles()({
+         position: 'absolute',
+     },
+     trackRenderingContainer: {
+-        overflowY: 'auto',
++        overflowY: 'hidden',
+         overflowX: 'hidden',
+         whiteSpace: 'nowrap',
+         position: 'relative',
+diff --git a/node_modules/@jbrowse/plugin-linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx b/node_modules/@jbrowse/plugin-linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx
+index e1857c4..2920652 100644
+--- a/node_modules/@jbrowse/plugin-linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx
++++ b/node_modules/@jbrowse/plugin-linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx
+@@ -54,7 +54,7 @@ const useStyles = makeStyles()({
+     position: 'absolute',
+   },
+   trackRenderingContainer: {
+-    overflowY: 'auto',
++    overflowY: 'hidden',
+     overflowX: 'hidden',
+     whiteSpace: 'nowrap',
+     position: 'relative',

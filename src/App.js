@@ -7,15 +7,15 @@ import CustomizationAccordion from './components/CustomizationAccordion';
 import { dataOriginTypes } from './enums';
 import * as tubeMap from './util/tubemap';
 import config from './config.json';
-import assembly, {getAssembly} from './jbrowse/assembly'
-import tracks, {getTracks} from './jbrowse/tracks'
-import defaultSession, {getDefaultSession} from './jbrowse/defaultSession'
+import {getAssembly} from './jbrowse/assembly'
+import {getTracks} from './jbrowse/tracks'
+import {getDefaultSession} from './jbrowse/defaultSession'
 
 import {
   createViewState,
   JBrowseLinearGenomeView,
 } from '@jbrowse/react-linear-genome-view'
-import {Button, Form} from "reactstrap";
+import {Button, ButtonGroup, Form, Modal, ModalBody, ModalFooter, ModalHeader, Table} from "reactstrap";
 import SelectionDropdown from "./components/SelectionDropdown";
 import {Cross} from "./components/Cross";
 import {setDrawTextFlag, update} from "./util/tubemap";
@@ -67,7 +67,8 @@ class App extends Component {
         showExons: true,
         showReads: false,
         showSoftClips: true,
-        haplotypeColors: 'greys',
+        haplotypeColors: 'lightColors',
+        exonColors: 'greys',
         forwardReadColors: 'reds',
         reverseReadColors: 'blues',
         colorReadsByMappingQuality: false,
@@ -76,16 +77,8 @@ class App extends Component {
         transcriptSelectOptions: [],
         transcripts: {}
       },
-      jbrowseViewStates: {
-        [config.reference.name]: createViewState({
-          assembly,
-          tracks,
-          defaultSession,
-          configuration: defaultConfiguration,
-          disableAddTracks: true,
-          location: 'chr01:38382380-38382540',
-        })
-      },
+      jbrowseViewStates: {},
+      showReorderLinearViewModel: false
     };
   }
 
@@ -100,6 +93,7 @@ class App extends Component {
     tubeMap.setColorSet('haplotypeColors', visOptions.haplotypeColors);
     tubeMap.setColorSet('forwardReadColors', visOptions.forwardReadColors);
     tubeMap.setColorSet('reverseReadColors', visOptions.reverseReadColors);
+    tubeMap.setColorSet('exonColors', visOptions.exonColors);
     tubeMap.setColorReadsByMappingQualityFlag(
       visOptions.colorReadsByMappingQuality
     );
@@ -118,6 +112,10 @@ class App extends Component {
       dataOrigin: dataOriginTypes.API
     });
   };
+
+  handleClickReorder = () => {
+    this.setState({showReorderLinearViewModel: !this.state.showReorderLinearViewModel})
+  }
 
   toggleVisOptionFlag = flagName => {
     if (flagName === "showExons") {
@@ -180,7 +178,8 @@ class App extends Component {
     }));
   }
 
-  handleChangeRegion = (pathCoords, indexOfFirstBase) => {
+  handleChangeRegion = (reference, pathCoords, indexOfFirstBase) => {
+    this.props.reference = reference
     this.props.pathCoords = pathCoords
     this.props.indexOfFirstBase = indexOfFirstBase
   }
@@ -188,50 +187,78 @@ class App extends Component {
   clearJBrowseViews = () => {
     this.setState((state) => ({
       jbrowseViewStates: {
-        [config.reference.name]: state.jbrowseViewStates[config.reference.name]
+        // [this.props.reference]: state.jbrowseViewStates[this.props.reference]
       },
     }))
+  }
+
+  clearJBrowseView = (trackName) => {
+    let jbrowseViewStates = this.state.jbrowseViewStates
+    delete jbrowseViewStates[trackName]
+    this.setState({jbrowseViewStates: jbrowseViewStates})
+  }
+
+  moveJBrowseViewBehind = (i) => {
+    const jbrowseViews = this.getJBrowseViewList()
+    let tmp = jbrowseViews[i]
+    jbrowseViews[i] = jbrowseViews[i + 1]
+    jbrowseViews[i + 1] = tmp
+    this.setState({jbrowseViewStates: Object.fromEntries(jbrowseViews)})
   }
 
   resetCompress = () => {
     this.HeaderForm.resetCompress()
   }
 
-  addJBrowseView = (trackName) => {
-    if (this.state.jbrowseViewStates[trackName] !== undefined) return
+  getJBrowseViewState = (trackName, location) => {
     const accession = trackName.substring(0, trackName.indexOf(".chr"))
     const assembly = getAssembly(accession)
     const tracks = getTracks(accession)
     const defaultSession = getDefaultSession(accession)
-    let location;
-    if (trackName in this.props.regions) {
+    if (location === undefined && trackName in this.props.regions) {
       location = this.props.regions[trackName]
     }
+    return createViewState({
+      assembly,
+      tracks,
+      defaultSession,
+      configuration: defaultConfiguration,
+      disableAddTracks: true,
+      location: location
+    })
+  }
+
+  getJBrowseViewList = () => {
+    return Object.entries(this.state.jbrowseViewStates).filter(e => e[1] !== undefined)
+  }
+
+  addJBrowseView = (trackName, location, addReference=false) => {
+    if ((!addReference && trackName.includes(config.reference.name)) ||
+      this.state.jbrowseViewStates[trackName] !== undefined) return
     this.setState((state) => ({
       jbrowseViewStates: {
         ...state.jbrowseViewStates,
-        [trackName]: createViewState({
-          assembly,
-          tracks,
-          defaultSession,
-          configuration: defaultConfiguration,
-          disableAddTracks: true,
-          location: location
-        })
+        [trackName]: this.getJBrowseViewState(trackName, location)
       },
     }))
   }
 
   jbrowseNav = (regionStart, regionEnd) => {
-    const graphStart = this.props.indexOfFirstBase
-    const chrId = graphStart.match(/chr\d+/)[0];
-    const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
-    this.props.regions = {}
-    for (let accession in this.props.pathCoords) {
-      const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
-      this.props.regions[accession] = region
-      if (accession in this.state.jbrowseViewStates) {
-        this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
+    if (this.props.indexOfFirstBase !== undefined) {
+
+      const graphStart = this.props.indexOfFirstBase
+      const chrId = graphStart.match(/chr\d+/)[0];
+      const indexOfFirstBase = Number(graphStart.substring(graphStart.indexOf(':') + 1))
+      this.props.regions = {}
+      for (let accession in this.props.pathCoords) {
+        const region = `${chrId}:${this.props.pathCoords[accession] + regionStart - indexOfFirstBase + 1}-${this.props.pathCoords[accession] + regionEnd - indexOfFirstBase + 1}`
+        this.props.regions[accession] = region
+        if (accession === this.props.reference) {
+          this.addJBrowseView(accession, region, true)
+        }
+        if (this.state.jbrowseViewStates[accession] !== undefined) {
+          this.state.jbrowseViewStates[accession].session.view.navToLocString(region)
+        }
       }
     }
   }
@@ -259,14 +286,41 @@ class App extends Component {
             jbrowseNav={this.jbrowseNav}
             resetCompress={this.resetCompress}
           />
-          <div style={{margin: "-20px 20px 20px 20px"}}>
-            <JBrowseLinearGenomeView viewState={this.state.jbrowseViewStates[config.reference.name]}/>
-              {Object.entries(this.state.jbrowseViewStates).filter(e => !e[0].startsWith(config.reference.name) && e[1] !== undefined).map(e => {
+          {(this.getJBrowseViewList().length > 0) &&
+            <div style={{margin: "-20px 20px 20px 20px"}}>
+              {this.getJBrowseViewList().map(e => {
                 return <div>
                   <JBrowseLinearGenomeView viewState={e[1]}/>
                 </div>
               })}
-          </div>
+              <Modal isOpen={this.state.showReorderLinearViewModel} toggle={this.handleClickReorder}>
+                <ModalHeader toggle={this.handleClickReorder}>Rearrange Linear Views</ModalHeader>
+                <ModalBody>
+                  <Table hover>
+                    <thead><tr>
+                      <th>Order</th><th>Trackname</th><th>Operation</th>
+                    </tr></thead>
+                    <tbody>
+                    {this.getJBrowseViewList().map((e, index) =>
+                      <tr>
+                      <th scope="row">{index}</th>
+                        {e[0].startsWith(this.props.reference) ? <th scope="row">{e[0]}</th> : <td>{e[0]}</td>}
+                      <td><ButtonGroup>
+                        <Button disabled={index===0} color="primary" size="sm" onClick={() => {this.moveJBrowseViewBehind(index - 1)}}>↑</Button>
+                        <Button disabled={index===this.getJBrowseViewList().length-1} color="primary" size="sm" onClick={() => {this.moveJBrowseViewBehind(index)}}>↓</Button>
+                        {!e[0].startsWith(this.props.reference) && (<Button color="danger" size="sm" onClick={() => {this.clearJBrowseView(e[0])}}>×</Button>)}
+                      </ButtonGroup></td>
+                    </tr>)}
+                    </tbody>
+                  </Table>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onClick={this.handleClickReorder}>
+                    Done
+                  </Button>
+                </ModalFooter>
+              </Modal>
+          </div>}
         </div>
         <CustomizationAccordion
           visOptions={this.state.visOptions}
@@ -277,6 +331,7 @@ class App extends Component {
           apiUrl={this.props.apiUrl}
           handleSelectTranscript={this.handleSelectTranscript}
           setColorSetting={this.setColorSetting}
+          handleClickReorder={this.handleClickReorder}
         />
       </div>
     );
@@ -287,7 +342,8 @@ App.propTypes = {
   apiUrl: PropTypes.string,
   pathCoords: PropTypes.object,
   regions: PropTypes.object,
-  indexOfFirstBase: PropTypes.number
+  indexOfFirstBase: PropTypes.number,
+  reference: PropTypes.string
 }
 
 App.defaultProps = {
@@ -296,6 +352,7 @@ App.defaultProps = {
   // browser testing environment to point to a real testing backend.
   // Note that host includes the port.
   apiUrl: (config.BACKEND_URL || `http://${window.location.host}`) + '/api/v0',
+  reference: `${config.reference.name}.chr01[38382380]`,
   regions: {}
 };
 

@@ -190,6 +190,10 @@ export function create(params) {
   jbrowseNav = params.jbrowseNav;
   resetCompress = params.resetCompress;
   update();
+  jbNav();
+}
+
+export function jbNav() {
   const regionStart = getXCoord(0)
   const regionEnd = getXCoord(document.getElementById(svgID.substring(1)).parentNode.offsetWidth)
   if (jbrowseNav !== undefined && regionStart !== undefined) jbrowseNav(regionStart, regionEnd)
@@ -358,7 +362,7 @@ export function set9RefTrackVisible(isUpdate) {
   })
   for (let index in accessions9Ref) {
     for (let i = 0; i < inputTracks.length; i++) {
-      if (inputTracks[i].name.startsWith(accessions9Ref[index])) {
+      if (inputTracks[i].name.startsWith(accessions9Ref[index]) || inputTracks[i].hasOwnProperty('indexOfFirstBase')) {
         inputTracks[i].hidden = false
         let checkbox = document.getElementById(`showTrack${i}`);
         if (checkbox) {
@@ -493,7 +497,6 @@ function createTubeMap() {
   const nodesStr = JSON.stringify(inputNodes)
   const tracksStr = JSON.stringify(inputTracks)
   const configStr = JSON.stringify(config)
-
   if (lastInputNodes === nodesStr && lastInputTracks === tracksStr && lastConfig
     === configStr) {
     return;
@@ -516,14 +519,13 @@ function createTubeMap() {
   trackForRuler = undefined;
 
   svg = d3.select(svgID);
-  svg.selectAll('*').remove(); // clear svg for (re-)drawing
-
+  // clear svg for (re-)drawing
   // early exit is necessary when visualization options such as colors are
   // changed before any graph has been rendered
   if (inputNodes.length === 0 || inputTracks.length === 0) {
     return;
   }
-
+  svg.selectAll('*').remove();
   if (resetCompress) {
     resetCompress();
   }
@@ -653,6 +655,15 @@ function createTubeMap() {
     console.log(`number of nodes: ${numberOfNodes}`);
   }
   return tracks;
+}
+
+const sd1 = ['H7L1', 'H7L26', 'H7L27', 'H7L28', 'H7L29', 'H7L30', 'H7L32', 'H7L33', 'IR64', 'IR8', 'PR106', 'R498', 'SE-134', 'SE-19',
+  'SE-3', 'SE-33', 'TG45', 'TG51', 'TG68', 'TG76', 'TG77', 'TG78', 'TG85', 'TG82', 'TG83', 'TG88', 'TG86', 'WSSM']
+const isSd1 = d => {
+  for (let i in sd1) {
+    if (d.name.startsWith(sd1[i])) return d.xStart >= 4070 && d.xStart <= 8429;
+  }
+  return false;
 }
 
 // generates attributes (node.y, node.contentHeight) for nodes without tracks, only reads
@@ -2614,7 +2625,7 @@ function getColorSet(colorSetName) {
 }
 
 function getTrackColor(track, isFeature) {
-  const colors = isFeature ? haplotypeColors : exonColors;
+  const colors = isFeature ? exonColors : haplotypeColors;
   const index = track.id % colors.length
   return colors[index]
 }
@@ -2637,10 +2648,10 @@ function generateTrackColor(track, highlight) {
       }
     }
   } else {
-    if (config.showExonsFlag === false || highlight !== 'plain') {
-      trackColor = haplotypeColors[track.id % haplotypeColors.length];
-    } else {
+    if (config.showExonsFlag && highlight !== 'plain') {
       trackColor = exonColors[track.id % exonColors.length];
+    } else {
+      trackColor = haplotypeColors[track.id % haplotypeColors.length];
     }
   }
   return trackColor;
@@ -3496,6 +3507,7 @@ function drawTrackRectangles(rectangles, type) {
   .attr('y', d => d.yStart)
   .attr('width', d => d.xEnd - d.xStart + 1)
   .attr('height', d => d.yEnd - d.yStart + 1)
+  //.style('fill', d => isSd1(d) ? 'url(#dashed)' : d.color)
   .style('fill', d => d.color)
   .attr('trackID', d => d.id)
   .attr('class', d => `track${d.id}`)
@@ -3541,6 +3553,17 @@ function defineSVGPatterns() {
   pattern
   .append('rect')
   .attrs({x: '4', y: '4', width: '3', height: '3', fill: '#505050'});
+
+  pattern = defs.append('pattern').attrs({
+    id: 'dashed',
+    width: '25',
+    height: '7',
+    patternUnits: 'userSpaceOnUse',
+  });
+
+  pattern
+  .append('rect')
+  .attrs({ x: '0', y: '0', width: '18', height: '7', fill: '#A0A0A0' });
 
   pattern = defs.append('pattern').attrs({
     id: 'patternB',
@@ -3733,6 +3756,7 @@ function drawTrackCurves(type) {
   .enter()
   .append('path')
   .attr('d', d => d.path)
+  //.style('fill', d => isSd1(d) ? 'url(#dashed)' : d.color)
   .style('fill', d => d.color)
   .attr('trackID', d => d.id)
   .attr('class', d => `track${d.id}`)

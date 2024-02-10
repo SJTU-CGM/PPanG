@@ -42,7 +42,8 @@ input[type='file'] {
 
 /* the div containing the tubemap svg */
 #tubeMapSVG {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: calc(100% - 40px);
   position: relative;
   margin: 20px;
@@ -170,7 +171,7 @@ input[type='file'] {
 }
 
 @-webkit-keyframes fadeIn {
-  from {opacity: 0;} 
+  from {opacity: 0;}
   to {opacity: 1;}
 }
 

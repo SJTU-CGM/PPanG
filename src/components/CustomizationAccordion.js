@@ -16,6 +16,7 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import SelectionDropdown from "./SelectionDropdown";
 import blatCols from '../blat/blatCols.json'
 import {fetchAndParse} from "../fetchAndParse";
+import RadioRow from "./RadioRow";
 
 class VisualizationOptions extends Component {
   state = {
@@ -77,8 +78,8 @@ class VisualizationOptions extends Component {
       })
     }).then(res => {
       this.setState({blatResult: res.result})
-    }).catch(() => {
-      this.setState({blatResult: "BLAT search failed"})
+    }).catch((e) => {
+      this.setState({blatResult: "Fetch data failed, maybe either the data is too large or the network connection is unstable. Please check and retry."})
     });
   }
 
@@ -115,21 +116,29 @@ class VisualizationOptions extends Component {
                 <Form inline>
                   <Label check>
                     <Input
-                      type="checkbox"
-                      value={this.state.isFullBlat}
-                      onChange={this.toggleFullBlat}
+                      type="radio"
+                      checked={!this.state.isFullBlat}
+                      onChange={(e) => this.setState({isFullBlat: false})}
+                      />
+                    Search 9 reference genomes
+                  </Label>
+                  <Label check style={{margin: "0 10px"}}>
+                    <Input
+                      type="radio"
+                      checked={this.state.isFullBlat}
+                      onChange={() => this.setState({isFullBlat: true})}
                     />
-                    Search all samples (9 references default)
+                    Search all genomes (maybe over the time limit)
                   </Label>
-                  <Label
-                  style={{margin: "0 5px 0 20px"}}>
-                    BLAT result count:
-                  </Label>
-                  <SelectionDropdown
-                    value={this.state.blatCount}
-                    onChange={event => this.setState({blatCount: event.target.value})}
-                    options={[25, 50, 100]}
-                  />
+                  {/*<Label*/}
+                  {/*// style={{margin: "0 5px 0 20px"}}>*/}
+                  {/*//   BLAT result count:*/}
+                  {/*// </Label>*/}
+                  {/*<SelectionDropdown*/}
+                  {/*  value={this.state.blatCount}*/}
+                  {/*  onChange={event => this.setState({blatCount: event.target.value})}*/}
+                  {/*  options={[25, 50, 100]}*/}
+                  {/*/>*/}
                   <Button
                     color="primary"
                     onClick={this.handleBlat}
@@ -152,7 +161,9 @@ class VisualizationOptions extends Component {
                           },
                         }}
                       />
-                      <h6>Just select the chromosome and copy the tRegion into "Region" box above for visualization in PPanG</h6>
+                      <br/>
+                      <h6>Just select the target chromosome and navigation type to "custom region", and copy the tRegion into "Region" box</h6>
+                      <br/>
                     </div>)
                 )}
               </CardBody>
@@ -162,7 +173,7 @@ class VisualizationOptions extends Component {
             <CardHeader id="feature" onClick={this.toggleFeatureCard}>
               <h5 className="mb-0">
                 <a href="#collapse" onClick={this.toggleFeatureCard}>
-                  Features
+                  Annotation Data
                 </a>
               </h5>
             </CardHeader>
@@ -198,17 +209,17 @@ class VisualizationOptions extends Component {
             <Collapse isOpen={this.state.isOpenVisualizationOptions}>
               <CardBody>
                 <FormGroup>
-                  <h5>General</h5>
-                  <FormGroup check>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        checked={visOptions.removeRedundantNodes}
-                        onChange={() => toggleFlag('removeRedundantNodes')}
-                      />
-                      Remove redundant nodes
-                    </Label>
-                  </FormGroup>
+                  <h5>SequenceTubeMap View</h5>
+                  {/*<FormGroup check>*/}
+                  {/*  <Label check>*/}
+                  {/*    <Input*/}
+                  {/*      type="checkbox"*/}
+                  {/*      checked={visOptions.removeRedundantNodes}*/}
+                  {/*      onChange={() => toggleFlag('removeRedundantNodes')}*/}
+                  {/*    />*/}
+                  {/*    Remove redundant nodes*/}
+                  {/*  </Label>*/}
+                  {/*</FormGroup>*/}
                   <FormGroup check>
                     <Label check>
                       <Input
@@ -216,7 +227,7 @@ class VisualizationOptions extends Component {
                         checked={visOptions.compressedView}
                         onChange={() => toggleFlag('compressedView')}
                       />
-                      Hide all text
+                      Hide nucleotide bases
                     </Label>
                   </FormGroup>
                   <FormGroup check>
@@ -236,7 +247,7 @@ class VisualizationOptions extends Component {
                         checked={visOptions.showExons}
                         onChange={() => toggleFlag('showExons')}
                       />
-                      Show exons on tracks
+                      Show exons on genome tracks
                     </Label>
                   </FormGroup>
                 </FormGroup>
@@ -253,6 +264,27 @@ class VisualizationOptions extends Component {
                     </div>
                   </React.Fragment>
                 )}
+                <h6 style={{marginTop: "20px"}}>Colors</h6>
+                <Form>
+                  <RadioRow
+                    rowHeading="Haplotypes"
+                    color={visOptions.haplotypeColors}
+                    trackType="haplotypeColors"
+                    setColorSetting={this.props.setColorSetting}
+                  />
+                  {visOptions.showExons && (
+                    <RadioRow
+                      rowHeading="Exons"
+                      color={visOptions.exonColors}
+                      trackType="exonColors"
+                      setColorSetting={this.props.setColorSetting}
+                    />)}
+                <h5 style={{marginTop: "20px"}}>JBrowse2 Views</h5>
+                <Button
+                  color="primary"
+                  onClick={this.props.handleClickReorder}
+                >Rearrange Linear Views
+                </Button>
                 {/*<FormGroup>*/}
                 {/*  <h5>Sequence Reads</h5>*/}
                 {/*  <FormGroup check>*/}
@@ -306,15 +338,6 @@ class VisualizationOptions extends Component {
                 {/*    </React.Fragment>*/}
                 {/*  )}*/}
                 {/*</FormGroup>*/}
-
-                {/*<h5>Colors</h5>*/}
-                {/*<Form>*/}
-                {/*  <RadioRow*/}
-                {/*    rowHeading="Haplotypes"*/}
-                {/*    color={visOptions.haplotypeColors}*/}
-                {/*    trackType="haplotypeColors"*/}
-                {/*    setColorSetting={this.props.setColorSetting}*/}
-                {/*  />*/}
                 {/*  {visOptions.showReads &&*/}
                 {/*    !visOptions.colorReadsByMappingQuality && (*/}
                 {/*      <React.Fragment>*/}
@@ -332,7 +355,7 @@ class VisualizationOptions extends Component {
                 {/*        />*/}
                 {/*      </React.Fragment>*/}
                 {/*    )}*/}
-                {/*</Form>*/}
+                </Form>
               </CardBody>
             </Collapse>
           </Card>
@@ -346,7 +369,8 @@ VisualizationOptions.propTypes = {
   handleMappingQualityCutoffChange: PropTypes.func.isRequired,
   setColorSetting: PropTypes.func.isRequired,
   handleSelectTranscript: PropTypes.func.isRequired,
-  apiUrl: PropTypes.string.isRequired
+  apiUrl: PropTypes.string.isRequired,
+  handleClickReorder: PropTypes.func.isRequired
 };
 
 export default VisualizationOptions;
