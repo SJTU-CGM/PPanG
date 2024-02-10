@@ -79,7 +79,7 @@ class VisualizationOptions extends Component {
     }).then(res => {
       this.setState({blatResult: res.result})
     }).catch((e) => {
-      this.setState({blatResult: "Fetch data failed, maybe either the data is too large or the network connection is unstable. Please check and retry."})
+      this.setState({blatResult: e})
     });
   }
 

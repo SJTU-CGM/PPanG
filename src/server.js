@@ -159,11 +159,11 @@ api.post('/blatSearch', (req, res, next) => {
   });
   blatCall.on('close', code => {
     if (code !== 0) {
-      return next(new VgExecutionError('BLAT search failed'));
+      return next(new VgExecutionError('BLAT search failed, maybe either the data is too large or the network connection is unstable. Please check and retry.'));
     }
     let blatResult = [];
     const rows = result.trim().split('\n')
-    if (rows.length === 0) {
+    if (rows.length < 2) {
       return next(new VgExecutionError('BLAT search finished: No segment matches'));
     }
     let count = Math.min(rows.length, 200);
