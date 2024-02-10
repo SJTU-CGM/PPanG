@@ -116,11 +116,19 @@ class VisualizationOptions extends Component {
                 <Form inline>
                   <Label check>
                     <Input
-                      type="checkbox"
-                      value={this.state.isFullBlat}
-                      onChange={this.toggleFullBlat}
+                      type="radio"
+                      value={false}
+                      checked={!this.state.isFullBlat}
+                      onChange={e => this.setState({isFullBlat: e.target.value})}
+                      />
+                    Search 9 reference genomes
+                    <Input
+                      type="radio"
+                      value={true}
+                      checked={this.state.isFullBlat}
+                      onChange={e => this.setState({isFullBlat: e.target.value})}
                     />
-                    Search all samples (maybe over the time limit)
+                    Search all genomes
                   </Label>
                   {/*<Label*/}
                   {/*// style={{margin: "0 5px 0 20px"}}>*/}
@@ -165,7 +173,7 @@ class VisualizationOptions extends Component {
             <CardHeader id="feature" onClick={this.toggleFeatureCard}>
               <h5 className="mb-0">
                 <a href="#collapse" onClick={this.toggleFeatureCard}>
-                  Features
+                  Annotation Data
                 </a>
               </h5>
             </CardHeader>
