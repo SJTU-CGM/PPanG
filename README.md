@@ -22,20 +22,27 @@ Navigation Area allows users to provide the custom region for visualization besi
 navigation is very simple within three steps:
 1. Select the target chromosome at "Data". Pangenome graphs built by both MC and PGGB are available for users to choose.
 2. Select the navigation type. There are three navigation types available:
+
    a) `Navigation Type=built-in genes`
 
    Just select from the built-in genes. e.g.The navigation of `GS5` on chr05:
-![](public/Figure2.png)
+
+   <img src="public/Figure2.png" height="80px">
+
    b) `Navigation Type=reference annotation gene ID`
 
    Input the target MSU RGAP7 gene ID and select the gene ID from the list. e.g. The navigation of `LOC_Os08g03060` on chr08:
-![](public/Figure3.png)
+
+   <img src="public/Figure3.png" height="120px">
+   
    c) `Navigation Type=custom region`
 
    Input the target region by coordinates. Format: `<sample name.chrxx>:<start coordinate>-<end coordinate>`. In this step
 any individual can be selected as reference. The "Custom Path" box provides the list of available paths. Type and select the path name (related samples will be suggested if typing into the box), and 
 "Region" is automatically filled with the selected path name. e.g. The navigation of `CHAOMEO.chr11:6541923-6546025`:
-![](public/Figure4.png)
+
+   <img src="public/Figure4.png" height="80px">
+   
 3. Click the "Go" button and wait a minute for loading. The visualization of `Visualization Area` will be updated.
 
 There are several functional buttons beside "Go":
@@ -71,7 +78,8 @@ equivalent to normal zoom scaling.
 Above the graph is the coordinate axis of the reference (not necessarily the reference genome, but the reference selected in the target region).
 In SequenceTubeMap, the coordinate axis may be longer than the target region, and the actual start and end coordinates are 
 marked in yellow circles. For example, in the figure below, the yellow circle represents the start coordinate 6,541,923:
-![img.png](public/Figure5.png)
+
+<img src="public/Figure5.png" width="800px">
 
 #### Linear View in JBrowse2
 By default, the linear view of reference is visible below the graph view. Linear views for other individuals are simply added
@@ -149,7 +157,7 @@ Double click some of the paths in graph view to add them into linear views. The 
 ## Run PPanG for your own data
 
 - ### Install
-clone the repo and install dependencies:
+  clone the repo and install dependencies:
   ```shell
   git clone git@github.com:SJTU-CGM/PPanG.git
   cd PPanG/
@@ -173,7 +181,7 @@ the results together. That explains why searching all genomes may exceed the tim
 For novel sequences, just use sequence alignment tool like BLAST at user's local machine is enough and ignore the BLAT server.
 - ### Other Configurations for PPanG
   `builtin_genes.json` and `reference_genes.json` are required in `src/` folder. The format is
-  ```json
+  ```
   {
     "<data.xg>": {
       "<gene_id>": "<gene_region>",
@@ -183,7 +191,7 @@ For novel sequences, just use sequence alignment tool like BLAST at user's local
   }
   ```
   For example, the `builtin_genes.json` in PPanG is like:
-  ```json
+  ```
   {
     "chr01_mc.xg": {
       "sd1 (LOC_Os01g66100)": "IRGSP-1.0.chr01:38382381-38385503",
