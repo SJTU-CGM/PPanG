@@ -215,13 +215,13 @@ class DataPositionFormRow extends Component {
           {this.state.isDownloading ? "Processing..." : "Download Image"}
         </Button>
 
-	<Button
-          color="primary"
-          id="aboutButton"
-          onClick={this.toAboutPage}
-        >
-          About & Manual
-        </Button>
+	{/*<Button*/}
+  {/*        color="primary"*/}
+  {/*        id="aboutButton"*/}
+  {/*        onClick={this.toAboutPage}*/}
+  {/*      >*/}
+  {/*        About & Manual*/}
+  {/*      </Button>*/}
       </Form>
     );
   }
