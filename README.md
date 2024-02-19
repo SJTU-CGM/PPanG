@@ -1,6 +1,6 @@
 # PPanG: a precision pangenome browser enabling nucleotide-level analysis of genomic variations in individual genomes and their graph-based pangenome
 
-PPanG is a precision genome browser with a new perspective of pangenome. Existing pangenome browsers focus on the variations of nucleotide sequences, including base mutations and structural variations. However, pangenomic studies of the variations at gene level (presence/absence variations (PAV) and gene structural variations (gSV)) just stay on statistics, and the details of variation still remains unknown. PPanG provides te nucleotide-accurate visualization of both genome sequences and genome annotations, making it clear to analyze the genomic variations from the nucleotide level to gene level.
+PPanG is a precision genome browser with a new perspective of pangenome. Existing pangenome browsers focus on the variations of nucleotide sequences, including base mutations and structural variations. However, pangenomic studies of the variations at gene level (presence/absence variations (PAV) and gene structural variations (gSV)) just stay on statistics, and the details of variation still remain unknown. PPanG provides nucleotide-accurate visualization of both genome sequences and genome annotations, making it clear to analyze the genomic variations from the nucleotide level to gene level.
 
 PPanG is composed of two subviews: graph view for the whole pangenome in SequenceTubeMap and linear view for each individual genome in JBrowse2. PPanG is easy to get started, but requires efforts to interpret the visualizations, as the visualizations are mixture of different views (graph & linear views) and different tracks (sequence & annotation tracks). So it is strongly recommended to understand the principles of PPanG first. The introduction page is https://cgm.sjtu.edu.cn/PPanG/.
 
@@ -29,21 +29,20 @@ Navigation Area allows users to provide the custom region for visualization besi
    
    c) `Navigation Type=custom region`
 
-   Input the target region by coordinates. Format: `<sample name.chrxx>:<start coordinate>-<end coordinate>`. In this step any individual can be selected as reference. The "Custom Path" box provides the list of available paths. Type and select the path name (related samples will be suggested if typing into the box), and "Region" is automatically filled with the selected path name. e.g. The navigation of `CHAOMEO.chr11:6541923-6546025`:
+   Input the target region by coordinates. Format: `<sample name.chrxx>:<start coordinate>-<end coordinate>`. In this step any individual can be selected as reference. The "Custom Path" box provides the list of available paths. Type and select the path name (related samples will be suggested if typing into the box), and "Region" is automatically filled with the selected path name. e.g. `Data=chr11_mc`, `Navigation Type=custom region`, `Custom Path=CHAOMEO.chr11` and fill the region with `CHAOMEO.chr11:6541923-6546025`:
 
    <img src="public/Figure4.png" height="80px">
    
 3. Click the "Go" button and wait a minute for loading. The visualization of `Visualization Area` will be updated.
 
-There are several functional buttons beside "Go":
-- Left: Shift the target region to `(start - offset, end - offset)`. `offset` is half the length of target region.
-- Zoom in: Double the scaling of visualization in graph view.
-- Zoom out: Half the scaling of visualization in graph view.
-- Right: Shift the target region to `(start + offset, end + offset)`. `offset` is half the length of target region.
-- Compress: Compress the visualization of graph view within the width of the window. This function may be useful because the whole pangenome graph can be too long to observe.
-- Reset: Reset the translation/zoom scaling to default in graph view.
-- Download Image: Download the visualization composed of graph view and linear views. Note that this function is not suitable for large graphs. For this use case, see `FAQ` for more details.
-- About & Manual: Navigate to PPanG homepage.
+There are several functional buttons beside <b>"Go"</b>:
+- <b>Left</b>: Shift the target region to `(start - offset, end - offset)`. `offset` is half the length of target region.
+- <b>Zoom in</b>: Double the scaling of visualization in graph view.
+- <b>Zoom out</b>: Half the scaling of visualization in graph view.
+- <b>Right</b>: Shift the target region to `(start + offset, end + offset)`. `offset` is half the length of target region.
+- <b>Compress</b>: Compress the visualization of graph view within the width of the window. This function may be useful because the whole pangenome graph can be too long to observe.
+- <b>Reset</b>: Reset the translation/zoom scaling to default in graph view.
+- <b>Download Image</b>: Download the visualization composed of graph view and linear views. Note that this function is not suitable for large graphs. For this use case, see `FAQ` for more details.
 
 ### Visualization Area
 The visualization of PPanG is composed of SequenceTubeMap graph view and JBrowse2 linear views. For interpretation of PPanG visualization, please refer to the PPanG homepage: https://cgm.sjtu.edu.cn/PPanG/. The custom options for visualization is available at `Functional Area`.
@@ -52,8 +51,8 @@ In the graph view, the pangenome graph of nine representative genomes are visual
 
 ##### Zoom Behavior
 The zoom behavior of "Zoom" button at `Navigation Area` and mouse-scrolling is different, because sometimes the zoom is only required at horizontal direction (compress the graph):
-- For "Zoom" button: It is equivalent to normal zoom scaling.
-- For mouse-scrolling: If horizontal zoom scaling < 1.0, the zoom only works horizontally. That is to compress/uncompress the graph. If horizontal zoom scaling > 1.0, the zoom works both horizontally and vertically. That is equivalent to normal zoom scaling.
+- <b>For "Zoom" button</b>: It is equivalent to normal zoom scaling.
+- <b>For mouse-scrolling</b>: If horizontal zoom scaling < 1.0, the zoom only works horizontally. That is to compress/uncompress the graph. If horizontal zoom scaling > 1.0, the zoom works both horizontally and vertically. That is equivalent to normal zoom scaling.
 
 ##### Coordinates
 Above the graph is the coordinate axis of the reference (not necessarily the reference genome, but the reference selected in the target region). In SequenceTubeMap, the coordinate axis may be longer than the target region, and the actual start and end coordinates are marked in yellow circles. For example, in the figure below, the yellow circle represents the start coordinate 6,541,923:
@@ -61,10 +60,10 @@ Above the graph is the coordinate axis of the reference (not necessarily the ref
 <img src="public/Figure5.png" width="800px">
 
 #### Linear View in JBrowse2
-By default, the linear view of reference is visible below the graph view. Linear views for other individuals are simply added by double-clicking the paths in graph view. The usage of linear view is the same as native JBrowse2 component. The document of JBrowse2: https://www.jbrowse.org/jb2/docs/.
+By default, the linear view of reference is visible below the graph view. Linear views for other individuals are simply added by double-clicking the paths in graph view. The usage of linear view is the same as native JBrowse2 component. (The more detailed document of JBrowse2 is available at https://www.jbrowse.org/jb2/docs/.)
 
 #### Combination of Graph View and Linear View
-In PPanG, the graph view and linear views are combined in parallel. The connection among different views are shared coordinates. Different linear views are all aligned to the graph view according to start coordinate of the reference. Besides, the coordinate change in graph view will trigger synchronous changes in linear views (The opposite is unavailable, because the linear views are free to extend outside the target region while the graph view is not). Consequently, exons at the same position from different views represents the same exon. Note that the coordinate alignment cannot be exactly perfect, because the coordinates of graph view are not uniformly distributed with occasional variations.
+In PPanG, the graph view and linear views are combined in parallel. The connection among different views are shared coordinates. <u>Different linear views are all aligned to the graph view according to start and end coordinates. Besides, the coordinate change in graph view will trigger synchronous changes in linear views (The opposite is unavailable, because the linear views are free to extend outside the target region while the graph view is not).</u> Consequently, exons at the same position from different views represents the same exon. Note that the coordinate alignment cannot be exactly perfect, because the coordinates of graph view are not uniformly distributed with occasional variations.
 
 ### Functional Area
 Functional Area contains several additional features helpful to users:
@@ -72,7 +71,7 @@ Functional Area contains several additional features helpful to users:
 #### BLAT server
 As the list of reference gene IDs is available in PPanG, it is easy to navigate to the known gene region. But it does not work for novel sequences, including distributed genes absent in reference genome but present in other genomes. Therefore, a BLAT server is embedded in PPanG, which helps the locating of novel sequences. Input the target sequence and click the "Search" button, the BLAT server will automatically process the alignment result and provide the target region. By default, the novel sequence is searched within the nine reference genomes, and the search range can be expanded to all individuals by selecting the "Search all genomes".
 ![img.png](public/Figure6.png)
-Then input the "tRegion" of BLAT result as `Navigation Type=custom region` in 2c to visualize the custom region in PPanG.
+Then input the "tRegion" (target region) of BLAT result as `Navigation Type=custom region` in 2c to visualize the custom region in PPanG.
 
 #### Annotation Data 
 The "Annotation Data" tab collects genome annotations within the target region. Click the "Download All" button to download these annotation data for each individual.
@@ -95,7 +94,10 @@ For JBrowse2 views:
 
 Other options for JBrowse2 are available by clicking the button in the top-left corner of each linear view.
 
-## Example for visualization of Xa7
+## Quick Start
+### Example for visualization of known genes
+
+### Example for visualization of Xa7 (novel sequence)
 This section we will describe the whole user path for visualization of the distributed gene Xa7.
 
 Xa7 is known to be absent in the reference genome, so the `Navigation Type=reference annotation gene ID` is unable for navigation. Then, the BLAT server is necessary to locate the Xa7 region. The Xa7 sequence is input into the BLAT server to find the target "tRegion":
