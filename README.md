@@ -95,7 +95,7 @@ For JBrowse2 views:
 Other options for JBrowse2 are available by clicking the button in the top-left corner of each linear view.
 
 ## Quick Start
-### Example for visualization of MSU RGAP7 genes (reference annotation)
+### Example for MSU RGAP7 genes (reference annotation)
 The visualization of reference annotation genes (e.g. `LOC_Os08g03060`) is simple with the steps below:
 - Select "chr08_mc" at `Data`;
 - Select "reference annotation gene ID" at `Navigation Type` and type the gene ID `LOC_Os08g03060` into `MSU RGAP7 Gene ID`;
@@ -103,7 +103,7 @@ The visualization of reference annotation genes (e.g. `LOC_Os08g03060`) is simpl
 
 <img src="public/Figure3.png" height="120px">
 
-### Example for visualization of distributed gene Xa7 (novel sequence)
+### Example for distributed gene Xa7 (novel sequence)
 This section we will describe the whole user path for visualization of the distributed gene Xa7.
 
 Xa7 is known to be absent in the reference genome, so the `Navigation Type=reference annotation gene ID` is unable for navigation. Then, the BLAT server is necessary to locate the Xa7 region. The Xa7 sequence is input into the BLAT server to find the target "tRegion":
@@ -122,7 +122,7 @@ Click the "Select all" button to visualize all individuals and click the "Compre
 
 ## Run PPanG for your own data
 
-- ### Install
+- #### Install
   clone the repo and install dependencies:
   ```shell
   git clone git@github.com:SJTU-CGM/PPanG.git
@@ -130,16 +130,16 @@ Click the "Select all" button to visualize all individuals and click the "Compre
   npm install # or yarn install
   ```
   tabix (https://github.com/samtools/tabix) and vg (https://github.com/vgteam/vg) are also needed in your `PATH`.
-- ### Configurations for SequenceTubeMap
+- #### Configuration for SequenceTubeMap
 
   The configuration of SequenceTubeMap view is in `src/config.json`, `dataPath` should be set to your own data folder (in PPanG `dataPath` is `riceData/`) and `DATA_SOURCES` correspond to the xg files in your `dataPath`. The reference is set in `reference`. The `name`, `alias` and `annotation` of `reference` can be the same. `bedFile` is only available if vg chunks are pre-processed, otherwise it should be removed. Other detailed configuration is available in SequenceTubeMap.
-- ### Configuration for JBrowse2
+- #### Configuration for JBrowse2
   All genomes and GFF3 annotations are needed in bgzip format (*.fasta.gz, *.fasta.gz.gzi, *.fasta.gz.fai, *.gff.gz, *.gff.gz.tbi) in `jbrowse/` folder.
-- ### Notes for BLAT server
-  Unfortunately, the total size of all 113 genomes in PPanG are over the max limit of the BLAT server. So indeed, these genomes are divided into 11 parts of database. The BLAT server searches part1 (for nine references) or all parts (for all genomes) for the query sequence and collects the results together. That explains why searching all genomes may exceed the time limit. We do not recommend deploying the BLAT server as PPanG does. For novel sequences, just use sequence alignment tool like BLAST at user's local machine is enough and ignore the BLAT server.
-- ### Other Configurations for PPanG
+- #### Notes for BLAT server
+  Unfortunately, the total size of all 113 genomes in PPanG is over the max limit of the BLAT server. So indeed, these genomes are divided into 11 parts of database. The BLAT server searches part1 (for nine references) or all parts (for all genomes) for the query sequence and collects the results together. That explains why searching all genomes may exceed the time limit. We do not recommend deploying the BLAT server as PPanG does. For novel sequences, just use sequence alignment tool like BLAST at user's local machine is enough and ignore the BLAT server.
+- #### Other Configurations for PPanG
   `builtin_genes.json` and `reference_genes.json` are required in `src/` folder. The format is
-  ```
+  ```json
   {
     "<data.xg>": {
       "<gene_id>": "<gene_region>",
@@ -149,7 +149,7 @@ Click the "Select all" button to visualize all individuals and click the "Compre
   }
   ```
   For example, the `builtin_genes.json` in PPanG is like:
-  ```
+  ```json
   {
     "chr01_mc.xg": {
       "sd1 (LOC_Os01g66100)": "IRGSP-1.0.chr01:38382381-38385503",
@@ -171,14 +171,14 @@ Click the "Select all" button to visualize all individuals and click the "Compre
 
 ## FAQ
 
-### Q: Why sometimes the linear view reports the bug like "failed to fetch data, reload"?
+#### Q: Why sometimes the linear view reports the bug like "failed to fetch data, reload"?
 A: This bug occurs possibly due to the network failure. Click the "reload" button will solve the problem.
-### Q: How to download the large pangenome graph?
+#### Q: How to download the large pangenome graph?
 A: The library used by "Download Image" button is designed for daily use, when users hardly need to download a so large graph. It is not suitable for the large pangenome data. As an alternative, we recommend a better way to download the large graph with a native tool in the Edge/Chrome browser. Press `F12` to open the developer tools. Select the `Elements` tab, double-click the `<div id="root">`, and double-click the `<div>` below. Then, right-click the `<div id="Pangenome browser">...</div>` and click `Capture node screenshot`. Then the browser will automatically download the large graph into `xx.png`.
 ![img.png](public/Figure11.png)
-### Q: Is it unavailable to search all genomes in the BLAT server if it exceeds the time limit?
+#### Q: Is it unavailable to search all genomes in the BLAT server if it exceeds the time limit?
 A: Actually, the BLAT server uses caches to store the alignment results. Although one request exceeds the time limit, the caches are still saved in the server. If the same request comes, the BLAT server will use cashes to avoid redundant calculations. So it is feasible to click the "Search" button again and again until success.
-### Q: Why one genome has more than one paths in some regions in the graph view?
+#### Q: Why one genome has more than one paths in some regions in the graph view?
 A: From the perspective of the whole pangenome graph, one genome should correspond to only one path exactly. But in a directed cyclic graph, one path may be truncated into different pieces within a target region. We show a simple demo in the figure below:
 ![img.png](public/Figure12.png)
 There are totally two paths in this graph. However, if the right part of this graph is extracted as marked in the figure, there will be many broken lines in the subgraph. Actually, how to extract a pretty subgraph from the original graph is also a challenge to pangenome graph algorithms.
