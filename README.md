@@ -12,7 +12,7 @@ Next we will explain these three areas in details.
 
 ### Navigation Area
 Navigation Area allows users to provide the custom region for visualization besides the default sd-1 gene region. The navigation is very simple within three steps:
-1. Select the target chromosome at "Data". Pangenome graphs built by both MC and PGGB are available for users to choose.
+1. Select the target chromosome at `Data`. Pangenome graphs built by both MC and PGGB are available for users to choose.
 2. Select the navigation type. There are three navigation types available:
 
    a) `Navigation Type=built-in genes`
@@ -74,7 +74,7 @@ As the list of reference gene IDs is available in PPanG, it is easy to navigate 
 Then input the "tRegion" (target region) of BLAT result as `Navigation Type=custom region` in 2c to visualize the custom region in PPanG.
 
 #### Annotation Data 
-The "Annotation Data" tab collects genome annotations within the target region. Click the "Download All" button to download these annotation data for each individual.
+The `Annotation Data` tab collects genome annotations within the target region. Click the "Download All" button to download these annotation data for each individual.
 
 #### Legend
 The legends of all aligned genome tracks in graph view are shown in this tab. By default, the nine reference genomes are selected to show, and users are available to select any individual to add it in the pangenome graph. To visualize all individuals, please click the "Select all" and wait a moment. The large pangenome graph may cost much time and memory.
@@ -95,21 +95,27 @@ For JBrowse2 views:
 Other options for JBrowse2 are available by clicking the button in the top-left corner of each linear view.
 
 ## Quick Start
-### Example for visualization of known genes
+### Example for visualization of MSU RGAP7 genes (reference annotation)
+The visualization of reference annotation genes (e.g. `LOC_Os08g03060`) is simple with the steps below:
+- Select "chr08_mc" at `Data`;
+- Select "reference annotation gene ID" at `Navigation Type` and type the gene ID `LOC_Os08g03060` into `MSU RGAP7 Gene ID`;
+- Click the "Go" button.
 
-### Example for visualization of Xa7 (novel sequence)
+<img src="public/Figure3.png" height="120px">
+
+### Example for visualization of distributed gene Xa7 (novel sequence)
 This section we will describe the whole user path for visualization of the distributed gene Xa7.
 
 Xa7 is known to be absent in the reference genome, so the `Navigation Type=reference annotation gene ID` is unable for navigation. Then, the BLAT server is necessary to locate the Xa7 region. The Xa7 sequence is input into the BLAT server to find the target "tRegion":
 ![](public/Figure7.png)
 As the BLAT result shows, there is only one match with the "tRegion" of `NATELBORO.chr06:28873554-28874897`. Then the region is provided in the `Navigation Area` step 2c:
-- Select "chr06_mc" at "Data";
-- Select "custom region" at "Navigation Type" and copy the tRegion `NATELBORO.chr06:28873554-28874897` into "Region";
+- Select "chr06_mc" at `Data`;
+- Select "custom region" at `Navigation Type` and copy the tRegion `NATELBORO.chr06:28873554-28874897` into `Region`;
 - Click the "Go" button.
 
 The visualization is shown below:
 ![img.png](public/Figure8.png)
-As this figure shows, only one track is visible for nine reference genomes. That is, Xa7 sequence is only present in one genome and absent in the other eight genomes. All aligned tracks are listed in the "Legend" tab:
+As this figure shows, only one track is visible for nine reference genomes. That is, Xa7 sequence is only present in one genome and absent in the other eight genomes. All aligned tracks are listed in the `Legend` tab:
 ![img.png](public/Figure9.png)
 Click the "Select all" button to visualize all individuals and click the "Compress" button at `Navigation Area` for a global overview. Double click some of the paths in graph view to add them into linear views. The final visualization is as follows:
 ![img.png](public/Figure10.png)
@@ -168,7 +174,7 @@ Click the "Select all" button to visualize all individuals and click the "Compre
 ### Q: Why sometimes the linear view reports the bug like "failed to fetch data, reload"?
 A: This bug occurs possibly due to the network failure. Click the "reload" button will solve the problem.
 ### Q: How to download the large pangenome graph?
-A: The library used by "Download Image" button is designed for daily use, when users hardly need to download a so large graph. It is not suitable for the large pangenome data. As an alternative, we recommend a better way to download the large graph with a native tool in the Edge/Chrome browser. Press `F12` to open the developer tools. Select the "Elements" tab, double-click the `<div id="root">`, and double-click the `<div>` below. Then, right-click the `<div id="Pangenome browser">...</div>` and click `Capture node screenshot`. Then the browser will automatically download the large graph into `xx.png`.
+A: The library used by "Download Image" button is designed for daily use, when users hardly need to download a so large graph. It is not suitable for the large pangenome data. As an alternative, we recommend a better way to download the large graph with a native tool in the Edge/Chrome browser. Press `F12` to open the developer tools. Select the `Elements` tab, double-click the `<div id="root">`, and double-click the `<div>` below. Then, right-click the `<div id="Pangenome browser">...</div>` and click `Capture node screenshot`. Then the browser will automatically download the large graph into `xx.png`.
 ![img.png](public/Figure11.png)
 ### Q: Is it unavailable to search all genomes in the BLAT server if it exceeds the time limit?
 A: Actually, the BLAT server uses caches to store the alignment results. Although one request exceeds the time limit, the caches are still saved in the server. If the same request comes, the BLAT server will use cashes to avoid redundant calculations. So it is feasible to click the "Search" button again and again until success.
