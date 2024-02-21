@@ -280,6 +280,7 @@ class VisualizationOptions extends Component {
                       setColorSetting={this.props.setColorSetting}
                     />)}
                 <h5 style={{marginTop: "20px"}}>JBrowse2 Views</h5>
+                  <p>Hint: Double-click a path in SequenceTubeMap View to add it in JBrowse2 Views.</p>
                 <Button
                   color="primary"
                   onClick={this.props.handleClickReorder}
