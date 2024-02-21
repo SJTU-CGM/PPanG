@@ -1,3 +1,5 @@
+[TOC]
+
 # PPanG: a precision pangenome browser enabling nucleotide-level analysis of genomic variations in individual genomes and their graph-based pangenome
 
 PPanG is a precision genome browser with a new perspective of pangenome. Existing pangenome browsers focus on the variations of nucleotide sequences, including base mutations and structural variations. However, pangenomic studies of the variations at gene level (presence/absence variations (PAV) and gene structural variations (gSV)) just stay on statistics, and the details of variation still remain unknown. PPanG provides nucleotide-accurate visualization of both genome sequences and genome annotations, making it clear to analyze the genomic variations from the nucleotide level to gene level.
@@ -45,7 +47,7 @@ There are several functional buttons beside <b>"Go"</b>:
 - <b>Download Image</b>: Download the visualization composed of graph view and linear views. Note that this function is not suitable for large graphs. For this use case, see `FAQ` for more details.
 
 ### Visualization Area
-The visualization of PPanG is composed of SequenceTubeMap graph view and JBrowse2 linear views. For interpretation of PPanG visualization, please refer to the PPanG homepage: https://cgm.sjtu.edu.cn/PPanG/. The custom options for visualization is available at `Functional Area`.
+The visualization of PPanG is composed of SequenceTubeMap graph view and JBrowse2 linear views. For interpretation of PPanG visualization, please refer to the PPanG homepage: https://cgm.sjtu.edu.cn/PPanG/. The custom options for visualization are available at `Functional Area`.
 #### Graph View in SequenceTubeMap
 In the graph view, the pangenome graph of nine representative genomes are visualized by default. The graph is ultra long because each nucleotide is visualized, and the graph can be translated by mouse-dragging, zoomed by mouse-scrolling and compressed by clicking the "Compress" button at `Navigation Area`.
 
@@ -77,20 +79,20 @@ Then input the "tRegion" (target region) of BLAT result as `Navigation Type=cust
 The `Annotation Data` tab collects genome annotations within the target region. Click the "Download All" button to download these annotation data for each individual.
 
 #### Legend
-The legends of all aligned genome tracks in graph view are shown in this tab. By default, the nine reference genomes are selected to show, and users are available to select any individual to add it in the pangenome graph. To visualize all individuals, please click the "Select all" and wait a moment. The large pangenome graph may cost much time and memory.
+The legends of all aligned genome tracks in graph view are shown in this tab. By default, the nine reference genomes are selected to show, and users are able to select any individual to add it in the pangenome graph. To visualize all individuals, please click the "Select all" and wait a moment. The large pangenome graph may cost much time and memory.
 
 #### Visualization Options
 There are some options to adjust the visualization in PPanG.
 
 For SequenceTubeMap view:
-- Hide nucleotide bases: Hide the text of nucleotide bases for simplicity.
-- Fully transparent nodes: Turn the nodes transparent. Otherwise, the nodes are covered with gray masks.
-- Show exons on genome tracks: Visualize the exons on genome tracks. Otherwise, only genome tracks are visualized.
-- Select genes of no interest to hide: Hide exons from the selected transcripts. It is useful when different transcripts overlap and cannot be distinguished.
-- Colors: By default, the genome tracks are colored in pale colors and exons are colored in grayscale. Users are available to select the color options to their preferences.
+- **Hide nucleotide bases**: Hide the text of nucleotide bases for simplicity.
+- **Fully transparent nodes**: Turn the nodes transparent. Otherwise, the nodes are covered with gray masks.
+- **Show exons on genome tracks**: Visualize the exons on genome tracks. Otherwise, only genome tracks are visualized.
+- **Select genes of no interest to hide**: Hide exons from the selected transcripts. It is useful when different transcripts overlap and cannot be distinguished.
+- **Colors**: By default, the genome tracks are colored in pale colors and exons are colored in grayscale. Users are able to select the color options to their preferences.
 
 For JBrowse2 views:
-- Rearrange linear views: Reorder or remove the linear views for better visualization.
+- **Rearrange linear views**: Reorder or remove the linear views for better visualization.
 
 Other options for JBrowse2 are available by clicking the button in the top-left corner of each linear view.
 
@@ -134,11 +136,11 @@ Click the "Select all" button to visualize all individuals and click the "Compre
 
   The configuration of SequenceTubeMap view is in `src/config.json`, `dataPath` should be set to your own data folder (in PPanG `dataPath` is `riceData/`) and `DATA_SOURCES` correspond to the xg files in your `dataPath`. The reference is set in `reference`. The `name`, `alias` and `annotation` of `reference` can be the same. `bedFile` is only available if vg chunks are pre-processed, otherwise it should be removed. Other detailed configuration is available in SequenceTubeMap.
 - #### Configuration for JBrowse2
-  All genomes and GFF3 annotations are needed in bgzip format (*.fasta.gz, *.fasta.gz.gzi, *.fasta.gz.fai, *.gff.gz, *.gff.gz.tbi) in `jbrowse/` folder.
+  All genomes and GFF3 annotations are needed in bgzip format with `tabix` index (*.fasta.gz, *.fasta.gz.gzi, *.fasta.gz.fai, *.gff.gz, *.gff.gz.tbi) in `jbrowse/` folder.
 - #### Notes for BLAT server
-  Unfortunately, the total size of all 113 genomes in PPanG is over the max limit of the BLAT server. So indeed, these genomes are divided into 11 parts of database. The BLAT server searches part1 (for nine references) or all parts (for all genomes) for the query sequence and collects the results together. That explains why searching all genomes may exceed the time limit. We do not recommend deploying the BLAT server as PPanG does. For novel sequences, just use sequence alignment tool like BLAST at user's local machine is enough and ignore the BLAT server.
+  Unfortunately, the total size of all 113 genomes in PPanG is over the max limit of the BLAT server. So indeed, these genomes are divided into 11 parts of database. The BLAT server searches part1 (for nine references) or all parts (for all genomes) for the query sequence and collects the results together. That explains why searching all genomes may exceed the time limit. We do not recommend deploying the BLAT server as PPanG does. For novel sequences, just use sequence alignment tool like BLAST at user's local machine and ignore the BLAT server.
 - #### Other Configurations for PPanG
-  `builtin_genes.json` and `reference_genes.json` are required in `src/` folder. The format is
+  `builtin_genes.json` and `reference_genes.json` are required in `src/` folder. The format is:
   ```json
   {
     "<data.xg>": {
