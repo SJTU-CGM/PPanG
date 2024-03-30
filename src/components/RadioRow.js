@@ -5,7 +5,7 @@ import { Col, Label, Input, FormGroup } from 'reactstrap';
 const colorMap = new Map([
   ['colorful', 'plainColors'],
   ['greyscale', 'greys'],
-  ['Ygreyscale', 'ygreys'],
+  // ['Ygreyscale', 'ygreys'],
   ['reds', 'reds'],
   ['blues', 'blues'],
   ['pale colors', 'lightColors']
@@ -50,7 +50,7 @@ RadioRow.propTypes = {
   color: PropTypes.string.isRequired,
   rowHeading: PropTypes.string.isRequired,
   setColorSetting: PropTypes.func.isRequired,
-  trackType: PropTypes.string.isRequired 
+  trackType: PropTypes.string.isRequired
 };
 
 export default RadioRow;
