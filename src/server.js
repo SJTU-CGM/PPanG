@@ -236,7 +236,7 @@ api.post('/getChunkedData', (req, res, next) => {
 function getChunkedData(req, res, next) {
   let sentResponse = false;
   let region = req.body.region;
-  let chrId = req.region.match(/chr\d\d/)
+  let chrId = region.match(/chr\d\d/)
   if (chrId !== null) {
     req.body.xgFile = req.body.xgFile.replace(/chr\d\d/, chrId)
   }
