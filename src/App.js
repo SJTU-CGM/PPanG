@@ -233,7 +233,7 @@ class App extends Component {
   }
 
   addJBrowseView = (trackName, location, addReference=false) => {
-    if ((!addReference && trackName.includes(config.reference.name)) ||
+    if ((!addReference && !trackName.includes('[')) ||
       this.state.jbrowseViewStates[trackName] !== undefined) return
     this.setState((state) => ({
       jbrowseViewStates: {

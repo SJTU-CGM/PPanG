@@ -451,15 +451,15 @@ class HeaderForm extends Component {
     const pathNamesFlag = true;
 
     return (
-      <div>
+      <div style={{marginLeft: "110px"}}>
         {errorDiv}
         <Container fluid={true}>
           <Row>
-            <Col md="1.5" style={{marginLeft: "20px"}}>
-              <a href="https://cgm.sjtu.edu.cn/PPanG" target="_blank">
-                <img src="./logo.png" style={{height: "70px"}} alt="Logo"/>
-              </a>
-            </Col>
+            {/*<Col md="1.5" style={{marginLeft: "20px"}}>*/}
+            {/*  <a href="https://cgm.sjtu.edu.cn/PPanG" target="_blank">*/}
+            {/*    <img src="./logo.png" style={{height: "70px"}} alt="Logo"/>*/}
+            {/*  </a>*/}
+            {/*</Col>*/}
             <Col>
               <Form inline>
                 <Label
